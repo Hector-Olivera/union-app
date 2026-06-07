@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/react-logo@3x.png",
         "backgroundColor": "#0a0a0a"
       },
       "package": "com.unionapp.base",
