@@ -1,6 +1,11 @@
 import { create } from 'zustand';
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  subscribeToAuthChanges,
+} from '@services/firebase/auth';
 
-// Define la forma del objeto usuario
 export type User = {
   id: string;
   email: string;
@@ -8,25 +13,58 @@ export type User = {
   avatarUrl?: string;
 };
 
-// Define todas las propiedades y acciones del store
 type AuthState = {
-  user: User | null;       // null = no hay sesión
-  loading: boolean;        // true mientras verifica sesión al arrancar
+  user: User | null;
+  loading: boolean;
+  error: string | null;
   isAuthenticated: boolean;
-  setUser: (user: User | null) => void;
-  setLoading: (loading: boolean) => void;
-  signOut: () => void;
+  // Acciones
+  initialize: () => () => void; // devuelve el unsubscribe
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, displayName: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  clearError: () => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  loading: true,
+  user:            null,
+  loading:         true,
+  error:           null,
   isAuthenticated: false,
 
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
-  // !!user convierte el objeto a boolean: si hay user = true, si es null = false
+  // Inicia el observer de Firebase. Se llama una vez al arrancar la app.
+  // Devuelve unsubscribe para limpiar cuando la app se cierra.
+  initialize: () => {
+    const unsubscribe = subscribeToAuthChanges((user) => {
+      set({ user, isAuthenticated: !!user, loading: false });
+    });
+    return unsubscribe;
+  },
 
-  setLoading: (loading) => set({ loading }),
+  login: async (email, password) => {
+    try {
+      set({ loading: true, error: null });
+      const user = await loginUser(email, password);
+      set({ user, isAuthenticated: true, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
 
-  signOut: () => set({ user: null, isAuthenticated: false }),
+  register: async (email, password, displayName) => {
+    try {
+      set({ loading: true, error: null });
+      const user = await registerUser(email, password, displayName);
+      set({ user, isAuthenticated: true, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  signOut: async () => {
+    await logoutUser();
+    set({ user: null, isAuthenticated: false });
+  },
+
+  clearError: () => set({ error: null }),
 }));
