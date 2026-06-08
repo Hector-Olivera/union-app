@@ -1,29 +1,42 @@
-import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { Colors, Typography, Spacing } from '@constants/theme';
+import { AuthButton } from '@features/auth/components/AuthButton';
 
-import { ThemedText } from '@/components/ui/themed-text';
-import { ThemedView } from '@/components/ui/themed-view';
-
+// Modal genérico reutilizable de la plataforma.
+// En el futuro recibirá contenido dinámico vía parámetros de ruta.
+// Ejemplo de uso: router.push('/modal?type=inventory')
 export default function ModalScreen() {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo style={styles.link}>
-        <ThemedText type="link">Go to home screen</ThemedText>
-      </Link>
-    </ThemedView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Modal</Text>
+      <Text style={styles.subtitle}>Contenido dinámico próximamente</Text>
+      <AuthButton
+        label="Cerrar"
+        onPress={() => router.back()}
+        variant="ghost"
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: Colors.dark.background,
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center',
+    padding: Spacing.xl,
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+  title: {
+    color: Colors.dark.text,
+    fontSize: Typography.sizes.xl,
+    fontWeight: Typography.weights.bold,
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    color: Colors.dark.icon,
+    fontSize: Typography.sizes.md,
+    marginBottom: Spacing.xl,
   },
 });
