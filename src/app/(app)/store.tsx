@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors, Typography, Spacing } from '@constants/theme';
 
-// Hub central de la plataforma.
-// Acá irán accesos rápidos a los módulos y actividad de la comunidad.
-export default function HomeScreen() {
+// Módulo de tienda: compras in-app, intercambios entre usuarios.
+// Integrará expo-in-app-purchases + Firestore para el catálogo.
+export default function StoreScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>UNION APP</Text>
-      <Text style={styles.title}>Inicio</Text>
-      <Text style={styles.subtitle}>Hub central — próximamente</Text>
+      <Text style={styles.label}>MÓDULO</Text>
+      <Text style={styles.title}>Tienda</Text>
+      <Text style={styles.subtitle}>Compras + intercambios — próximamente</Text>
     </View>
   );
 }
