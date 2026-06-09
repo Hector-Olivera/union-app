@@ -86,7 +86,7 @@ export default function LoginScreen() {
 
             <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>
-                ¿Olvidaste tu contraseña?
+                ¿Has Olvidado tu contraseña?        -.-
               </Text>
             </TouchableOpacity>
           </View>
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
+    marginBottom: Spacing.lg,
   },
   firebaseError: {
     backgroundColor: 'rgba(255,82,82,0.1)',
