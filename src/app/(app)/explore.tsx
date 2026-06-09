@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors, Typography, Spacing } from '@constants/theme';
 
-// Hub central de la plataforma.
-// Acá irán accesos rápidos a los módulos y actividad de la comunidad.
-export default function HomeScreen() {
+// Módulo de exploración: mapa de lugares, jugadores cercanos, comunidad.
+// Integrará expo-location + Google Maps API.
+export default function ExploreScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>UNION APP</Text>
-      <Text style={styles.title}>Inicio</Text>
-      <Text style={styles.subtitle}>Hub central — próximamente</Text>
+      <Text style={styles.label}>MÓDULO</Text>
+      <Text style={styles.title}>Explorar</Text>
+      <Text style={styles.subtitle}>Mapa + comunidad — próximamente</Text>
     </View>
   );
 }
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   label: {
-    color: Colors.brand.primary,
+    color: Colors.brand.secondary,
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
     letterSpacing: 4,
