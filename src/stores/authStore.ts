@@ -43,35 +43,27 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     try {
-    set({ loading: true, error: null });
-    await loginUser(email, password);
-    // El observer detecta el login y llama setUser automáticamente
-    // No seteamos user acá — evitamos doble actualización
-  } catch (error: any) {
-    set({ error: error.message, loading: false });
-  }
+      set({ loading: true, error: null });
+      const user = await loginUser(email, password);
+      set({ user, isAuthenticated: true, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
   },
 
   register: async (email, password, displayName) => {
     try {
       set({ loading: true, error: null });
-      await registerUser(email, password, displayName);
-      // Ídem — el observer maneja la actualización del estado
+      const user = await registerUser(email, password, displayName);
+      set({ user, isAuthenticated: true, loading: false });
     } catch (error: any) {
       set({ error: error.message, loading: false });
     }
   },
 
   signOut: async () => {
-      try {
-        set({ loading: true });
-        await logoutUser();
-        // No llamamos set({ user: null }) acá manualmente.
-        // El observer subscribeToAuthChanges lo detecta automáticamente
-        // y actualiza el store. Así hay una sola fuente de verdad.
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
-    }
+    await logoutUser();
+    set({ user: null, isAuthenticated: false });
   },
 
   clearError: () => set({ error: null }),
