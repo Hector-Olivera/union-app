@@ -14,42 +14,31 @@ export default function LoginScreen() {
   const { fields, errors, touchField, updateField, validateAll } = useAuthForm('login');
 
   const handleLogin = async () => {
-    // 1. Validar localmente antes de hacer cualquier llamada
     if (!validateAll()) return;
-    clearError(); // Limpia errores previos de Firebase
+    clearError();
     await login(fields.email, fields.password);
-    // El redirect lo maneja index.tsx via el observer de Firebase
-    // No navegamos manualmente acá — separación de responsabilidades
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      // iOS y Android manejan el teclado diferente
-      // 'padding' en iOS sube el contenido, 'height' en Android reduce el viewport
     >
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
-        // "handled" permite que los taps en botones funcionen
-        // incluso cuando el teclado está abierto
+        showsVerticalScrollIndicator={false}
       >
-        {/* Fondo decorativo */}
         <View style={styles.bgAccent} pointerEvents="none" />
 
         <View style={styles.container}>
 
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.tagline}>UNION APP</Text>
             <Text style={styles.title}>Bienvenido</Text>
-            <Text style={styles.subtitle}>
-              Ingresa al universo aumentado
-            </Text>
+            <Text style={styles.subtitle}>Ingresa al universo aumentado</Text>
           </View>
 
-          {/* Formulario */}
           <View style={styles.form}>
             <AuthInput
               label="Email"
@@ -71,7 +60,6 @@ export default function LoginScreen() {
               secureTextEntry
             />
 
-            {/* Error de Firebase (distinto a errores de validación local) */}
             {!!error && (
               <View style={styles.firebaseError}>
                 <Text style={styles.firebaseErrorText}>{error}</Text>
@@ -86,12 +74,11 @@ export default function LoginScreen() {
 
             <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>
-                ¿Has Olvidado tu contraseña?        -.-
-              </Text>
+                ¿Olvidaste tu contraseña? </Text>
             </TouchableOpacity>
           </View>
 
-          {/* Footer — navegación a Register */}
+          {/* Footer siempre visible — no depende de space-between */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>¿No tenés cuenta? </Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
@@ -106,10 +93,17 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: Colors.dark.background },
-  scroll: { flexGrow: 1 },
+  flex: {
+    flex: 1,
+    backgroundColor: Colors.dark.background,
+  },
+  scroll: {
+    // Sin flexGrow: 1 — dejamos que el contenido defina la altura
+    // Esto permite que el ScrollView haga scroll si el contenido
+    // no entra en pantalla, en lugar de comprimir los elementos
+    paddingBottom: Spacing.xl,
+  },
   bgAccent: {
-    // Círculo decorativo — da profundidad sin necesitar librerías externas
     position: 'absolute',
     top: -120,
     right: -80,
@@ -120,11 +114,10 @@ const styles = StyleSheet.create({
     opacity: 0.08,
   },
   container: {
-    flex: 1,
+    // Sin justifyContent: 'space-between' — causa que elementos
+    // queden fuera del viewport en pantallas pequeñas
     paddingHorizontal: Spacing.xl,
     paddingTop: 80,
-    paddingBottom: Spacing.xl,
-    justifyContent: 'space-between',
   },
   header: {
     marginBottom: Spacing.xxl,
@@ -148,7 +141,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.md,
   },
   form: {
-    flex: 1,
     marginBottom: Spacing.lg,
   },
   firebaseError: {
@@ -165,18 +157,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   forgotPassword: {
+    width: '100%',
     alignItems: 'center',
     paddingVertical: Spacing.md,
   },
   forgotPasswordText: {
     color: Colors.dark.icon,
     fontSize: Typography.sizes.sm,
+    textAlign: 'center',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xl,
   },
   footerText: {
     color: Colors.dark.icon,
