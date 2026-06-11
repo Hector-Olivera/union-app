@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   instructionContainer: {
     position: 'absolute',
-    bottom: '28%',
+    bottom: '33%',
     alignSelf: 'center',
   },
   instruction: {

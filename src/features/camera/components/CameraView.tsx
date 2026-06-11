@@ -1,39 +1,33 @@
 import { StyleSheet, View } from 'react-native';
 import { CameraView as ExpoCameraView } from 'expo-camera';
-import { Colors } from '@constants/theme';
-
-// Renombramos el import para no colisionar con el nombre de nuestro archivo
-// "ExpoCameraView" es el componente nativo de expo-camera
-// "CameraView.tsx" es nuestro wrapper con los controles integrados
 
 type Props = {
   cameraRef: React.RefObject<ExpoCameraView | null>;
   facing: 'front' | 'back';
   onReady: () => void;
+  onBarcodeScanned?: (data: { type: string; data: string }) => void;
   children?: React.ReactNode;
-  // children permite que el padre inyecte overlays AR encima de la cámara
-  // Así en la Capa 2 simplemente pasamos el overlay como hijo
+  // children ahora va FUERA de la cámara, en un View hermano
 };
 
 export const CameraViewComponent = ({
-  cameraRef,
-  facing,
-  onReady,
-  children,
+  cameraRef, facing, onReady, onBarcodeScanned, children,
 }: Props) => {
   return (
+    // El View contenedor es el que permite superponer elementos.
+    // La cámara y los overlays son hermanos dentro de este View,
+    // no padre e hijo. Los overlays usan position: absolute.
     <View style={styles.container}>
       <ExpoCameraView
         ref={cameraRef}
         style={styles.camera}
         facing={facing}
         onCameraReady={onReady}
-        // onCameraReady dispara cuando el hardware de la cámara
-        // terminó de inicializarse y está listo para recibir comandos
-      >
-        {/* Los children se renderizan encima de la cámara — para los overlays AR */}
-        {children}
-      </ExpoCameraView>
+        onBarcodeScanned={onBarcodeScanned}
+        barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+      />
+      {/* Children FUERA de ExpoCameraView — encima gracias a position absolute */}
+      {children}
     </View>
   );
 };
@@ -41,11 +35,12 @@ export const CameraViewComponent = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
+    // position: relative implícito — los hijos con position: absolute
+    // se posicionan relativo a este contenedor
   },
   camera: {
-    flex: 1,
-    // flex: 1 hace que la cámara ocupe todo el espacio disponible
-    // El viewport de la cámara se adapta al tamaño del contenedor
+    ...StyleSheet.absoluteFillObject,
+    // absoluteFillObject = { position: 'absolute', top:0, left:0, right:0, bottom:0 }
+    // La cámara llena el contenedor como capa base
   },
 });
