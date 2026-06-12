@@ -3,6 +3,7 @@ import { Stack, router, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@stores/authStore';
+import { injectWebGlobalStyles } from '@/utils/webStyles';
 
 export default function RootLayout() {
   const { initialize, isAuthenticated, loading } = useAuthStore();
@@ -12,6 +13,7 @@ export default function RootLayout() {
   // Nos permite saber en qué grupo de rutas estamos
 
   useEffect(() => {
+    injectWebGlobalStyles();
     const unsubscribe = initialize();
     return unsubscribe;
   }, []);
