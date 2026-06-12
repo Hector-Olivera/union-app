@@ -86,8 +86,7 @@ export default function LoginScreen() {
 
             <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>
-                ¿Olvidaste tu contraseña?
-              </Text>
+                ¿Olvidaste tu contraseña?  </Text>
             </TouchableOpacity>
           </View>
 
@@ -107,7 +106,10 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: Colors.dark.background },
-  scroll: { flexGrow: 1 },
+  scroll: { 
+    paddingBottom: Spacing.xl,
+    minHeight: '100%',
+   },
   bgAccent: {
     // Círculo decorativo — da profundidad sin necesitar librerías externas
     position: 'absolute',
@@ -120,11 +122,9 @@ const styles = StyleSheet.create({
     opacity: 0.08,
   },
   container: {
-    flex: 1,
     paddingHorizontal: Spacing.xl,
     paddingTop: 80,
     paddingBottom: Spacing.xl,
-    justifyContent: 'space-between',
   },
   header: {
     marginBottom: Spacing.xxl,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.md,
   },
   form: {
-    flex: 1,
+    marginBottom: Spacing.lg,
   },
   firebaseError: {
     backgroundColor: 'rgba(255,82,82,0.1)',
@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: Spacing.lg,
+     paddingBottom: Spacing.xl,
   },
   footerText: {
     color: Colors.dark.icon,
