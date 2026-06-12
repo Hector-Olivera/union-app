@@ -17,6 +17,15 @@ export const injectWebGlobalStyles = () => {
       caret-color: #ECEDEE;
       transition: background-color 9999s ease-in-out 0s;
     }
+
+  /* Oculta el scrollbar en todos los navegadores manteniendo la funcionalidad de scroll */
+  * {
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE / Edge */
+  }
+  *::-webkit-scrollbar {
+    display: none;                /* Chrome / Safari / Opera */
+  }
   `;
   document.head.appendChild(style);
 };  
