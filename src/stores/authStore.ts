@@ -61,10 +61,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  
   signOut: async () => {
-    await logoutUser();
-    set({ user: null, isAuthenticated: false });
+    try {
+      set({ loading: true });
+      await logoutUser();
+      // resetTheme se llama automáticamente desde _layout.tsx
+      // cuando isAuthenticated cambia a false
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
   },
-
   clearError: () => set({ error: null }),
 }));
