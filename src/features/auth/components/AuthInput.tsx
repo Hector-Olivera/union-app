@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, TextInput, Text, TouchableOpacity,
-  StyleSheet, Animated
+  StyleSheet, Animated, Platform 
 } from 'react-native';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
@@ -65,9 +65,14 @@ export const AuthInput = ({
             onPress={() => setIsVisible(v => !v)}
             style={styles.eyeButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            // hitSlop agranda el área táctil sin cambiar el tamaño visual
           >
-            <Text style={styles.eyeText}>{isVisible ? '🙈' : '👁'}</Text>
+            {isVisible ? (
+              // Ojo abierto — contraseña visible
+              <EyeOpenIcon />
+            ) : (
+              // Ojo cerrado — contraseña oculta
+              <EyeClosedIcon />
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -115,6 +120,9 @@ const styles = StyleSheet.create({
     color: Colors.dark.text,
     fontSize: Typography.sizes.md,
     height: '100%',
+     // @ts-ignore — 'outline' es una propiedad CSS válida en web
+    // react-native-web la soporta pero no está en los tipos de RN
+    ...(Platform.OS === 'web' && { outline: 'none' }),
   },
   eyeButton: {
     padding: Spacing.xs,
@@ -127,5 +135,54 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     marginTop: Spacing.xs,
     marginLeft: Spacing.xs,
+  },
+});
+// Íconos de ojo minimalistas — sin dependencias externas
+// Estética coherente con el tema HUD de la plataforma
+const EyeOpenIcon = () => (
+  <View style={iconStyles.container}>
+    {/* Forma del ojo — elipse con punto central */}
+    <View style={iconStyles.eyeOuter}>
+      <View style={iconStyles.eyeInner} />
+    </View>
+  </View>
+);
+
+const EyeClosedIcon = () => (
+  <View style={iconStyles.container}>
+    {/* Ojo cerrado — línea horizontal */}
+    <View style={iconStyles.eyeOuter}>
+      <View style={iconStyles.eyeClosed} />
+    </View>
+  </View>
+);
+
+const iconStyles = StyleSheet.create({
+  container: {
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eyeOuter: {
+    width: 18,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: Colors.dark.icon,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eyeInner: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: Colors.dark.icon,
+  },
+  eyeClosed: {
+    width: 14,
+    height: 1.5,
+    backgroundColor: Colors.dark.icon,
+    borderRadius: 1,
   },
 });

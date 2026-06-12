@@ -3,12 +3,13 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@stores/authStore';
+import { injectWebGlobalStyles } from '@/utils/webStyles';
 
 export default function RootLayout() {
   const { initialize } = useAuthStore();
 
   useEffect(() => {
-    // Inicia el observer y guarda el unsubscribe
+    injectWebGlobalStyles();
     const unsubscribe = initialize();
     // Cuando el componente se desmonta, cancela el observer
     // Esto evita memory leaks y llamadas a setState en componentes muertos

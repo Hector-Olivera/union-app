@@ -1,6 +1,10 @@
-// Este archivo se carga en web cuando no existe auth.native.ts
-// Web usa browserLocalPersistence en lugar de AsyncStorage
-import { initializeAuth, browserLocalPersistence } from 'firebase/auth';
+// Este archivo solo se carga en iOS y Android.
+// Metro resuelve automáticamente .native.ts sobre .ts en plataformas nativas.
+import { initializeAuth } from 'firebase/auth';
+// @ts-ignore — false-positive conocido de Firebase v10+ en RN
+import { getReactNativePersistence } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firebaseApp } from './config';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,19 +14,17 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { firebaseApp, db } from './config';
+import { db } from './config';
 import type { User } from '@stores/authStore';
 
 export const auth = initializeAuth(firebaseApp, {
-  persistence: browserLocalPersistence,
-  // browserLocalPersistence usa localStorage del navegador
-  // equivalente a AsyncStorage pero para web
+  persistence: getReactNativePersistence(AsyncStorage),
 });
 
 const mapFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => ({
   id:          firebaseUser.uid,
   email:       firebaseUser.email!,
-  displayName: firebaseUser.displayName || 'Usuario',
+  displayName: firebaseUser.displayName || 'Jugador',
   avatarUrl:   firebaseUser.photoURL || undefined,
 });
 
