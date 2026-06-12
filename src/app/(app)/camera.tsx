@@ -15,6 +15,8 @@ import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
 type CameraMode = 'ar' | 'qr';
 
+// Módulo de cámara: AR, escaneo QR, interacción con objetos 3D.
+// Integrará expo-camera + expo-barcode-scanner + motor AR.
 export default function CameraScreen() {
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<CameraMode>('ar');
