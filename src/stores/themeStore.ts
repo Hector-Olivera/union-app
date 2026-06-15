@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@services/firebase/config';
 
 // Paletas predefinidas de la plataforma.
@@ -90,7 +90,7 @@ export const useThemeStore = create<ThemeState>((set) => ({
     });
 
     try {
-      await updateDoc(doc(db, 'players', userId), { themeId });
+      await setDoc(doc(db, 'players', userId), { themeId }, { merge: true });
     } catch (error) {
       console.error('[themeStore] setTheme:', error);
       // Si falla el guardado, el tema igual queda aplicado localmente
