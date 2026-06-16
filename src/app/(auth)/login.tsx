@@ -8,6 +8,7 @@ import { AuthInput } from '@features/auth/components/AuthInput';
 import { AuthButton } from '@features/auth/components/AuthButton';
 import { useAuthForm } from '@features/auth/hooks/useAuthForm';
 import { Colors, Typography, Spacing } from '@constants/theme';
+import { authStyles } from '@features/auth/authStyles'; 
 
 export default function LoginScreen() {
   const { login, loading, error, clearError } = useAuthStore();
@@ -24,7 +25,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={authStyles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       // iOS y Android manejan el teclado diferente
       // 'padding' en iOS sube el contenido, 'height' en Android reduce el viewport
@@ -36,21 +37,21 @@ export default function LoginScreen() {
         // incluso cuando el teclado está abierto
       >
         {/* Fondo decorativo */}
-        <View style={styles.bgAccent} pointerEvents="none" />
+        <View style={authStyles.bgAccent} pointerEvents="none" />
 
-        <View style={styles.container}>
+        <View style={authStyles.container}>
 
           {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.tagline}>UNION APP</Text>
-            <Text style={styles.title}>Bienvenido</Text>
-            <Text style={styles.subtitle}>
+          <View style={authStyles.header}>
+            <Text style={authStyles.tagline}>UNION APP</Text>
+            <Text style={authStyles.title}>Bienvenido</Text>
+            <Text style={authStyles.subtitle}>
               Ingresa al universo aumentado
             </Text>
           </View>
 
           {/* Formulario */}
-          <View style={styles.form}>
+          <View style={authStyles.form}>
             <AuthInput
               label="Email"
               value={fields.email}
@@ -73,8 +74,8 @@ export default function LoginScreen() {
 
             {/* Error de Firebase (distinto a errores de validación local) */}
             {!!error && (
-              <View style={styles.firebaseError}>
-                <Text style={styles.firebaseErrorText}>{error}</Text>
+              <View style={authStyles.firebaseError}>
+                <Text style={authStyles.firebaseErrorText}>{error}</Text>
               </View>
             )}
 
@@ -91,10 +92,10 @@ export default function LoginScreen() {
           </View>
 
           {/* Footer — navegación a Register */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>¿No tenés cuenta? </Text>
+          <View style={authStyles.footer}>
+            <Text style={authStyles.footerText}>¿No tenés cuenta? </Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-              <Text style={styles.footerLink}>Registrate</Text>
+              <Text style={authStyles.footerLink}>Registrate</Text>
             </TouchableOpacity>
           </View>
 
@@ -105,64 +106,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: Colors.dark.background },
-  scroll: { 
-    paddingBottom: Spacing.xl,
-    minHeight: '100%',
-   },
-  bgAccent: {
-    // Círculo decorativo — da profundidad sin necesitar librerías externas
-    position: 'absolute',
-    top: -120,
-    right: -80,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: Colors.brand.primary,
-    opacity: 0.08,
-  },
-  container: {
-    paddingHorizontal: Spacing.xl,
-    paddingTop: 80,
-    paddingBottom: Spacing.xl,
-  },
-  header: {
-    marginBottom: Spacing.xxl,
-  },
-  tagline: {
-    color: Colors.brand.primary,
-    fontSize: Typography.sizes.xs,
-    fontWeight: Typography.weights.bold,
-    letterSpacing: 4,
-    textTransform: 'uppercase',
-    marginBottom: Spacing.sm,
-  },
-  title: {
-    color: Colors.dark.text,
-    fontSize: Typography.sizes.display,
-    fontWeight: Typography.weights.bold,
-    marginBottom: Spacing.xs,
-  },
-  subtitle: {
-    color: Colors.dark.icon,
-    fontSize: Typography.sizes.md,
-  },
-  form: {
-    marginBottom: Spacing.lg,
-  },
-  firebaseError: {
-    backgroundColor: 'rgba(255,82,82,0.1)',
-    borderWidth: 1,
-    borderColor: Colors.status.error,
-    borderRadius: 8,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-  },
-  firebaseErrorText: {
-    color: Colors.status.error,
-    fontSize: Typography.sizes.sm,
-    textAlign: 'center',
-  },
   forgotPassword: {
     alignItems: 'center',
     paddingVertical: Spacing.md,
@@ -170,21 +113,5 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     color: Colors.dark.icon,
     fontSize: Typography.sizes.sm,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: Spacing.lg,
-     paddingBottom: Spacing.xl,
-  },
-  footerText: {
-    color: Colors.dark.icon,
-    fontSize: Typography.sizes.sm,
-  },
-  footerLink: {
-    color: Colors.brand.primary,
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.semibold,
   },
 });

@@ -2,51 +2,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
 import { router } from 'expo-router';
 import type { QRScanResult } from '@/types/qr';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { QR_CONFIG } from '@constants/qrConfig';
 
 type Props = {
   result: QRScanResult;
   onDismiss: () => void;
 };
 
-// Mensajes y acciones según el tipo de QR detectado
-const QR_CONFIG = {
-  object_3d: {
-    label: 'OBJETO 3D',
-    color: Colors.brand.accent,
-    description: (id: string) => `Objeto: ${id}`,
-    actionLabel: 'Ver en AR',
-  },
-  location: {
-    label: 'LUGAR VIRTUAL',
-    color: Colors.brand.primary,
-    description: (id: string) => `Lugar: ${id}`,
-    actionLabel: 'Explorar lugar',
-  },
-  profile: {
-    label: 'JUGADOR',
-    color: Colors.brand.secondary,
-    description: (id: string) => `Usuario: ${id}`,
-    actionLabel: 'Ver perfil',
-  },
-  store_item: {
-    label: 'ITEM DE TIENDA',
-    color: Colors.status.success,
-    description: (id: string) => `Item: ${id}`,
-    actionLabel: 'Ver en tienda',
-  },
-  external_url: {
-    label: 'ENLACE EXTERNO',
-    color: Colors.status.warning,
-    description: (id: string) => id.slice(0, 40) + (id.length > 40 ? '...' : ''),
-    actionLabel: 'Abrir enlace',
-  },
-  unknown: {
-    label: 'QR NO RECONOCIDO',
-    color: Colors.dark.icon,
-    description: (id: string) => 'Este QR no pertenece al ecosistema Union App',
-    actionLabel: '',
-  },
-};
+
 
 export const QRResultOverlay = ({ result, onDismiss }: Props) => {
   const config = QR_CONFIG[result.payload.type];
