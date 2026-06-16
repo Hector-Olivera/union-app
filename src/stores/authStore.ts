@@ -24,6 +24,7 @@ type AuthState = {
   register: (email: string, password: string, displayName: string) => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
+  setUser: (user: User) => void;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -40,6 +41,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
     return unsubscribe;
   },
+
+  setUser: (user) => set({ user }),
 
   login: async (email, password) => {
     try {
@@ -61,10 +64,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  signOut: async () => {
-    await logoutUser();
-    set({ user: null, isAuthenticated: false });
+  
+    signOut: async () => {
+    try {
+      await logoutUser();
+      // Forzamos la limpieza del estado local inmediatamente
+      // sin esperar al observer — más rápido y confiable
+      set({ user: null, isAuthenticated: false, loading: false, error: null });
+    } catch (error: any) {
+      set({ loading: false, error: error.message });
+    }
   },
-
   clearError: () => set({ error: null }),
 }));
