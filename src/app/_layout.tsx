@@ -5,11 +5,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@stores/authStore';
 import { useThemeStore } from '@stores/themeStore';
 import { injectWebGlobalStyles } from '@utils/webStyles';
+import { useStoreStore } from '@stores/storeStore';
 
 export default function RootLayout() {
+  const { loadStore, clearStore } = useStoreStore();
   const { initialize, isAuthenticated, loading, user } = useAuthStore();
   const { loadUserTheme, resetTheme } = useThemeStore();
   const segments = useSegments();
+  
 
   useEffect(() => {
     injectWebGlobalStyles();
@@ -23,9 +26,11 @@ export default function RootLayout() {
     if (isAuthenticated && user) {
       // Usuario logueado → cargar su tema personalizado desde Firestore
       loadUserTheme(user.id);
+      loadStore(user.id);
     } else {
       // Usuario deslogueado → volver al tema default
       resetTheme();
+      clearStore();
     }
   }, [isAuthenticated, user, loading]);
 
