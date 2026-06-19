@@ -86,6 +86,14 @@ export default function AppLayout() {
               ),
             }}
           />
+          <Tabs.Screen
+            name="qrgenerator"
+            options={{
+              // href: null oculta esta ruta de la tab bar
+              // pero sigue siendo navegable con router.push()
+              href: null,
+            }}
+          />
         </Tabs>
     </View>
   );
