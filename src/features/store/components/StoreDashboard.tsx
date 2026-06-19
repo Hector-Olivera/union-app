@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { ThemePicker } from '@features/profile/components/ThemePicker';
 import { LayoutEditor } from './LayoutEditor';
@@ -44,7 +45,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         {/* Botón QR — placeholder por ahora */}
         <TouchableOpacity
           style={[styles.qrButton, { borderColor: colors.brand.primary }]}
-          onPress={() => console.log('TODO: QR generator')}
+          onPress={() => router.push('/(app)/qrgenerator')}
         >
           <Text style={[styles.qrButtonText, { color: colors.brand.primary }]}>
             Ver QR
