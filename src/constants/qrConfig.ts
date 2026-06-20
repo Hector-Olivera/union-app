@@ -4,6 +4,12 @@ import { Colors } from './theme';
 // Usada por QRResultOverlay y cualquier otro módulo que procese QRs.
 // Al agregar un nuevo tipo de QR, solo se edita este archivo.
 export const QR_CONFIG = {
+  store: {
+    label: 'TIENDA',
+    color: Colors.brand.primary,
+    description: (id: string) => `Tienda: ${id}`,
+    actionLabel: 'Ir a la tienda',
+  },
   object_3d: {
     label: 'OBJETO 3D',
     color: Colors.brand.accent,

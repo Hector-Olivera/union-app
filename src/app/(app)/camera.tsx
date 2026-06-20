@@ -12,6 +12,7 @@ import { ScanFrame } from '@features/camera/components/overlays/ScanFrame';
 import { PlayerTag } from '@features/camera/components/overlays/PlayerTag';
 import { QRResultOverlay } from '@features/camera/components/overlays/QRResultOverlay';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { StoreARPreview } from '@features/qr/components/StoreARPreview';
 
 type CameraMode = 'ar' | 'qr';
 
@@ -51,35 +52,49 @@ export default function CameraScreen() {
           {mode === 'ar' && (
             <>
               <ARCrosshair />
-              <PlayerTag name="Andres" level={5} position={{ x: 120, y: 180 }} />
+              <PlayerTag name="Andres" level={11} position={{ x: 120, y: 180 }} />
             </>
           )}
 
           {mode === 'qr' && !lastScan && <ScanFrame />}
 
-          {lastScan && (
-            <QRResultOverlay result={lastScan} onDismiss={clearScan} />
+          {lastScan && lastScan.payload.type === 'store' && (
+              <StoreARPreview
+                storeId={lastScan.payload.id}
+                onDismiss={clearScan}
+              />
           )}
+
+            {lastScan && lastScan.payload.type !== 'store' && (
+              <QRResultOverlay result={lastScan} onDismiss={clearScan} />
+            )}
 
         </AROverlayContainer>
       </CameraViewComponent>
 
-      <View style={[styles.modeSelector, { bottom: 130 + insets.bottom }]}>
-        <TouchableOpacity
-          style={[styles.modeButton, mode === 'ar' && styles.modeButtonActive]}
-          onPress={() => { setMode('ar'); clearScan(); }}
-        >
-          <Text style={[styles.modeText, mode === 'ar' && styles.modeTextActive]}>AR</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.modeButton, mode === 'qr' && styles.modeButtonActive]}
-          onPress={() => setMode('qr')}
-        >
-          <Text style={[styles.modeText, mode === 'qr' && styles.modeTextActive]}>QR</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Solo mostrar selector de modo si no hay un escaneo activo */}
+        {!lastScan && (
+          
+            <View style={[styles.modeSelector, { bottom: 130 + insets.bottom }]}>
+              <TouchableOpacity
+                style={[styles.modeButton, mode === 'ar' && styles.modeButtonActive]}
+                onPress={() => { setMode('ar'); clearScan(); }}
+              >
+                <Text style={[styles.modeText, mode === 'ar' && styles.modeTextActive]}>AR</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modeButton, mode === 'qr' && styles.modeButtonActive]}
+                onPress={() => setMode('qr')}
+              >
+                <Text style={[styles.modeText, mode === 'qr' && styles.modeTextActive]}>QR</Text>
+              </TouchableOpacity>
+            </View>
 
-      <CameraControls onFlip={toggleFacing} onCapture={takePicture} mode={mode} />
+            
+            
+        )}
+        <CameraControls onFlip={toggleFacing} onCapture={takePicture} mode={mode} hidden={!!lastScan} />
+      
     </View>
   );
 }
