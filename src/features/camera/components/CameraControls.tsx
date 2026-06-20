@@ -10,9 +10,11 @@ type Props = {
   // ar: flip + overlay controls
   // qr: solo scanning (sin botón de captura)
   // photo: flip + captura
+  hidden?: boolean;
 };
 
-export const CameraControls = ({ onFlip, onCapture, mode }: Props) => {
+export const CameraControls = ({ onFlip, onCapture, mode, hidden = false }: Props) => {
+   if (hidden) return null;
   return (
     <View style={styles.container}>
 
