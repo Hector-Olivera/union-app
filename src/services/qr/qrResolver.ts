@@ -39,7 +39,7 @@ const parseUnionAppQR = (content: string): QRPayload => {
   const [type, id, ...rest] = path.split('/');
 
   const validTypes: QRContentType[] = [
-    'object_3d', 'location', 'profile', 'store_item'
+    'object_3d', 'location', 'profile', 'store', 'store_item'
   ];
 
   const resolvedType: QRContentType = validTypes.includes(type as QRContentType)

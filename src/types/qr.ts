@@ -5,6 +5,7 @@ export type QRContentType =
   | 'object_3d'      // Renderizar un objeto 3D en AR
   | 'location'       // Lugar virtual con estética propia
   | 'profile'        // Perfil de otro usuario
+  | 'store'
   | 'store_item'     // Item de la tienda
   | 'external_url'   // URL externa — tratamos con cuidado
   | 'unknown';       // QR no reconocido por el ecosistema
