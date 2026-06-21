@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
-import { Colors, Typography, Radius } from '@constants/theme';
+import { createShadow } from '@utils/shadowStyle';
 
 type Props = {
   color: string;
@@ -51,6 +51,8 @@ export const ARLogoSpinner = ({
     outputRange: [0.4, 0.15, 0.4, 0.15, 0.4],
   });
 
+  const spinnerShadow = createShadow({ color, offsetY: 8, opacity: 0.5, radius: 16, elevation: 10 });
+
   return (
     <View style={styles.container}>
 
@@ -67,6 +69,7 @@ export const ARLogoSpinner = ({
       <Animated.View
         style={[
           styles.spinner,
+          spinnerShadow,
           {
             width: size,
             height: size,
@@ -79,7 +82,6 @@ export const ARLogoSpinner = ({
               { rotateY },
               { scaleX },
             ],
-            shadowColor: color,
           }
         ]}
       >
@@ -115,10 +117,6 @@ const styles = StyleSheet.create({
   spinner: {
     justifyContent: 'center',
     alignItems: 'center',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 10,
   },
   label: {
     color: '#fff',

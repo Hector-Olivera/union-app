@@ -43,7 +43,7 @@ export const QRResultOverlay = ({ result, onDismiss }: Props) => {
 
   return (
     // Fondo semitransparente que cubre la parte inferior de la pantalla
-    <View style={styles.container} pointerEvents="box-none">
+    <View style={[styles.container, { pointerEvents: 'box-none' }]}>
       <View style={styles.card}>
 
         {/* Indicador de tipo */}

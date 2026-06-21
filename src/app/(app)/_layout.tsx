@@ -94,6 +94,10 @@ export default function AppLayout() {
               href: null,
             }}
           />
+          <Tabs.Screen
+            name="store-view/[storeId]"
+            options={{ href: null }}
+          />
         </Tabs>
     </View>
   );

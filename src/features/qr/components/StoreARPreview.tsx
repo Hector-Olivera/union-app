@@ -1,9 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { ARLogoSpinner } from './ARLogoSpinner';
-import { useAppTheme } from '@hooks/useAppTheme';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { useStorePreview } from '@features/qr/hooks/useStorePreview';
+import { THEME_OPTIONS } from '@stores/themeStore';
 
 type Props = {
   storeId: string;
@@ -14,28 +14,27 @@ type Props = {
 // Reemplaza el QRResultOverlay genérico con una experiencia más rica:
 // logo girando con efecto 3D simulado + acción directa a la tienda.
 export const StoreARPreview = ({ storeId, onDismiss }: Props) => {
-  const { colors } = useAppTheme();
   const { store, loading } = useStorePreview(storeId);
 
 
-  const handleGoToStore = () => {
-    onDismiss();
-    // TODO: navegar a la vista pública de la tienda cuando exista
-    // Por ahora navega al dashboard si es la propia tienda del usuario
-    router.push('/(app)/store');
-  };
+ const handleGoToStore = () => {
+  onDismiss();
+  router.push(`/(app)/store-view/${storeId}`);
+};
 
   const displayName = loading ? 'Cargando...' : (store?.name || 'Tienda no encontrada');
   const initial = store?.name ? store.name.charAt(0).toUpperCase() : 'U';
 
+  const storeTheme = THEME_OPTIONS.find(t => t.id === store?.themeId) || THEME_OPTIONS[0];
+
   return (
-    <View style={styles.container} pointerEvents="box-none">
+    <View style={[styles.container, { pointerEvents: 'box-none' }]}>
 
       {/* Logo girando — el efecto AR principal */}
       <View style={styles.spinnerArea}>
         <ARLogoSpinner
-          color={colors.brand.primary}
-          secondaryColor={colors.brand.secondary}
+          color={storeTheme.primary}
+          secondaryColor={storeTheme.secondary}
           size={130}
           label={initial}
         />
@@ -50,7 +49,7 @@ export const StoreARPreview = ({ storeId, onDismiss }: Props) => {
 
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.goButton, { backgroundColor: colors.brand.primary }]}
+            style={[styles.goButton, { backgroundColor: storeTheme.primary }]}
             onPress={handleGoToStore}
             activeOpacity={0.85}
             disabled={!store}

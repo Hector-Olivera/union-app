@@ -6,9 +6,7 @@ import { Colors } from '@constants/theme';
 // Estética HUD militar — coherente con el tema de la plataforma.
 export const ARCrosshair = () => {
   return (
-    <View style={styles.container} pointerEvents="none">
-      {/* pointerEvents="none" en elementos decorativos puros —
-          nunca deben interceptar toques del usuario */}
+    <View style={[styles.container, { pointerEvents: 'none' }]}>
 
       {/* Las cuatro esquinas del marco */}
       <View style={[styles.corner, styles.topLeft]} />
