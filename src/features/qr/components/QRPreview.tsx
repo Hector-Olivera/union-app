@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { QRGeneratorConfig } from '@/types/qrGenerator';
+import { createShadow } from '@utils/shadowStyle';
 
 type Props = {
   config: QRGeneratorConfig;
@@ -86,18 +87,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.xl,
   },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: Radius.lg,
-    padding: Spacing.lg,
-    alignItems: 'center',
-    gap: Spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
+ card: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: Radius.lg,
+  padding: Spacing.lg,
+  alignItems: 'center',
+  gap: Spacing.sm,
+  ...createShadow({ color: '#000000', offsetY: 4, opacity: 0.3, radius: 8, elevation: 8 }),
+},
   appName: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,

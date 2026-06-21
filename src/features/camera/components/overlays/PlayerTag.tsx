@@ -22,7 +22,7 @@ export const PlayerTag = ({ name, level, position }: Props) => {
   // Si no, se renderiza en el flujo normal del contenedor padre.
 
   return (
-    <View style={[styles.container, positionStyle]} pointerEvents="none">
+    <View style={[styles.container, positionStyle, { pointerEvents: 'none' }]}>
 
       {/* Línea vertical que conecta el tag con el jugador */}
       <View style={styles.connector} />

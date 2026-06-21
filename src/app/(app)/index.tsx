@@ -6,11 +6,14 @@ import { useThemeStore } from '@stores/themeStore';
 import { AvatarPicker } from '@features/profile/components/AvatarPicker';
 import { CURRENT_APP_CONFIG } from '@constants/appConfig';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { useStoreStore } from '@stores/storeStore';
+import type { Store } from '@/types/store';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
   const { activeTheme } = useThemeStore();
+  const { store } = useStoreStore();
 
   if (!user) return null;
 
@@ -73,7 +76,7 @@ export default function HomeScreen() {
 
       {/* ── STORE CARD ── */}
       <SectionTitle title="Mi Tienda" />
-      <StoreCard activeTheme={activeTheme} />
+      <StoreCard activeTheme={activeTheme} store={store}/>
 
       {/* ── ACTIVIDAD ── */}
       <SectionTitle title="Actividad reciente" />
@@ -91,8 +94,41 @@ const SectionTitle = ({ title }: { title: string }) => (
   <Text style={styles.sectionTitle}>{title}</Text>
 );
 
-const StoreCard = ({ activeTheme }: { activeTheme: { primary: string; secondary: string; accent: string } }) => (
-  <TouchableOpacity
+const StoreCard = ({ 
+  activeTheme, store 
+}: { 
+  activeTheme: { primary: string; secondary: string; accent: string };
+  store: Store | null;
+ }) => {
+   if (store) {
+    return (
+      <TouchableOpacity
+        style={[styles.storeCard, { borderColor: `${activeTheme.primary}30` }]}
+        onPress={() => router.push('/(app)/store')}
+        activeOpacity={0.8}
+      >
+        <View style={styles.storeCardHeader}>
+          <Text style={styles.storeCardTitle}>{store.name}</Text>
+          <View style={[
+            styles.storeCardBadge,
+            { backgroundColor: `${activeTheme.primary}20`, borderColor: activeTheme.primary }
+          ]}>
+            <Text style={[styles.storeCardBadgeText, { color: activeTheme.primary }]}>
+              {store.isPublic ? 'PÚBLICA' : 'PRIVADA'}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.storeCardDescription}>
+          Gestioná tu tienda, tu QR y tus productos.
+        </Text>
+        <Text style={[styles.storeCardAction, { color: activeTheme.primary }]}>
+          Ver mi tienda →
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+  return (
+      <TouchableOpacity
     style={[styles.storeCard, { borderColor: `${activeTheme.secondary}30` }]}
     onPress={() => router.push('/(app)/store')}
     activeOpacity={0.8}
@@ -113,7 +149,8 @@ const StoreCard = ({ activeTheme }: { activeTheme: { primary: string; secondary:
     </Text>
     {/* TODO: cuando hasStore === true, mostrar estadísticas y notificaciones */}
   </TouchableOpacity>
-);
+  )
+ };
 
 const ActivityPlaceholder = ({ activeTheme }: { activeTheme: { primary: string; secondary: string; accent: string } }) => (
   <View style={[styles.activityCard, { borderColor: `${activeTheme.accent}20` }]}>

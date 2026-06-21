@@ -20,7 +20,7 @@ type CameraMode = 'ar' | 'qr';
 // Integrará expo-camera + expo-barcode-scanner + motor AR.
 export default function CameraScreen() {
   const insets = useSafeAreaInsets();
-  const [mode, setMode] = useState<CameraMode>('ar');
+  const [mode, setMode] = useState<CameraMode>('qr');
   const {
     cameraRef, facing, isReady, permission,
     setIsReady, toggleFacing, takePicture, requestPermission,
@@ -73,7 +73,7 @@ export default function CameraScreen() {
       </CameraViewComponent>
 
         {/* Solo mostrar selector de modo si no hay un escaneo activo */}
-        {!lastScan && (
+        {false && !lastScan && (
           
             <View style={[styles.modeSelector, { bottom: 130 + insets.bottom }]}>
               <TouchableOpacity

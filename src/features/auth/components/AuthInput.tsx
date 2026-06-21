@@ -120,9 +120,7 @@ const styles = StyleSheet.create({
     color: Colors.dark.text,
     fontSize: Typography.sizes.md,
     height: '100%',
-     // @ts-ignore — 'outline' es una propiedad CSS válida en web
-    // react-native-web la soporta pero no está en los tipos de RN
-    ...(Platform.OS === 'web' && { outline: 'none' }),
+    ...(Platform.OS === 'web' && { outlineWidth: 0, }),
   },
   eyeButton: {
     padding: Spacing.xs,

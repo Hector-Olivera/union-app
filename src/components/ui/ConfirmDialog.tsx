@@ -39,7 +39,7 @@ export const ConfirmDialog = ({
         onPress={onCancel}
       />
 
-      <View style={styles.centeredContainer} pointerEvents="box-none">
+      <View style={[styles.centeredContainer, { pointerEvents: 'box-none' }]}>
         <View style={styles.dialog}>
 
           <Text style={styles.title}>{title}</Text>

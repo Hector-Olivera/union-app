@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Text } from 'react-native';
 import { Colors, Typography, Spacing } from '@constants/theme';
+import { createShadow } from '@utils/shadowStyle';
 
 // Marco de escaneo animado para modo QR.
 // La línea que se mueve de arriba a abajo simula el escaneo activo
@@ -42,7 +43,7 @@ export const ScanFrame = () => {
   });
 
   return (
-    <View style={styles.container} pointerEvents="none">
+    <View style={[styles.container, { pointerEvents: 'none' }]}>
 
       {/* Overlay oscuro con hueco central — enfoca la atención en el QR */}
       <View style={[styles.mask, styles.maskTop]} />
@@ -148,11 +149,7 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: Colors.brand.accent,
     opacity: 0.8,
-    shadowColor: Colors.brand.accent,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    // El shadow crea un efecto glow alrededor de la línea de escaneo
+   ...createShadow({ color: '#000000', offsetY: 4, opacity: 0.3, radius: 8, elevation: 8 }),
   },
   instructionContainer: {
     position: 'absolute',

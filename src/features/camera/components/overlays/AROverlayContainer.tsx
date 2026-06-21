@@ -14,10 +14,7 @@ type Props = {
 // Cualquier overlay que creemos vive dentro de este contenedor.
 export const AROverlayContainer = ({ children }: Props) => {
   return (
-    <View style={styles.container} pointerEvents="box-none">
-      {/* pointerEvents="box-none" permite que los toques pasen
-          a través del contenedor pero sigan funcionando en los hijos.
-          Sin esto, el overlay bloquearía los controles de la cámara. */}
+    <View style={[styles.container, { pointerEvents: 'box-none' }]}>
       {children}
     </View>
   );

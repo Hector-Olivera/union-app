@@ -31,13 +31,13 @@ export default function LoginScreen() {
       // 'padding' en iOS sube el contenido, 'height' en Android reduce el viewport
     >
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={authStyles.scroll}
         keyboardShouldPersistTaps="handled"
         // "handled" permite que los taps en botones funcionen
         // incluso cuando el teclado está abierto
       >
         {/* Fondo decorativo */}
-        <View style={authStyles.bgAccent} pointerEvents="none" />
+        <View style={[authStyles.bgAccent, { pointerEvents: 'none' }]}/>
 
         <View style={authStyles.container}>
 
