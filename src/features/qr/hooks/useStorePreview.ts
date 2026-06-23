@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUserStore } from '@services/firebase/store';
+import { subscribeToStore } from '@services/firebase/store';
 import type { Store } from '@/types/store';
 
 // Busca los datos de una tienda por su ID cuando se escanea su QR.
@@ -15,9 +15,20 @@ export const useStorePreview = (storeId: string | null) => {
       return;
     }
     setLoading(true);
-    getUserStore(storeId)
-      .then(setStore)
-      .finally(() => setLoading(false));
+
+    const unsubscribe = subscribeToStore(storeId, (data) => {
+      setStore(data);
+      setLoading(false);
+    });
+
+    // Cleanup: cancela la suscripción cuando cambia el storeId
+    // o el componente se desmonta, evitando memory leaks
+    return () => unsubscribe();
+
+    
+
+
+
   }, [storeId]);
 
   return { store, loading };
