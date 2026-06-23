@@ -1,6 +1,6 @@
 import {
   doc, getDoc, setDoc, updateDoc,
-  collection, serverTimestamp
+  collection, serverTimestamp, onSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
 import type { Store, StoreSection } from '@/types/store';
@@ -54,4 +54,24 @@ export const updateStoreLayout = async (
   layout: StoreSection[]
 ): Promise<void> => {
   await updateDoc(doc(db, 'stores', storeId), { layout });
+};
+export const subscribeToStore = (
+  storeId: string,
+  callback: (store: Store | null) => void
+) => {
+  const unsubscribe = onSnapshot(
+    doc(db, 'stores', storeId),
+    (snap) => {
+      if (snap.exists()) {
+        callback({ id: snap.id, ...snap.data() } as Store);
+      } else {
+        callback(null);
+      }
+    },
+    (error) => {
+      console.error('[store] subscribeToStore:', error);
+      callback(null);
+    }
+  );
+  return unsubscribe;
 };

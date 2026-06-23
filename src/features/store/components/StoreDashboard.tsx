@@ -120,7 +120,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
           onPress={() => router.push(`/(app)/store-view/${store.id}`)}
         >
           <Text style={[styles.actionButtonText, { color: colors.brand.secondary }]}>
-            Ver Tienda
+            Mi Tienda
           </Text>
         </TouchableOpacity>
       </View>
