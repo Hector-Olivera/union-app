@@ -29,8 +29,8 @@ export default function RegisterScreen() {
         contentContainerStyle={authStyles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={authStyles.bgAccent} pointerEvents="none" />
-        <View style={styles.bgAccentSecondary} pointerEvents="none" />
+        <View style={[authStyles.bgAccent, { pointerEvents: 'none' }]} />
+        <View style={[styles.bgAccentSecondary, { pointerEvents: 'none' }]} />
 
         <View style={authStyles.container}>
 
@@ -52,7 +52,7 @@ export default function RegisterScreen() {
 
           <View style={authStyles.form}>
             <AuthInput
-              label="Nombre de jugador"
+              label="Nombre de usuario"
               value={fields.displayName || ''}
               onChangeText={(v) => updateField('displayName', v)}
               onBlur={() => touchField('displayName')}
