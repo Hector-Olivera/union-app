@@ -6,7 +6,12 @@ import { router } from 'expo-router';
 import { ThemePicker } from '@features/profile/components/ThemePicker';
 import { LayoutEditor } from './LayoutEditor';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { useRef } from 'react';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
+import { StoreLivePreview } from './StoreLivePreview';
+import { PreviewScrollButton } from './PreviewScrollButton';
 import type { Store } from '@/types/store';
+
 
 type Props = {
   store: Store;
@@ -21,6 +26,27 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(store.name);
   const [nameError, setNameError] = useState<string | null>(null);
+
+  const { useSplitLayout } = useResponsiveLayout();
+  const scrollRef = useRef<ScrollView>(null);
+  const previewYRef = useRef(0);
+
+  const scrollToPreview = () => {
+    scrollRef.current?.scrollTo({ y: previewYRef.current, animated: true });
+  };
+
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  const handleScroll = (e: any) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+    // Si estamos a menos de 100px del final del scroll, mostramos "volver arriba"
+    const isNearBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 100;
+    setShowBackToTop(isNearBottom);
+  };
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
 
   const handleSaveName = async () => {
     const trimmed = nameInput.trim();
@@ -43,18 +69,11 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
     setEditingName(false);
   };
 
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header de la tienda */}
+  const renderEditorContent = () => (
+    <>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-
           {editingName ? (
-            // Modo edición inline — mismo patrón que el nombre de usuario en perfil
             <View style={styles.nameEditContainer}>
               <TextInput
                 style={[
@@ -104,7 +123,6 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         </View>
       </View>
 
-      {/* Acciones de navegación: QR y Vista pública */}
       <View style={styles.actionsRow}>
         <TouchableOpacity
           style={[styles.actionButton, { borderColor: colors.brand.primary }]}
@@ -138,8 +156,59 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         layout={store.layout}
         onUpdate={onUpdateLayout}
       />
+    </>
+  );
 
-    </ScrollView>
+ if (useSplitLayout) {
+  // Layout dividido para web ancha: controles | preview fija
+  return (
+    <View style={styles.splitContainer}>
+      <ScrollView
+        style={styles.splitLeft}
+        contentContainerStyle={styles.splitLeftContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Todo el contenido de edición: header, nombre, acciones, tema, layout */}
+        {renderEditorContent()}
+      </ScrollView>
+
+      <View style={styles.splitRight}>
+        <StoreLivePreview store={store} />
+      </View>
+    </View>
+  );
+}
+
+// Layout apilado para mobile: todo en columna + botón flotante
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        ref={scrollRef}
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
+        {renderEditorContent()}
+
+        {/* La preview vive al final del scroll en mobile */}
+        <View
+          onLayout={(e) => { previewYRef.current = e.nativeEvent.layout.y; }}
+          // onLayout mide automáticamente la posición Y de este View
+          // apenas se renderiza — sin esto no sabríamos a dónde scrollear
+        >
+          <Text style={styles.previewSectionTitle}>Vista previa</Text>
+          <StoreLivePreview store={store} />
+        </View>
+      </ScrollView>
+
+      <PreviewScrollButton 
+        onPress={showBackToTop ? scrollToTop : scrollToPreview}
+        mode={showBackToTop ? 'up' : 'down'}
+       />
+      
+    </View>
   );
 };
 
@@ -229,5 +298,33 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',
     marginVertical: Spacing.lg,
+  },
+  splitContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    position: 'relative',
+    overflow: 'hidden',
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+  },
+  splitLeft: {
+    flex: 1.4,
+    paddingRight: Spacing.lg,
+  },
+  splitLeftContent: {
+    padding: Spacing.xl,
+  },
+  splitRight: {
+    flex: 1,
+    padding: Spacing.xl,
+    alignSelf: 'center',
+  },
+  previewSectionTitle: {
+    color: Colors.dark.text,
+    fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.semibold,
+    marginBottom: Spacing.md,
+    marginTop: Spacing.lg,
   },
 });
