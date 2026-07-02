@@ -42,7 +42,7 @@ export default function StoreScreen() {
 
   // Estado 3: tienda activa — mostrar dashboard
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, flex: 1  }]}>
       <StoreDashboard
         store={store}
         onUpdateLayout={updateLayout}
