@@ -3,7 +3,10 @@ import {
   collection, serverTimestamp, onSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
-import type { Store, StoreSection } from '@/types/store';
+import type { 
+  Store, StoreSection,
+  BusinessHours, TodoItem, Announcement
+ } from '@/types/store';
 import { DEFAULT_STORE_LAYOUT } from '@/types/store';
 
 // Obtener la tienda de un usuario por su ownerId
@@ -74,4 +77,30 @@ export const subscribeToStore = (
     }
   );
   return unsubscribe;
+};
+
+// Actualiza los horarios de atención completos
+export const updateBusinessHours = async (
+  storeId: string,
+  businessHours: BusinessHours
+): Promise<void> => {
+  await setDoc(doc(db, 'stores', storeId), { businessHours }, { merge: true });
+};
+
+// Reescribe la lista completa de pendientes.
+// Simple y confiable para listas chicas — evita la complejidad
+// de arrayUnion/arrayRemove con objetos (que requieren coincidencia exacta).
+export const updateTodos = async (
+  storeId: string,
+  todos: TodoItem[]
+): Promise<void> => {
+  await setDoc(doc(db, 'stores', storeId), { todos }, { merge: true });
+};
+
+// Reescribe la lista completa de novedades
+export const updateAnnouncements = async (
+  storeId: string,
+  announcements: Announcement[]
+): Promise<void> => {
+  await setDoc(doc(db, 'stores', storeId), { announcements }, { merge: true });
 };

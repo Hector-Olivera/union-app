@@ -34,11 +34,7 @@ export default function AppLayout() {
             tabBarShowLabel: true,
               // El contenido de cada tab se limita en ancho desde cada screen
               // La tab bar ocupa el 100% del ancho siempre
-              sceneStyle: Platform.OS === 'web' ? {
-                maxWidth: 480,
-                alignSelf: 'center',
-                width: '100%',
-              } : {},
+              
           }}
         >
           <Tabs.Screen
