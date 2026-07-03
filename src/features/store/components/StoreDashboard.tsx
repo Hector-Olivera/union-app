@@ -10,6 +10,10 @@ import { useRef } from 'react';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { StoreLivePreview } from './StoreLivePreview';
 import { PreviewScrollButton } from './PreviewScrollButton';
+import { StoreTabSelector, type DashboardTab } from './StoreTabSelector';
+import { BusinessHoursEditor } from './management/BusinessHoursEditor';
+import { TodoList } from './management/TodoList';
+import { AnnouncementsFeed } from './management/AnnouncementsFeed';
 import type { Store } from '@/types/store';
 
 
@@ -21,7 +25,11 @@ type Props = {
 
 export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) => {
   const { colors } = useAppTheme();
-  const { updateStoreName } = useStoreStore();
+  const [activeTab, setActiveTab] = useState<DashboardTab>('edit');
+  const {
+      updateStoreName, updateHours, addTodo, toggleTodo, deleteTodo,
+      addAnnouncement, deleteAnnouncement,
+    } = useStoreStore();
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(store.name);
@@ -69,8 +77,30 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
     setEditingName(false);
   };
 
+  const renderManagementContent = () => (
+  <>
+    <BusinessHoursEditor
+      hours={store.businessHours}
+      onUpdate={updateHours}
+    />
+    <View style={styles.divider} />
+    <TodoList
+      todos={store.todos}
+      onAdd={addTodo}
+      onToggle={toggleTodo}
+      onDelete={deleteTodo}
+    />
+    <View style={styles.divider} />
+    <AnnouncementsFeed
+      announcements={store.announcements}
+      onAdd={addAnnouncement}
+      onDelete={deleteAnnouncement}
+    />
+  </>
+);
+
   const renderEditorContent = () => (
-    <>
+  <>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           {editingName ? (
@@ -145,6 +175,13 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
       <View style={styles.divider} />
 
+      <StoreTabSelector activeTab={activeTab} onChange={setActiveTab} />
+
+      <View style={styles.divider} />
+
+    {activeTab === 'edit' ? (
+    <>
+
       <ThemePicker
         selectedThemeId={store.themeId}
         onSelect={onUpdateTheme}
@@ -157,7 +194,13 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         onUpdate={onUpdateLayout}
       />
     </>
+      ) : (
+      renderManagementContent()
+    )}
+  </>
   );
+
+
 
  if (useSplitLayout) {
   // Layout dividido para web ancha: controles | preview fija
