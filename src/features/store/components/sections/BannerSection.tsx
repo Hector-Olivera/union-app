@@ -1,37 +1,58 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { Colors, Typography } from '@constants/theme';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import { Typography } from '@constants/theme';
 
 type Props = {
   storeName: string;
   description: string;
   primaryColor: string;
   secondaryColor: string;
+  bannerUrl?: string;
 };
 
-// Banner: nombre grande de la tienda con fondo en degradado simulado
-// (dos bloques de color superpuestos con opacidad, sin librería de gradiente)
-export const BannerSection = ({ storeName, description, primaryColor, secondaryColor }: Props) => {
+export const BannerSection = ({
+   storeName, description, primaryColor, secondaryColor, bannerUrl
+   }: Props) => {
+  if (bannerUrl) {
+    return (
+      <View style={styles.container}>
+        <Image source={{ uri: bannerUrl }} style={styles.bannerImage} resizeMode="cover" />
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.container, { backgroundColor: primaryColor }]}>
+    <View style={[styles.container, styles.placeholderContainer, { backgroundColor: primaryColor }]}>
       <View style={[styles.overlay, { backgroundColor: secondaryColor }]} />
-      <Text style={styles.name}>{storeName}</Text>
-      {!!description && <Text style={styles.description}>{description}</Text>}
+      <View style={styles.textOverlay}>
+        <Text style={styles.name}>{storeName}</Text>
+        {!!description && <Text style={styles.description}>{description}</Text>}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 32,
-    paddingHorizontal: 24,
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 8,
+    minHeight: 80,
+  },
+   placeholderContainer: {
+    justifyContent: 'flex-end',
+  },
+   bannerImage: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
   },
   overlay: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
     opacity: 0.25,
+  },
+  textOverlay: {
+    padding: 24,
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   name: {
     color: '#fff',

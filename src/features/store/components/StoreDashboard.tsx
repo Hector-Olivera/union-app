@@ -14,6 +14,7 @@ import { StoreTabSelector, type DashboardTab } from './StoreTabSelector';
 import { BusinessHoursEditor } from './management/BusinessHoursEditor';
 import { TodoList } from './management/TodoList';
 import { AnnouncementsFeed } from './management/AnnouncementsFeed';
+import { ImagePickerField } from './ImagePickerField';
 import type { Store } from '@/types/store';
 
 
@@ -28,7 +29,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
   const [activeTab, setActiveTab] = useState<DashboardTab>('edit');
   const {
       updateStoreName, updateHours, addTodo, toggleTodo, deleteTodo,
-      addAnnouncement, deleteAnnouncement,
+      addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl,
     } = useStoreStore();
 
   const [editingName, setEditingName] = useState(false);
@@ -181,6 +182,28 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
     {activeTab === 'edit' ? (
     <>
+
+      <ImagePickerField
+        currentUrl={store.logoUrl}
+        onUploaded={updateLogoUrl}
+        aspectRatio={[1, 1]}
+        label="LOGO DE LA TIENDA"
+        folder="union-app/logos"
+        height={100}
+        placeholderIcon="🏪"
+      />
+
+      <ImagePickerField
+        currentUrl={store.bannerUrl}
+        onUploaded={updateBannerUrl}
+        aspectRatio={[16, 9]}
+        label="BANNER"
+        folder="union-app/banners"
+        height={140}
+        placeholderIcon="🖼"
+      />
+
+      <View style={styles.divider} />
 
       <ThemePicker
         selectedThemeId={store.themeId}

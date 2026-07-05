@@ -32,6 +32,7 @@ export const StoreSectionRenderer = ({ store }: Props) => {
                 key={section.id}
                 storeName={store.name}
                 primaryColor={theme.primary}
+                logoUrl={store.logoUrl}
               />
             );
           case 'banner':
@@ -42,6 +43,7 @@ export const StoreSectionRenderer = ({ store }: Props) => {
                 description={store.description}
                 primaryColor={theme.primary}
                 secondaryColor={theme.secondary}
+                bannerUrl={store.bannerUrl}
               />
             );
           case 'product_grid':
