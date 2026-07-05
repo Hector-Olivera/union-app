@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 const CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 
@@ -10,12 +12,10 @@ const MAX_FILE_SIZE_MB = 5;
 
 export type UploadResult = {
   url: string;      // URL pública final de la imagen
-  publicId: string; // ID interno de Cloudinary, útil para borrar después
+  publicId: string; // ID interno de Cloudinary
 };
 
 // Sube una imagen a Cloudinary desde su URI local (del picker).
-// Funciona igual en web y en native porque FormData + fetch
-// son estándares soportados en ambas plataformas.
 export const uploadImageToCloudinary = async (
   localUri: string,
   folder: string = 'union-app'
@@ -23,33 +23,37 @@ export const uploadImageToCloudinary = async (
 
   const formData = new FormData();
 
-  // En React Native, adjuntar un archivo a FormData requiere este
-  // formato específico de objeto (no es un File real como en web puro)
-  formData.append('file', {
-    uri: localUri,
-    type: 'image/jpeg',
-    name: `upload_${Date.now()}.jpg`,
-  } as any);
+
+  if (Platform.OS === 'web') {
+    // En web, localUri es un blob: URL. Necesitamos convertirlo
+    // a un Blob real con fetch antes de adjuntarlo — FormData en
+    // el navegador espera un objeto File/Blob, no un string de uri.
+    const response = await fetch(localUri);
+    const blob = await response.blob();
+    formData.append('file', blob, `upload_${Date.now()}.jpg`);
+  } else {
+    // En React Native nativo, este formato de objeto es el correcto
+    formData.append('file', {
+      uri: localUri,
+      type: 'image/jpeg',
+      name: `upload_${Date.now()}.jpg`,
+    } as any);
+  }
 
   formData.append('upload_preset', UPLOAD_PRESET);
   formData.append('folder', folder);
 
-  const response = await fetch(UPLOAD_URL, {
+  const uploadResponse = await fetch(UPLOAD_URL, {
     method: 'POST',
     body: formData,
-    headers: {
-      // No seteamos Content-Type manualmente — fetch lo genera solo
-      // con el boundary correcto cuando el body es FormData.
-      // Si lo forzamos nosotros, la subida falla silenciosamente.
-    },
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
+  if (!uploadResponse.ok) {
+    const errorData = await uploadResponse.json().catch(() => null);
     throw new Error(errorData?.error?.message || 'Error al subir la imagen');
   }
 
-  const data = await response.json();
+  const data = await uploadResponse.json();
 
   return {
     url: data.secure_url,

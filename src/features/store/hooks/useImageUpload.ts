@@ -23,7 +23,7 @@ export const useImageUpload = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       // allowsEditing habilita el recorte nativo del sistema,
       // con el aspecto forzado que le pasamos
