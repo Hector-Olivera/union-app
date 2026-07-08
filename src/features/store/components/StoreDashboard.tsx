@@ -15,6 +15,8 @@ import { BusinessHoursEditor } from './management/BusinessHoursEditor';
 import { TodoList } from './management/TodoList';
 import { AnnouncementsFeed } from './management/AnnouncementsFeed';
 import { ImagePickerField } from './ImagePickerField';
+import { useProducts } from '@features/store/hooks/useProducts';
+import { ProductCatalogEditor } from './management/ProductCatalogEditor';
 import type { Store } from '@/types/store';
 
 
@@ -26,7 +28,7 @@ type Props = {
 
 export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) => {
   const { colors } = useAppTheme();
-  const [activeTab, setActiveTab] = useState<DashboardTab>('edit');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('manage');
   const {
       updateStoreName, updateHours, addTodo, toggleTodo, deleteTodo,
       addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl,
@@ -35,6 +37,8 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(store.name);
   const [nameError, setNameError] = useState<string | null>(null);
+
+  const { products, loading: productsLoading, add, edit, remove } = useProducts(store.id);
 
   const { useSplitLayout } = useResponsiveLayout();
   const scrollRef = useRef<ScrollView>(null);
@@ -180,7 +184,17 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
       <View style={styles.divider} />
 
-    {activeTab === 'edit' ? (
+    {activeTab === 'manage' ? (
+      renderManagementContent()
+    ) : activeTab === 'products' ? (
+        <ProductCatalogEditor
+          products={products}
+          loading={productsLoading}
+          onAdd={add}
+          onEdit={edit}
+          onRemove={remove}
+        />
+      ) : (
     <>
 
       <ImagePickerField
@@ -217,8 +231,6 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         onUpdate={onUpdateLayout}
       />
     </>
-      ) : (
-      renderManagementContent()
     )}
   </>
   );
@@ -239,7 +251,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
       </ScrollView>
 
       <View style={styles.splitRight}>
-        <StoreLivePreview store={store} />
+        <StoreLivePreview store={store} products={products}/>
       </View>
     </View>
   );
@@ -265,7 +277,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
           // apenas se renderiza — sin esto no sabríamos a dónde scrollear
         >
           <Text style={styles.previewSectionTitle}>Vista previa</Text>
-          <StoreLivePreview store={store} />
+          <StoreLivePreview store={store} products={products}/>
         </View>
       </ScrollView>
 
