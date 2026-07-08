@@ -2,11 +2,17 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
-export type DashboardTab = 'edit' | 'manage';
+export type DashboardTab = 'manage' | 'products' | 'edit' ;
 
 type Props = {
   activeTab: DashboardTab;
   onChange: (tab: DashboardTab) => void;
+};
+
+const TAB_LABELS: Record<DashboardTab, string> = {
+  manage: 'Gestión',
+  products: 'Productos',
+  edit: 'Edición',
 };
 
 export const StoreTabSelector = ({ activeTab, onChange }: Props) => {
@@ -14,7 +20,7 @@ export const StoreTabSelector = ({ activeTab, onChange }: Props) => {
 
   return (
     <View style={styles.container}>
-      {(['edit', 'manage'] as DashboardTab[]).map((tab) => {
+      {(['manage', 'products', 'edit'] as DashboardTab[]).map((tab) => {
         const isActive = tab === activeTab;
         return (
           <TouchableOpacity
@@ -29,7 +35,7 @@ export const StoreTabSelector = ({ activeTab, onChange }: Props) => {
               styles.tabText,
               { color: isActive ? '#fff' : Colors.dark.icon }
             ]}>
-              {tab === 'edit' ? 'Edición' : 'Gestión'}
+              {TAB_LABELS[tab]}
             </Text>
           </TouchableOpacity>
         );

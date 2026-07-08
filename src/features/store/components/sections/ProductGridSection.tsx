@@ -1,27 +1,38 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import type { Product } from '@/types/product';
 
 type Props = {
   primaryColor: string;
+  products: Product[];
 };
 
-// Grilla de productos: placeholder hasta tener catálogo real.
-// Muestra 4 cards vacías para comunicar la estructura visual final.
-export const ProductGridSection = ({ primaryColor }: Props) => {
+export const ProductGridSection = ({ primaryColor, products }: Props) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Productos</Text>
-      <View style={styles.grid}>
-        {[1, 2, 3, 4].map((i) => (
-          <View key={i} style={styles.card}>
-            <View style={[styles.cardImage, { backgroundColor: `${primaryColor}15` }]} />
-            <Text style={styles.cardLabel}>Producto {i}</Text>
-          </View>
-        ))}
-      </View>
-      <Text style={styles.placeholder}>
-        El catálogo completo estará disponible próximamente.
-      </Text>
+
+      {products.length === 0 ? (
+        <Text style={styles.placeholder}>
+          Esta tienda todavía no agregó productos.
+        </Text>
+      ) : (
+        <View style={styles.grid}>
+          {products.map((product) => (
+            <View key={product.id} style={styles.card}>
+              {product.imageUrl ? (
+                <Image source={{ uri: product.imageUrl }} style={styles.cardImage} resizeMode="cover" />
+              ) : (
+                <View style={[styles.cardImage, { backgroundColor: `${primaryColor}15` }]} />
+              )}
+              <Text style={styles.cardLabel} numberOfLines={1}>{product.name}</Text>
+              <Text style={[styles.cardPrice, { color: primaryColor }]}>
+                ${product.price.toFixed(2)}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
@@ -34,6 +45,11 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.bold,
     marginBottom: Spacing.md,
   },
+  placeholder: {
+    color: Colors.dark.icon,
+    fontSize: Typography.sizes.sm,
+    fontStyle: 'italic',
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -41,7 +57,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flexBasis: '48%',
-    gap: 6,
+    gap: 4,
   },
   cardImage: {
     width: '100%',
@@ -49,14 +65,12 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
   },
   cardLabel: {
-    color: Colors.dark.icon,
+    color: Colors.dark.text,
     fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.medium,
   },
-  placeholder: {
-    color: Colors.dark.icon,
-    fontSize: Typography.sizes.xs,
-    textAlign: 'center',
-    marginTop: Spacing.sm,
-    opacity: 0.7,
+  cardPrice: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
   },
 });

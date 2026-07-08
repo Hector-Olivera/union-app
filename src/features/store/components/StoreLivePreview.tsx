@@ -3,9 +3,11 @@ import { View, Text, ScrollView, StyleSheet, LayoutChangeEvent } from 'react-nat
 import { StoreSectionRenderer } from './StoreSectionRenderer';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { Store } from '@/types/store';
+import { Product } from '@/types/product';
 
 type Props = {
   store: Store;
+  products?: Product[];
 };
 
 
@@ -15,18 +17,17 @@ const FRAME_VIEWPORT_HEIGHT = 650;
 
 const CONTENT_PADDING = Spacing.md;
 
-export const StoreLivePreview = ({ store }: Props) => {
+export const StoreLivePreview = ({ store, products = [] }: Props) => {
   const [contentHeight, setContentHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const hasMeasuredContent = useRef(false);
+  
 
   const handleContentLayout = (e: LayoutChangeEvent) => {
-    if (hasMeasuredContent.current) return;
+    
     const height = e.nativeEvent.layout.height;
-    if (height > 0) {
-      setContentHeight(height);
-      hasMeasuredContent.current = true;
-    }
+  if (height > 0 && Math.abs(height - contentHeight) > 1) {
+    setContentHeight(height);
+  }
   };
 
   const handleContainerLayout = (e: LayoutChangeEvent) => {
@@ -59,7 +60,7 @@ export const StoreLivePreview = ({ store }: Props) => {
           {/* Medidor invisible a ancho fijo — mide el alto real una sola vez */}
           <View style={styles.measurer} pointerEvents="none">
             <View style={{ width: REFERENCE_WIDTH }} onLayout={handleContentLayout}>
-              <StoreSectionRenderer store={store} />
+              <StoreSectionRenderer store={store} products={products}/>
             </View>
           </View>
 
@@ -77,7 +78,7 @@ export const StoreLivePreview = ({ store }: Props) => {
             ]}
             pointerEvents="none"
           >
-            <StoreSectionRenderer store={store} />
+            <StoreSectionRenderer store={store} products={products}/>
           </View>
 
           {/* Spacer: reserva el espacio real que ocupa el contenido
