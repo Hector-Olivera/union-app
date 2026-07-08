@@ -14,6 +14,9 @@ import { StoreTabSelector, type DashboardTab } from './StoreTabSelector';
 import { BusinessHoursEditor } from './management/BusinessHoursEditor';
 import { TodoList } from './management/TodoList';
 import { AnnouncementsFeed } from './management/AnnouncementsFeed';
+import { ImagePickerField } from './ImagePickerField';
+import { useProducts } from '@features/store/hooks/useProducts';
+import { ProductCatalogEditor } from './management/ProductCatalogEditor';
 import type { Store } from '@/types/store';
 
 
@@ -25,15 +28,17 @@ type Props = {
 
 export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) => {
   const { colors } = useAppTheme();
-  const [activeTab, setActiveTab] = useState<DashboardTab>('edit');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('manage');
   const {
       updateStoreName, updateHours, addTodo, toggleTodo, deleteTodo,
-      addAnnouncement, deleteAnnouncement,
+      addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl,
     } = useStoreStore();
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(store.name);
   const [nameError, setNameError] = useState<string | null>(null);
+
+  const { products, loading: productsLoading, add, edit, remove } = useProducts(store.id);
 
   const { useSplitLayout } = useResponsiveLayout();
   const scrollRef = useRef<ScrollView>(null);
@@ -179,8 +184,40 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
       <View style={styles.divider} />
 
-    {activeTab === 'edit' ? (
+    {activeTab === 'manage' ? (
+      renderManagementContent()
+    ) : activeTab === 'products' ? (
+        <ProductCatalogEditor
+          products={products}
+          loading={productsLoading}
+          onAdd={add}
+          onEdit={edit}
+          onRemove={remove}
+        />
+      ) : (
     <>
+
+      <ImagePickerField
+        currentUrl={store.logoUrl}
+        onUploaded={updateLogoUrl}
+        aspectRatio={[1, 1]}
+        label="LOGO DE LA TIENDA"
+        folder="union-app/logos"
+        height={100}
+        placeholderIcon="🏪"
+      />
+
+      <ImagePickerField
+        currentUrl={store.bannerUrl}
+        onUploaded={updateBannerUrl}
+        aspectRatio={[16, 9]}
+        label="BANNER"
+        folder="union-app/banners"
+        height={140}
+        placeholderIcon="🖼"
+      />
+
+      <View style={styles.divider} />
 
       <ThemePicker
         selectedThemeId={store.themeId}
@@ -194,8 +231,6 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         onUpdate={onUpdateLayout}
       />
     </>
-      ) : (
-      renderManagementContent()
     )}
   </>
   );
@@ -216,7 +251,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
       </ScrollView>
 
       <View style={styles.splitRight}>
-        <StoreLivePreview store={store} />
+        <StoreLivePreview store={store} products={products}/>
       </View>
     </View>
   );
@@ -242,7 +277,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
           // apenas se renderiza — sin esto no sabríamos a dónde scrollear
         >
           <Text style={styles.previewSectionTitle}>Vista previa</Text>
-          <StoreLivePreview store={store} />
+          <StoreLivePreview store={store} products={products}/>
         </View>
       </ScrollView>
 

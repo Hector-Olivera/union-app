@@ -7,6 +7,8 @@ import { THEME_OPTIONS } from '@stores/themeStore';
 import { useAuthStore } from '@stores/authStore';
 import { useStoreStore } from '@stores/storeStore';
 import { Colors, Typography, Spacing } from '@constants/theme';
+import { useProducts } from '@features/store/hooks/useProducts';
+
 
 // Vista pública de una tienda — lo que ve cualquier visitante.
 // Renderiza las secciones visibles del layout configurado por el dueño,
@@ -19,6 +21,8 @@ export default function StoreViewScreen() {
 
   const { user } = useAuthStore();
   const { store: myStore } = useStoreStore();
+
+  const { products } = useProducts(store?.id);
 
   if (loading) {
     return (
@@ -65,7 +69,7 @@ export default function StoreViewScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <StoreSectionRenderer store={store} />
+        <StoreSectionRenderer store={store} products={products} />
       </ScrollView>
 
     </View>

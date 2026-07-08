@@ -7,16 +7,14 @@ import { ContactSection } from './sections/ContactSection';
 import { CarouselSection } from './sections/CarouselSection';
 import type { Store } from '@/types/store';
 import { THEME_OPTIONS } from '@stores/themeStore';
+import { Product } from '@/types/product';
 
 type Props = {
   store: Store;
+  products?: Product[];
 };
 
-// Renderiza las secciones visibles del layout de la tienda, en orden.
-// El carrusel todavía no tiene componente propio — se omite hasta
-// que tengamos imágenes reales que mostrar (no tiene sentido un
-// placeholder de carrusel vacío).
-export const StoreSectionRenderer = ({ store }: Props) => {
+export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
   const theme = THEME_OPTIONS.find(t => t.id === store.themeId) || THEME_OPTIONS[0];
   const visibleSections = store.layout
     .filter(s => s.visible)
@@ -32,6 +30,7 @@ export const StoreSectionRenderer = ({ store }: Props) => {
                 key={section.id}
                 storeName={store.name}
                 primaryColor={theme.primary}
+                logoUrl={store.logoUrl}
               />
             );
           case 'banner':
@@ -42,6 +41,7 @@ export const StoreSectionRenderer = ({ store }: Props) => {
                 description={store.description}
                 primaryColor={theme.primary}
                 secondaryColor={theme.secondary}
+                bannerUrl={store.bannerUrl}
               />
             );
           case 'product_grid':
@@ -49,6 +49,7 @@ export const StoreSectionRenderer = ({ store }: Props) => {
               <ProductGridSection
                 key={section.id}
                 primaryColor={theme.primary}
+                products={products}
               />
             );
           case 'about':
