@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { useThemeStore } from '@stores/themeStore';
@@ -85,8 +85,6 @@ export default function AppLayout() {
           <Tabs.Screen
             name="qrgenerator"
             options={{
-              // href: null oculta esta ruta de la tab bar
-              // pero sigue siendo navegable con router.push()
               href: null,
             }}
           />
@@ -94,6 +92,8 @@ export default function AppLayout() {
             name="store-view/[storeId]"
             options={{ href: null }}
           />
+          <Tabs.Screen name="edit-profile" options={{ href: null }} />
+          <Tabs.Screen name="change-password" options={{ href: null }} />
         </Tabs>
     </View>
   );
