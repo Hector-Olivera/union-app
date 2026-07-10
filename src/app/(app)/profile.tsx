@@ -12,8 +12,13 @@ import { StoreActivation } from '@features/profile/components/StoreActivation';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { useAuthStore } from '@stores/authStore';
 import { Typography, Spacing, Radius, Colors } from '@constants/theme';
+import { EmailVerificationBanner } from '@features/profile/components/EmailVerificationBanner';
+import { router } from 'expo-router';
+import { useStoreStore } from '@stores/storeStore';
+
 
 export default function ProfileScreen() {
+  const { store } = useStoreStore();
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const { signOut } = useAuthStore();
@@ -57,48 +62,17 @@ export default function ProfileScreen() {
               displayName={user.displayName}
               avatarUrl={user.avatarUrl}
               size={90}
-              onPress={() => setEditingName(true)}
             />
 
             <View style={styles.userInfo}>
-              {editingName ? (
-                // Modo edición inline del nombre
-                <View style={styles.nameEditContainer}>
-                  <TextInput
-                    style={[styles.nameInput, { borderColor: colors.brand.primary, color: Colors.dark.text }]}
-                    value={nameInput}
-                    onChangeText={setNameInput}
-                    autoFocus
-                    onSubmitEditing={handleSaveName}
-                    maxLength={20}
-                  />
-                  <View style={styles.nameEditActions}>
-                    <TouchableOpacity
-                      onPress={handleSaveName}
-                      disabled={saving}
-                      style={[styles.nameActionBtn, { backgroundColor: colors.brand.primary }]}
-                    >
-                      <Text style={styles.nameActionText}>{saving ? '...' : '✓'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => { setEditingName(false); setNameInput(user.displayName); }}
-                      style={[styles.nameActionBtn, { backgroundColor: 'rgba(255,255,255,0.1)' }]}
-                    >
-                      <Text style={styles.nameActionText}>✕</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ) : (
-                // Modo visualización del nombre
-                <TouchableOpacity onPress={() => setEditingName(true)}>
+                <TouchableOpacity>
                   <Text style={styles.displayName}>{user.displayName}</Text>
-                  <Text style={styles.editHint}>Toca para editar</Text>
                 </TouchableOpacity>
-              )}
-
               <Text style={styles.email}>{user.email}</Text>
             </View>
           </View>
+
+          <EmailVerificationBanner />
 
           {/* Error global */}
           {!!error && (
@@ -120,8 +94,7 @@ export default function ProfileScreen() {
 
           {/* Activación de tienda */}
           <StoreActivation
-            hasStore={false}
-            // hasStore vendrá de Firestore en la próxima iteración
+            hasStore={!!store}           
             onActivate={activateStore}
             saving={saving}
           />
@@ -130,22 +103,15 @@ export default function ProfileScreen() {
 
           {/* Opciones de cuenta */}
           <View style={styles.accountSection}>
-            <TouchableOpacity style={styles.accountRow}>
-              <Text style={styles.accountRowText}>Cambiar contraseña</Text>
+            <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/edit-profile')}>
+              <Text style={styles.accountRowText}>Editar perfil  </Text>
               <Text style={styles.accountRowArrow}>›</Text>
             </TouchableOpacity>
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.accountRow}>
-              <Text style={styles.accountRowText}>Notificaciones</Text>
-              <Text style={styles.accountRowArrow}>›</Text>
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.accountRow}>
-              <Text style={styles.accountRowText}>Privacidad</Text>
+            <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/change-password')}>
+              <Text style={styles.accountRowText}>Cambiar contraseña </Text>
               <Text style={styles.accountRowArrow}>›</Text>
             </TouchableOpacity>
           </View>

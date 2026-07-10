@@ -4,13 +4,17 @@ import {
   registerUser,
   logoutUser,
   subscribeToAuthChanges,
+  updateUserProfile, sendVerificationEmail, reloadCurrentUser,
 } from '@services/firebase/auth';
 
 export type User = {
   id: string;
   email: string;
   displayName: string;
+  firstName?: string;
+  lastName?: string;
   avatarUrl?: string;
+  emailVerified: boolean;
 };
 
 type AuthState = {
@@ -25,9 +29,12 @@ type AuthState = {
   signOut: () => Promise<void>;
   clearError: () => void;
   setUser: (user: User) => void;
+  updateProfileInfo: (firstName: string, lastName: string, avatarUrl?: string) => Promise<void>;
+  resendVerification: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user:            null,
   loading:         true,
   error:           null,
@@ -74,6 +81,24 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       set({ loading: false, error: error.message });
     }
+  },
+    updateProfileInfo: async (firstName, lastName, avatarUrl) => {
+    const { user } = get();
+    if (!user) return;
+    const displayName = `${firstName} ${lastName}`.trim();
+    await updateUserProfile(user.id, { firstName, lastName, displayName, avatarUrl });
+    set({ user: { ...user, firstName, lastName, displayName, avatarUrl: avatarUrl ?? user.avatarUrl } });
+  },
+
+  resendVerification: async () => {
+    await sendVerificationEmail();
+  },
+
+  refreshUser: async () => {
+    // Recarga el estado de verificación desde Firebase
+    // (necesario porque emailVerified no cambia solo — hay que refrescar)
+    const updated = await reloadCurrentUser();
+    if (updated) set({ user: updated });
   },
   clearError: () => set({ error: null }),
 }));
