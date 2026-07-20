@@ -7,12 +7,16 @@ import { useAuthStore } from '@stores/authStore';
 import { AuthInput } from '@features/auth/components/AuthInput';
 import { AuthButton } from '@features/auth/components/AuthButton';
 import { useAuthForm } from '@features/auth/hooks/useAuthForm';
+import { useGoogleSignIn } from '@features/auth/hooks/useGoogleSignIn';
+import { GoogleSignInButton } from '@features/auth/components/GoogleSignInButton';
+import { AuthDivider } from '@features/auth/components/AuthDivider';
 import { Colors, Typography, Spacing } from '@constants/theme';
-import { authStyles } from '@features/auth/authStyles'; 
+import { authStyles } from '@features/auth/authStyles';
 
 export default function RegisterScreen() {
   const { register, loading, error, clearError } = useAuthStore();
   const { fields, errors, touchField, updateField, validateAll } = useAuthForm('register');
+  const { signInWithGoogle, loading: googleLoading, error: googleError } = useGoogleSignIn();
 
   const handleRegister = async () => {
     if (!validateAll()) return;
@@ -100,6 +104,19 @@ export default function RegisterScreen() {
               loading={loading}
             />
           </View>
+
+          <AuthDivider />
+
+          {!!googleError && (
+            <View style={authStyles.firebaseError}>
+              <Text style={authStyles.firebaseErrorText}>{googleError}</Text>
+            </View>
+          )}
+
+          <GoogleSignInButton
+            onPress={signInWithGoogle}
+            loading={googleLoading}
+          />
 
           <View style={authStyles.footer}>
             <Text style={authStyles.footerText}>¿Ya tenés cuenta? </Text>
