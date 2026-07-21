@@ -54,11 +54,11 @@ export const StoreActivation = ({ hasStore, onActivate, saving }: Props) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.storeButton, { borderColor: colors.brand.accent }]}
-            onPress={() => console.log('TODO: QR generator')}
+            onPress={() => router.push('/(app)/qrgenerator')}
             activeOpacity={0.8}
           >
             <Text style={[styles.storeButtonText, { color: colors.brand.accent }]}>
-              Generar QR
+              Ver QR
             </Text>
           </TouchableOpacity>
         </View>

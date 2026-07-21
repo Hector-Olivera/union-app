@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { Typography, Spacing, Radius } from '@constants/theme';
 
@@ -40,14 +40,22 @@ export const AvatarPicker = ({ displayName, avatarUrl, size = 80, onPress }: Pro
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: bgColor,
+        backgroundColor: avatarUrl ? 'transparent' : bgColor,
         borderColor: colors.brand.primary,
       }]}
       activeOpacity={0.8}
     >
-      <Text style={[styles.initials, { fontSize: size * 0.35 }]}>
-        {initials}
-      </Text>
+      {avatarUrl ? (        
+        <Image
+          source={{ uri: avatarUrl }}
+          style={{ width: size, height: size, borderRadius: size / 2 }}
+          resizeMode="cover"
+        />
+      ) : (
+        <Text style={[styles.initials, { fontSize: size * 0.35 }]}>
+          {initials}
+        </Text>
+      )}
 
       {/* Indicador de edición */}
       {onPress && (
