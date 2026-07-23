@@ -4,7 +4,9 @@ export type StoreSectionType =
   | 'carousel'
   | 'product_grid'
   | 'about'
-  | 'contact';
+  | 'contact'
+  | 'hours'
+  | 'announcements'; 
 
 export type StoreSection = {
   id: string;
@@ -28,6 +30,13 @@ export type Store = {
   businessHours?: BusinessHours;
   todos?: TodoItem[];
   announcements?: Announcement[];
+  carouselImages?: string[];
+  contact?: {
+    phone?: string;
+    whatsapp?: string;
+    address?: string;
+    instagram?: string;
+  };
 };
 
 // Layout por defecto cuando el usuario activa su tienda.
@@ -40,6 +49,8 @@ export const DEFAULT_STORE_LAYOUT: StoreSection[] = [
   { id: 'carousel',     type: 'carousel',     visible: false, order: 3 },
   { id: 'about',        type: 'about',        visible: false, order: 4 },
   { id: 'contact',      type: 'contact',      visible: false, order: 5 },
+  { id: 'hours',         type: 'hours',         visible: false, order: 6 },
+  { id: 'announcements', type: 'announcements', visible: false, order: 7 },
 ];
 
 // Labels en español para cada tipo de sección
@@ -50,6 +61,8 @@ export const SECTION_LABELS: Record<StoreSectionType, string> = {
   product_grid: 'Grilla de productos',
   about:        'Acerca de',
   contact:      'Contacto',
+  hours:         'Horarios de atención',
+  announcements: 'Novedades',
 };
 
 // ── HORARIOS DE ATENCIÓN ──

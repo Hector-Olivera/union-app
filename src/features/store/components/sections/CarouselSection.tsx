@@ -1,4 +1,38 @@
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Image, StyleSheet } from 'react-native';
+import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+
+type Props = {
+  primaryColor: string;
+  images?: string[];
+};
+
+export const CarouselSection = ({ primaryColor, images = [] }: Props) => {
+  if (images.length === 0) return null;
+  // Sin imágenes, la sección no ocupa espacio — mejor que placeholders vacíos
+
+  return (
+    <View style={styles.container}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        {images.map((url, i) => (
+          <Image key={i} source={{ uri: url }} style={styles.slide} resizeMode="cover" />
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { marginBottom: Spacing.lg },
+  scroll: { gap: Spacing.sm },
+  slide: {
+    width: 220,
+    height: 130,
+    borderRadius: Radius.lg,
+  },
+});
+
+
+/*import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
 type Props = {
@@ -54,4 +88,4 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },
-});
+});*/

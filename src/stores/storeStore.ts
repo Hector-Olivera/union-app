@@ -27,6 +27,8 @@ type StoreState = {
   deleteAnnouncement: (announcementId: string) => Promise<void>;
   updateLogoUrl: (url: string) => Promise<void>;
   updateBannerUrl: (url: string) => Promise<void>;
+  updateCarouselImages: (images: string[]) => Promise<void>;
+  updateContact: (contact: Store['contact']) => Promise<void>;
   clearStore: () => void;
 };
 
@@ -160,6 +162,20 @@ updateBannerUrl: async (url) => {
   if (!store) return;
   set({ store: { ...store, bannerUrl: url } });
   await updateStore(store.id, { bannerUrl: url });
+},
+
+updateCarouselImages: async (images: string[]) => {
+  const { store } = get();
+  if (!store) return;
+  set({ store: { ...store, carouselImages: images } });
+  await updateStore(store.id, { carouselImages: images });
+},
+
+updateContact: async (contact: Store['contact']) => {
+  const { store } = get();
+  if (!store) return;
+  set({ store: { ...store, contact } });
+  await updateStore(store.id, { contact });
 },
 
   clearStore: () => set({ store: null }),

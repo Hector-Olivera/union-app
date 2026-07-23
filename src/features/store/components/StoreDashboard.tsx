@@ -17,6 +17,8 @@ import { AnnouncementsFeed } from './management/AnnouncementsFeed';
 import { ImagePickerField } from './ImagePickerField';
 import { useProducts } from '@features/store/hooks/useProducts';
 import { ProductCatalogEditor } from './management/ProductCatalogEditor';
+import { CarouselEditor } from './management/CarouselEditor';
+import { AboutContactEditor } from './management/AboutContactEditor';
 import type { Store } from '@/types/store';
 
 
@@ -27,6 +29,7 @@ type Props = {
 };
 
 export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) => {
+  const { updateCarouselImages, updateContact, updateStoreDescription } = useStoreStore();
   const { colors } = useAppTheme();
   const [activeTab, setActiveTab] = useState<DashboardTab>('manage');
   const {
@@ -229,6 +232,18 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
       <LayoutEditor
         layout={store.layout}
         onUpdate={onUpdateLayout}
+      />
+
+      <View style={styles.divider} />
+
+      <CarouselEditor images={store.carouselImages} onUpdate={updateCarouselImages} />
+      
+      <View style={styles.divider} />
+      
+      <AboutContactEditor
+        store={store}
+        onUpdateDescription={updateStoreDescription}
+        onUpdateContact={updateContact}
       />
     </>
     )}
