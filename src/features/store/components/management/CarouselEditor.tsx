@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useImageUpload } from '@features/store/hooks/useImageUpload';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 
 type Props = {
   images: string[] | undefined;
@@ -13,6 +15,7 @@ const MAX_IMAGES = 6;
 export const CarouselEditor = ({ images = [], onUpdate }: Props) => {
   const { colors } = useAppTheme();
   const { pickAndUpload, uploading } = useImageUpload();
+  const [imageToRemove, setImageToRemove] = useState<number | null>(null);
 
   const handleAdd = async () => {
     if (images.length >= MAX_IMAGES) return;
@@ -24,6 +27,12 @@ export const CarouselEditor = ({ images = [], onUpdate }: Props) => {
     onUpdate(images.filter((_, i) => i !== index));
   };
 
+  const confirmRemove = () => {
+  if (imageToRemove === null) return;
+  onUpdate(images.filter((_, i) => i !== imageToRemove));
+  setImageToRemove(null);
+};
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Carrusel de imágenes</Text>
@@ -34,7 +43,7 @@ export const CarouselEditor = ({ images = [], onUpdate }: Props) => {
       {images.map((url, index) => (
         <View key={index} style={styles.row}>
           <Image source={{ uri: url }} style={styles.thumb} />
-          <TouchableOpacity onPress={() => handleRemove(index)} style={styles.removeButton}>
+          <TouchableOpacity onPress={() => setImageToRemove(index)} style={styles.removeButton}>
             <Text style={styles.removeText}>Quitar</Text>
           </TouchableOpacity>
         </View>
@@ -51,6 +60,17 @@ export const CarouselEditor = ({ images = [], onUpdate }: Props) => {
           </Text>
         </TouchableOpacity>
       )}
+
+      <ConfirmDialog
+        visible={imageToRemove !== null}
+        title="Quitar imagen"
+        message="¿Querés quitar esta imagen del carrusel?"
+        confirmLabel="Quitar"
+        cancelLabel="Cancelar"
+        destructive
+        onConfirm={confirmRemove}
+        onCancel={() => setImageToRemove(null)}
+      />
     </View>
   );
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { useStoreStore } from '@stores/storeStore';
 import { router } from 'expo-router';
@@ -19,7 +19,7 @@ import { useProducts } from '@features/store/hooks/useProducts';
 import { ProductCatalogEditor } from './management/ProductCatalogEditor';
 import { CarouselEditor } from './management/CarouselEditor';
 import { AboutContactEditor } from './management/AboutContactEditor';
-import type { Store } from '@/types/store';
+import type { Store, StoreSectionType } from '@/types/store';
 
 
 type Props = {
@@ -29,6 +29,7 @@ type Props = {
 };
 
 export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) => {
+  const [editingSectionType, setEditingSectionType] = useState<StoreSectionType | null>(null);
   const { updateCarouselImages, updateContact, updateStoreDescription } = useStoreStore();
   const { colors } = useAppTheme();
   const [activeTab, setActiveTab] = useState<DashboardTab>('manage');
@@ -199,29 +200,6 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         />
       ) : (
     <>
-
-      <ImagePickerField
-        currentUrl={store.logoUrl}
-        onUploaded={updateLogoUrl}
-        aspectRatio={[1, 1]}
-        label="LOGO DE LA TIENDA"
-        folder="union-app/logos"
-        height={100}
-        placeholderIcon="🏪"
-      />
-
-      <ImagePickerField
-        currentUrl={store.bannerUrl}
-        onUploaded={updateBannerUrl}
-        aspectRatio={[16, 9]}
-        label="BANNER"
-        folder="union-app/banners"
-        height={140}
-        placeholderIcon="🖼"
-      />
-
-      <View style={styles.divider} />
-
       <ThemePicker
         selectedThemeId={store.themeId}
         onSelect={onUpdateTheme}
@@ -232,24 +210,71 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
       <LayoutEditor
         layout={store.layout}
         onUpdate={onUpdateLayout}
+        editableTypes={['logo', 'banner', 'carousel', 'about', 'contact']}
+        onEditSection={(type) => setEditingSectionType(type)}
       />
 
       <View style={styles.divider} />
-
-      <CarouselEditor images={store.carouselImages} onUpdate={updateCarouselImages} />
-      
-      <View style={styles.divider} />
-      
-      <AboutContactEditor
-        store={store}
-        onUpdateDescription={updateStoreDescription}
-        onUpdateContact={updateContact}
-      />
     </>
     )}
+
+    <Modal
+          visible={editingSectionType !== null}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setEditingSectionType(null)}
+        >
+      <View style={styles.modalBackdrop}>
+        <View style={styles.modalSheet}>
+          <TouchableOpacity onPress={() => setEditingSectionType(null)} style={styles.modalClose}>
+            <Text style={styles.modalCloseText}>✕ Cerrar </Text>
+          </TouchableOpacity>
+
+          {editingSectionType === 'logo' && (
+            <ImagePickerField
+              currentUrl={store.logoUrl}
+              onUploaded={updateLogoUrl}
+              aspectRatio={[1, 1]}
+              label="LOGO DE LA TIENDA"
+              folder="union-app/logos"
+              height={100}
+              placeholderIcon="🏪"
+            />
+          )}
+
+          {editingSectionType === 'banner' && (
+            <ImagePickerField
+              currentUrl={store.bannerUrl}
+              onUploaded={updateBannerUrl}
+              aspectRatio={[16, 9]}
+              label="BANNER"
+              folder="union-app/banners"
+              height={140}
+              placeholderIcon="🖼"
+            />
+          )}
+
+          {editingSectionType === 'carousel' && (
+            <CarouselEditor
+              images={store.carouselImages}
+              onUpdate={updateCarouselImages}
+            />
+          )}
+
+          {(editingSectionType === 'about' || editingSectionType === 'contact') && (
+            <AboutContactEditor
+              store={store}
+              onUpdateDescription={updateStoreDescription}
+              onUpdateContact={updateContact}
+            />
+          )}
+        </View>
+      </View>
+    </Modal>
   </>
   );
 
+  
 
 
  if (useSplitLayout) {
@@ -419,5 +444,26 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
     marginBottom: Spacing.md,
     marginTop: Spacing.lg,
+  },
+  modalBackdrop: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: Colors.dark.surface,
+    borderTopLeftRadius: Radius.lg,
+    borderTopRightRadius: Radius.lg,
+    padding: Spacing.md,
+    paddingBottom: Spacing.xxl,
+    maxHeight: '85%',
+  },
+  modalClose: {
+    alignSelf: 'flex-end',
+    marginBottom: Spacing.sm,
+  },
+  modalCloseText: {
+    color: Colors.dark.icon,
+    fontSize: Typography.sizes.sm,
   },
 });

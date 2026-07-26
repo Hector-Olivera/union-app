@@ -19,20 +19,25 @@ export const HoursSection = ({ hours, primaryColor }: Props) => {
   const today = getTodayKey();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Horarios de atención</Text>
-      {DAY_ORDER.map((day) => {
-        const isToday = day === today;
-        const d = data[day];
-        return (
-          <View key={day} style={[styles.row, isToday && { borderColor: `${primaryColor}40`, borderWidth: 1 }]}>
-            <Text style={[styles.day, isToday && { color: primaryColor, fontWeight: Typography.weights.bold }]}>
-              {DAY_LABELS[day]}
-            </Text>
-            <Text style={[styles.hours, isToday && { color: primaryColor }]}>
-              {d.closed ? 'Cerrado' : `${d.open} - ${d.close}`}
-            </Text>
-          </View>
+  <View style={styles.container}>
+    <Text style={styles.title}>Horarios de atención</Text>
+    {DAY_ORDER.map((day) => {
+      const isToday = day === today;
+      const d = data[day];
+      return (
+        <View key={day} style={[styles.row, isToday && { borderColor: `${primaryColor}40`, borderWidth: 1 }]}>
+          <Text
+            style={[styles.day, isToday && { color: primaryColor, fontWeight: Typography.weights.bold }]}
+            numberOfLines={1}
+          >
+            {DAY_LABELS[day]}
+          </Text>
+          <Text
+            style={[styles.hours, isToday && { color: primaryColor }]}
+            numberOfLines={1}
+          >
+             {d.closed ? 'Cerrado' : ` ${d.open} - ${d.close}`} </Text>
+        </View>
         );
       })}
     </View>
@@ -49,18 +54,21 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
     borderRadius: Radius.sm,
     marginBottom: 2,
   },
   day: {
+    flex: 1,
     color: Colors.dark.text,
     fontSize: Typography.sizes.sm,
   },
   hours: {
+    flexShrink: 0,
     color: Colors.dark.icon,
     fontSize: Typography.sizes.sm,
+    textAlign: 'right',
   },
 });
