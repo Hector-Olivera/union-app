@@ -9,6 +9,18 @@ import type {
  } from '@/types/store';
 import { DEFAULT_STORE_LAYOUT } from '@/types/store';
 
+// Función auxiliar: asegura que el layout tenga todas las secciones conocidas,
+// agregando las que falten (de tiendas creadas antes de este cambio) sin
+// tocar las que el usuario ya configuró.
+const ensureCompleteLayout = (store: Store): Store => {
+  const existingTypes = new Set(store.layout.map(s => s.type));
+  const missingSections = DEFAULT_STORE_LAYOUT.filter(s => !existingTypes.has(s.type));
+  return {
+    ...store,
+    layout: [...store.layout, ...missingSections],
+  };
+};
+
 // Obtener la tienda de un usuario por su ownerId
 export const getUserStore = async (userId: string): Promise<Store | null> => {
   try {
@@ -16,7 +28,7 @@ export const getUserStore = async (userId: string): Promise<Store | null> => {
     // Un usuario = una tienda (por ahora)
     const snap = await getDoc(doc(db, 'stores', userId));
     if (!snap.exists()) return null;
-    return { id: snap.id, ...snap.data() } as Store;
+    return ensureCompleteLayout({ id: snap.id, ...snap.data() } as Store);
   } catch (error) {
     console.error('[store] getUserStore:', error);
     return null;
@@ -66,7 +78,7 @@ export const subscribeToStore = (
     doc(db, 'stores', storeId),
     (snap) => {
       if (snap.exists()) {
-        callback({ id: snap.id, ...snap.data() } as Store);
+        callback(ensureCompleteLayout({ id: snap.id, ...snap.data() } as Store));
       } else {
         callback(null);
       }

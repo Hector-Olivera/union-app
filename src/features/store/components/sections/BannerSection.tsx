@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 16,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: 33,
     minHeight: 80,
   },
    placeholderContainer: {

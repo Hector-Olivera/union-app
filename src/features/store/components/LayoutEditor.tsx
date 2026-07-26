@@ -2,18 +2,22 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { useAppTheme } from '@hooks/useAppTheme';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { StoreSection } from '@/types/store';
-import { SECTION_LABELS } from '@/types/store';
+import { SECTION_LABELS, StoreSectionType } from '@/types/store';
 
 type Props = {
   layout: StoreSection[];
   onUpdate: (layout: StoreSection[]) => void;
+  onEditSection?: (type: StoreSectionType) => void;
+  editableTypes?: StoreSectionType[];
 };
 
 // Editor de secciones de la tienda.
 // El usuario puede: mostrar/ocultar cada sección con un toggle,
 // y cambiar el orden con botones arriba/abajo.
 // Las secciones ocultas no aparecen en la vista pública de la tienda.
-export const LayoutEditor = ({ layout, onUpdate }: Props) => {
+export const LayoutEditor = ({
+   layout, onUpdate, onEditSection, editableTypes = []
+  }: Props) => {
   const { colors } = useAppTheme();
 
   // Ordenamos por el campo 'order' para mostrar en el orden correcto
@@ -52,63 +56,45 @@ export const LayoutEditor = ({ layout, onUpdate }: Props) => {
         Activá, desactivá y ordená las secciones de tu tienda.
       </Text>
 
-      {sorted.map((section, index) => (
-        <View
-          key={section.id}
-          style={[
-            styles.sectionRow,
-            { borderColor: section.visible ? `${colors.brand.primary}40` : 'rgba(255,255,255,0.06)' }
-          ]}
-        >
-          {/* Indicador de visibilidad */}
-          <View style={[
-            styles.visibilityDot,
-            { backgroundColor: section.visible ? colors.brand.primary : Colors.dark.icon }
-          ]} />
+      {sorted.map((section, index) => {
+        const isEditable = editableTypes.includes(section.type);
+        return (
+          <View
+            key={section.id}
+            style={[
+              styles.sectionRow,
+              { borderColor: section.visible ? `${colors.brand.primary}40` : 'rgba(255,255,255,0.06)' }
+            ]}
+          >
+            <View style={[styles.visibilityDot, { backgroundColor: section.visible ? colors.brand.primary : Colors.dark.icon }]} />
 
-          {/* Nombre de la sección */}
-          <Text style={[
-            styles.sectionName,
-            !section.visible && styles.sectionNameHidden
-          ]}>
-            {SECTION_LABELS[section.type]}
-          </Text>
+            <Text style={[styles.sectionName, !section.visible && styles.sectionNameHidden]}>
+              {SECTION_LABELS[section.type]}
+            </Text>
 
-          {/* Controles */}
-          <View style={styles.controls}>
-            {/* Mover arriba */}
-            <TouchableOpacity
-              onPress={() => moveSection(section.id, 'up')}
-              disabled={index === 0}
-              style={[styles.moveBtn, index === 0 && styles.moveBtnDisabled]}
-            >
-              <Text style={styles.moveBtnText}>↑</Text>
-            </TouchableOpacity>
+            <View style={styles.controls}>
+              {isEditable && onEditSection && (
+                <TouchableOpacity
+                  onPress={() => onEditSection(section.type)}
+                  style={styles.editBtn}
+                >
+                  <Text style={styles.editBtnText}>✎</Text>
+                </TouchableOpacity>
+              )}
 
-            {/* Mover abajo */}
-            <TouchableOpacity
-              onPress={() => moveSection(section.id, 'down')}
-              disabled={index === sorted.length - 1}
-              style={[styles.moveBtn, index === sorted.length - 1 && styles.moveBtnDisabled]}
-            >
-              <Text style={styles.moveBtnText}>↓</Text>
-            </TouchableOpacity>
-
-            {/* Toggle visibilidad */}
-            <TouchableOpacity
-              onPress={() => toggleVisibility(section.id)}
-              style={[
-                styles.toggleBtn,
-                { backgroundColor: section.visible ? colors.brand.primary : 'rgba(255,255,255,0.08)' }
-              ]}
-            >
-              <Text style={styles.toggleText}>
-                {section.visible ? 'Visible' : 'Oculto'}
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => moveSection(section.id, 'up')} disabled={index === 0} style={[styles.moveBtn, index === 0 && styles.moveBtnDisabled]}>
+                <Text style={styles.moveBtnText}>↑</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => moveSection(section.id, 'down')} disabled={index === sorted.length - 1} style={[styles.moveBtn, index === sorted.length - 1 && styles.moveBtnDisabled]}>
+                <Text style={styles.moveBtnText}>↓</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => toggleVisibility(section.id)} style={[styles.toggleBtn, { backgroundColor: section.visible ? colors.brand.primary : 'rgba(255,255,255,0.08)' }]}>
+                <Text style={styles.toggleText}>{section.visible ? 'Visible' : 'Oculto'}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
@@ -182,5 +168,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.medium,
+  },
+  editBtn: {
+  width: 28,
+  height: 28,
+  borderRadius: Radius.sm,
+  backgroundColor: 'rgba(255,255,255,0.08)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+  editBtnText: {
+    color: Colors.dark.text,
+    fontSize: Typography.sizes.sm,
   },
 });
