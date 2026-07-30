@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { Share, Platform } from 'react-native';
+import * as Sharing from 'expo-sharing';
+import type ViewShot from 'react-native-view-shot';
 import { useStoreStore } from '@stores/storeStore';
 import {
   DEFAULT_QR_CONFIG,
@@ -10,8 +12,7 @@ import {
 
 export const useQRGenerator = () => {
   const { store } = useStoreStore();
-  const svgRef = useRef<any>(null);
-  // svgRef permite capturar el QR como imagen para compartirlo
+  const viewShotRef = useRef<ViewShot>(null);
 
   const [config, setConfig] = useState<QRGeneratorConfig>({
     ...DEFAULT_QR_CONFIG,
@@ -30,14 +31,18 @@ export const useQRGenerator = () => {
 
   const handleShare = async () => {
     try {
-      // Por ahora compartimos el texto del scheme
-      // En la próxima iteración capturamos el SVG como imagen
-      await Share.share({
-        message: Platform.OS === 'ios'
-          ? config.value
-          : `Escaneá mi tienda en Union App: ${config.value}`,
-        title: `QR de ${config.storeName}`,
-      });
+      // capture() convierte la vista en un archivo de imagen temporal
+      // y devuelve la ruta local de ese archivo
+      const uri = await viewShotRef.current?.capture?.();
+      if (!uri) return;
+
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'image/png',
+          dialogTitle: `QR de ${config.storeName}`,
+        });
+      }
     } catch (error) {
       console.error('[QRGenerator] share error:', error);
     }
@@ -49,7 +54,7 @@ export const useQRGenerator = () => {
 
   return {
     config,
-    svgRef,
+    viewShotRef,
     colorOptions: QR_COLOR_OPTIONS,
     updateColor,
     updateSecondaryColor,

@@ -37,6 +37,7 @@ export const StoreARPreview = ({ storeId, onDismiss }: Props) => {
           secondaryColor={storeTheme.secondary}
           size={130}
           label={initial}
+          logoUrl={store?.logoUrl}
         />
       </View>
 
