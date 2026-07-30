@@ -1,19 +1,17 @@
 import { useEffect, useRef } from 'react';
-import { View, Text, Animated, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet, Image } from 'react-native';
 import { createShadow } from '@utils/shadowStyle';
 
 type Props = {
   color: string;
   secondaryColor?: string;
   size?: number;
-  label?: string; // Iniciales o letra del logo — placeholder hasta tener logos reales
+  label?: string;
+  logoUrl?: string;
 };
 
-// Simula un objeto 3D rotando usando transforms 2D con perspectiva.
-// No es WebGL real, pero el efecto visual de "objeto girando en el espacio"
-// es convincente porque usamos perspective + rotateY + escala dinámica.
 export const ARLogoSpinner = ({
-  color, secondaryColor, size = 120, label = 'U'
+  color, secondaryColor, size = 120, label = 'U', logoUrl
 }: Props) => {
   const rotation = useRef(new Animated.Value(0)).current;
 
@@ -21,9 +19,7 @@ export const ARLogoSpinner = ({
     const loop = Animated.loop(
       Animated.timing(rotation, {
         toValue: 1,
-        duration: 4000,
-        // 4 segundos por vuelta completa — lento y elegante,
-        // no agresivo como un loading spinner
+        duration: 4000,        
         useNativeDriver: true,
       })
     );
@@ -74,7 +70,7 @@ export const ARLogoSpinner = ({
             width: size,
             height: size,
             borderRadius: size / 5,
-            backgroundColor: color,
+            backgroundColor: logoUrl ? 'transparent' : color,
             transform: [
               { perspective: 800 },
               // perspective define qué tan pronunciado es el efecto 3D
@@ -85,9 +81,17 @@ export const ARLogoSpinner = ({
           }
         ]}
       >
-        <Text style={[styles.label, { fontSize: size * 0.4 }]}>
-          {label}
-        </Text>
+        {logoUrl ? (
+          <Image
+            source={{ uri: logoUrl }}
+            style={{ width: size, height: size, borderRadius: size / 5 }}
+            resizeMode="cover"
+          />
+        ) : (
+          <Text style={[styles.label, { fontSize: size * 0.4 }]}>
+            {label}
+          </Text>
+        )}
       </Animated.View>
 
       {/* Halo de luz ambiental detrás — da sensación de "flotando en AR" */}

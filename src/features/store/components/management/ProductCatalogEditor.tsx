@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { ProductFormModal } from '../ProductFormModal';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import type { Product, ProductFormData } from '@/types/product';
 
 type Props = {
@@ -17,6 +18,7 @@ export const ProductCatalogEditor = ({ products, loading, onAdd, onEdit, onRemov
   const { colors } = useAppTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   const openCreate = () => {
     setEditingProduct(null);
@@ -34,6 +36,12 @@ export const ProductCatalogEditor = ({ products, loading, onAdd, onEdit, onRemov
     } else {
       await onAdd(data);
     }
+  };
+
+  const confirmDelete = () => {
+    if (!productToDelete) return;
+    onRemove(productToDelete.id);
+    setProductToDelete(null);
   };
 
   return (
@@ -75,7 +83,7 @@ export const ProductCatalogEditor = ({ products, loading, onAdd, onEdit, onRemov
             <TouchableOpacity onPress={() => openEdit(product)} style={styles.iconButton}>
               <Text style={styles.iconText}>✎</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => onRemove(product.id)} style={styles.iconButton}>
+            <TouchableOpacity onPress={() => setProductToDelete(product)} style={styles.iconButton}>
               <Text style={styles.iconText}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -87,6 +95,17 @@ export const ProductCatalogEditor = ({ products, loading, onAdd, onEdit, onRemov
         editingProduct={editingProduct}
         onClose={() => setModalVisible(false)}
         onSave={handleSave}
+      />
+
+      <ConfirmDialog
+        visible={productToDelete !== null}
+        title="Eliminar producto"
+        message={`¿Querés eliminar "${productToDelete?.name}"? Esta acción no se puede deshacer.`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        destructive
+        onConfirm={confirmDelete}
+        onCancel={() => setProductToDelete(null)}
       />
     </View>
   );

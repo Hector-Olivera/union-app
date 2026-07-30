@@ -92,7 +92,7 @@ export default function CameraScreen() {
             
             
         )}
-        <CameraControls onFlip={toggleFacing} onCapture={takePicture} mode={mode} hidden={!!lastScan} />
+        <CameraControls  mode={mode} hidden={!!lastScan} />
       
     </View>
   );

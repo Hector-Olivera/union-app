@@ -71,8 +71,7 @@ export const ScanFrame = () => {
       {/* Instrucción */}
       <View style={styles.instructionContainer}>
         <Text style={styles.instruction}>
-          Apuntá al código QR
-        </Text>
+          Apuntá al código QR </Text>
       </View>
 
     </View>
@@ -153,7 +152,7 @@ const styles = StyleSheet.create({
   },
   instructionContainer: {
     position: 'absolute',
-    bottom: '33%',
+    bottom: '28%',
     alignSelf: 'center',
   },
   instruction: {

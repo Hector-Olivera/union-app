@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { useThemeStore } from '@stores/themeStore';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AppLayout() {
   const insets = useSafeAreaInsets();
@@ -22,64 +23,47 @@ export default function AppLayout() {
               height: 60 + insets.bottom,
               paddingBottom: insets.bottom,
               paddingTop: Spacing.sm,
+              padding: 0,
               elevation: 0,
             },
             tabBarActiveTintColor: activeTheme.primary,
             tabBarInactiveTintColor: Colors.dark.icon,
-            tabBarLabelStyle: {
-              fontSize: Typography.sizes.xs,
-              fontWeight: Typography.weights.medium,
-              marginTop: 2,
-            },
-            tabBarShowLabel: true,
-              // El contenido de cada tab se limita en ancho desde cada screen
-              // La tab bar ocupa el 100% del ancho siempre
-              
+            tabBarShowLabel: false,              
           }}
         >
           <Tabs.Screen
             name="index"
             options={{
               title: 'Inicio',
-              tabBarIcon: ({ focused }) => (
-                <TabDot focused={focused} />
-              ),
+              tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="home-outline" />,
             }}
           />
           <Tabs.Screen
             name="explore"
             options={{
               title: 'Explorar',
-              tabBarIcon: ({ focused }) => (
-                <TabDot focused={focused} />
-              ),
+              tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="compass-outline" />,
             }}
           />
           <Tabs.Screen
             name="camera"
             options={{
               title: 'Cámara',
-              tabBarIcon: ({ focused }) => (
-                <TabDot focused={focused} color="secondary" />
-              ),
+              tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="qr-code-outline" color="secondary" />
             }}
           />
           <Tabs.Screen
             name="store"
             options={{
               title: 'Tienda',
-              tabBarIcon: ({ focused }) => (
-                <TabDot focused={focused} />
-              ),
+              tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="storefront-outline" />,
             }}
           />
           <Tabs.Screen
             name="profile"
             options={{
               title: 'Perfil',
-              tabBarIcon: ({ focused }) => (
-                <TabDot focused={focused} />
-              ),
+              tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="person-circle-outline" />,
             }}
           />
           <Tabs.Screen
@@ -99,9 +83,9 @@ export default function AppLayout() {
   );
 }
 
-// TabDot lee del themeStore directamente para ser reactivo
-const TabDot = ({ focused, color = 'primary' }: {
+const TabIcon = ({ focused, name, color = 'primary' }: {
   focused: boolean;
+  name: keyof typeof Ionicons.glyphMap;
   color?: 'primary' | 'secondary';
 }) => {
   const { activeTheme } = useThemeStore();
@@ -110,15 +94,11 @@ const TabDot = ({ focused, color = 'primary' }: {
     : activeTheme.primary;
 
   return (
-    <View style={[
-      styles.iconContainer,
-      focused && { backgroundColor: `${activeColor}20` },
-    ]}>
-      <View style={[
-        styles.dot,
-        focused && { backgroundColor: activeColor },
-      ]} />
-    </View>
+    <Ionicons
+      name={name}
+      size={28}
+      color={focused ? activeColor : Colors.dark.icon}
+    />
   );
 };
 
