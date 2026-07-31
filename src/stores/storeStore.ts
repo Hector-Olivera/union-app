@@ -29,6 +29,7 @@ type StoreState = {
   updateBannerUrl: (url: string) => Promise<void>;
   updateCarouselImages: (images: string[]) => Promise<void>;
   updateContact: (contact: Store['contact']) => Promise<void>;
+  updateIsPublic: (isPublic: boolean) => Promise<void>;
   clearStore: () => void;
 };
 
@@ -176,6 +177,13 @@ updateContact: async (contact: Store['contact']) => {
   if (!store) return;
   set({ store: { ...store, contact } });
   await updateStore(store.id, { contact });
+},
+
+updateIsPublic: async (isPublic: boolean) => {
+  const { store } = get();
+  if (!store) return;
+  set({ store: { ...store, isPublic } });
+  await updateStore(store.id, { isPublic });
 },
 
   clearStore: () => set({ store: null }),
