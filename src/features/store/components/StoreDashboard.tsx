@@ -35,7 +35,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
   const [activeTab, setActiveTab] = useState<DashboardTab>('manage');
   const {
       updateStoreName, updateHours, addTodo, toggleTodo, deleteTodo,
-      addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl,
+      addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl, updateIsPublic,
     } = useStoreStore();
 
   const [editingName, setEditingName] = useState(false);
@@ -148,17 +148,20 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
             </TouchableOpacity>
           )}
 
-          <View style={[
-            styles.statusBadge,
-            { backgroundColor: store.isPublic ? `${colors.brand.accent}20` : 'rgba(255,255,255,0.06)' }
-          ]}>
+          <TouchableOpacity
+            onPress={() => updateIsPublic(!store.isPublic)}
+            style={[
+              styles.statusBadge,
+              { backgroundColor: store.isPublic ? `${colors.brand.accent}20` : 'rgba(255,255,255,0.06)' }
+            ]}
+          >
             <Text style={[
               styles.statusText,
               { color: store.isPublic ? colors.brand.accent : Colors.dark.icon }
             ]}>
-              {store.isPublic ? '● Pública' : '○ Privada'}
+              {store.isPublic ? '● Pública — toca para ocultar' : '○ Privada — toca para publicar'}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 
