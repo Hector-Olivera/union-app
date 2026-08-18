@@ -10,6 +10,8 @@ import { useStoreStore } from '@stores/storeStore';
 import { Colors, Typography, Spacing } from '@constants/theme';
 import { useProducts } from '@features/store/hooks/useProducts';
 import { useCommunity } from '@features/community/hooks/useCommunity';
+import { getOrCreateConversation } from '@services/firebase/messaging';
+import { Ionicons } from '@expo/vector-icons';
 
 
 // Vista pública de una tienda — lo que ve cualquier visitante.
@@ -37,6 +39,19 @@ const handleBack = () => {
     } else {
       router.push('/(app)/explore');
     }
+  };
+
+  const handleMessage = async () => {
+    if (!user || !store) return;
+    if (user.id === store.ownerId) return; // no te podés mensajear a vos mismo
+
+    const conversationId = await getOrCreateConversation(
+      user.id,
+      { name: user.displayName, avatarUrl: user.avatarUrl },
+      store.ownerId,
+      { name: store.name, avatarUrl: store.logoUrl }
+    );
+    router.push(`/(app)/chat/${conversationId}` as any);
   };
 
   if (loading) {
@@ -73,6 +88,11 @@ const handleBack = () => {
             {isFavorite(store.id) ? '★' : '☆'}
           </Text>
         </TouchableOpacity>
+        {user?.id !== store.ownerId && (
+          <TouchableOpacity onPress={handleMessage} style={styles.messageButton}>
+            <Ionicons name="chatbubble-outline" size={30} color={theme.primary} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -126,11 +146,16 @@ const styles = StyleSheet.create({
   },
   favButton: {
     position: 'absolute',
-    right: Spacing.xl,
-    top: Spacing.md,
+    right: Spacing.sm,
+    top: Spacing.xxl,
   },
   favIcon: {
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
+  },
+  messageButton: {
+    position: 'absolute',
+    right: Spacing.sm,
+    top: Spacing.sm,
   },
 });
