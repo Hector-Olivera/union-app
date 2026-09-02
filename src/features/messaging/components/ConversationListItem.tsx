@@ -49,7 +49,7 @@ export const ConversationListItem = ({ conversation, currentUserId }: Props) => 
         </Text>
       </View>
 
-      <Text style={styles.time}>{formatRelativeTime(conversation.lastMessageAt)}</Text>
+      <Text style={styles.time}>{formatRelativeTime(conversation.lastMessageAt)} </Text>
     </TouchableOpacity>
   );
 };
