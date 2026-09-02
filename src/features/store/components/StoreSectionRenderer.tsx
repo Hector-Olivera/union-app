@@ -8,6 +8,8 @@ import { CarouselSection } from './sections/CarouselSection';
 import type { Store } from '@/types/store';
 import { THEME_OPTIONS } from '@stores/themeStore';
 import { Product } from '@/types/product';
+import { HoursSection } from './sections/HoursSection';
+import { AnnouncementsSection } from './sections/AnnouncementsSection';
 
 type Props = {
   store: Store;
@@ -64,6 +66,7 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
               <ContactSection
                 key={section.id}
                 primaryColor={theme.primary}
+                contact={store.contact}
               />
             );
           case 'carousel':
@@ -71,8 +74,23 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
               <CarouselSection
                 key={section.id}
                 primaryColor={theme.primary}
+                images={store.carouselImages}
               />
             );
+            case 'hours':
+              return (
+                <HoursSection 
+                  key={section.id} 
+                  hours={store.businessHours} 
+                  primaryColor={theme.primary} />
+              );
+            case 'announcements':
+              return (
+                <AnnouncementsSection
+                 key={section.id} 
+                 announcements={store.announcements} 
+                 primaryColor={theme.primary} />
+              );
           default:
             return null;
         }

@@ -6,6 +6,7 @@ import {
   subscribeToAuthChanges,
   updateUserProfile, sendVerificationEmail, reloadCurrentUser,
 } from '@services/firebase/auth';
+import { RecentVisit } from '@/types/community';
 
 export type User = {
   id: string;
@@ -15,6 +16,8 @@ export type User = {
   lastName?: string;
   avatarUrl?: string;
   emailVerified: boolean;
+  favorites?: string[];
+  recentVisits?: RecentVisit[];
 };
 
 type AuthState = {

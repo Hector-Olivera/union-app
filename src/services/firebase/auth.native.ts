@@ -14,7 +14,7 @@ import {
   EmailAuthProvider, reauthenticateWithCredential, updatePassword,
   type User as FirebaseUser,
 } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './config';
 import type { User } from '@stores/authStore';
 
@@ -54,10 +54,25 @@ export const logoutUser = async (): Promise<void> => {
   await firebaseSignOut(auth);
 };
 
-export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
+export const subscribeToAuthChanges = (
+  callback: (user: User | null) => void
+) => {
   return onAuthStateChanged(auth, async (firebaseUser) => {
     if (firebaseUser) {
-      callback(await mapFirebaseUser(firebaseUser));
+      const baseUser = await mapFirebaseUser(firebaseUser);
+
+      // Traemos los datos extra que solo viven en Firestore
+      // (favoritos, recientes, firstName/lastName) y los combinamos
+      const firestoreDoc = await getDoc(doc(db, 'players', firebaseUser.uid));
+      const firestoreData = firestoreDoc.exists() ? firestoreDoc.data() : {};
+
+      callback({
+        ...baseUser,
+        firstName: firestoreData.firstName,
+        lastName: firestoreData.lastName,
+        favorites: firestoreData.favorites || [],
+        recentVisits: firestoreData.recentVisits || [],
+      });
     } else {
       callback(null);
     }

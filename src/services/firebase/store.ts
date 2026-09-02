@@ -9,6 +9,20 @@ import type {
  } from '@/types/store';
 import { DEFAULT_STORE_LAYOUT } from '@/types/store';
 
+// Función auxiliar: asegura que el layout tenga todas las secciones conocidas,
+// agregando las que falten (de tiendas creadas antes de este cambio) sin
+// tocar las que el usuario ya configuró.
+const ensureCompleteLayout = (store: Store): Store => {
+  const existingTypes = new Set(store.layout.map(s => s.type));
+  const missingSections = DEFAULT_STORE_LAYOUT.filter(s => !existingTypes.has(s.type));
+  const withCompleteLayout = {
+    ...store,
+    layout: [...store.layout, ...missingSections],
+  };
+  
+  return filterExpiredAnnouncements(withCompleteLayout);
+};
+
 // Obtener la tienda de un usuario por su ownerId
 export const getUserStore = async (userId: string): Promise<Store | null> => {
   try {
@@ -16,7 +30,7 @@ export const getUserStore = async (userId: string): Promise<Store | null> => {
     // Un usuario = una tienda (por ahora)
     const snap = await getDoc(doc(db, 'stores', userId));
     if (!snap.exists()) return null;
-    return { id: snap.id, ...snap.data() } as Store;
+    return ensureCompleteLayout({ id: snap.id, ...snap.data() } as Store);
   } catch (error) {
     console.error('[store] getUserStore:', error);
     return null;
@@ -64,9 +78,9 @@ export const subscribeToStore = (
 ) => {
   const unsubscribe = onSnapshot(
     doc(db, 'stores', storeId),
-    (snap) => {
+     (snap) => {
       if (snap.exists()) {
-        callback({ id: snap.id, ...snap.data() } as Store);
+        callback(ensureCompleteLayout({ id: snap.id, ...snap.data() } as Store));
       } else {
         callback(null);
       }
@@ -103,4 +117,52 @@ export const updateAnnouncements = async (
   announcements: Announcement[]
 ): Promise<void> => {
   await setDoc(doc(db, 'stores', storeId), { announcements }, { merge: true });
+};
+
+const ANNOUNCEMENT_LIFETIME_HOURS = 36;
+
+// Filtra las novedades vencidas (más de 36hs) y, si encontró alguna
+// vencida, actualiza el documento en Firestore para persistir el borrado
+// en todos lados que lean esta tienda — no solo en memoria local.
+export const pruneExpiredAnnouncements = async (store: Store): Promise<Store> => {
+  const now = Date.now();
+  const validAnnouncements = (store.announcements || []).filter(a => {
+    const ageHours = (now - new Date(a.createdAt).getTime()) / (1000 * 60 * 60);
+    return ageHours < ANNOUNCEMENT_LIFETIME_HOURS;
+  });
+
+  const hadExpired = validAnnouncements.length !== (store.announcements || []).length;
+
+  if (hadExpired) {
+    await updateStore(store.id, { announcements: validAnnouncements });
+  }
+
+  return { ...store, announcements: validAnnouncements };
+};
+
+// Filtra en MEMORIA las novedades vencidas, sin escribir nada.
+// Cualquier usuario (dueño o visitante) puede usar esto de forma segura
+// al leer una tienda — nunca intenta persistir el cambio.
+const filterExpiredAnnouncements = (store: Store): Store => {
+  const now = Date.now();
+  const validAnnouncements = (store.announcements || []).filter(a => {
+    const ageHours = (now - new Date(a.createdAt).getTime()) / (1000 * 60 * 60);
+    return ageHours < ANNOUNCEMENT_LIFETIME_HOURS;
+  });
+  return { ...store, announcements: validAnnouncements };
+};
+
+// Persiste el borrado en Firestore — SOLO debe llamarse cuando
+// el usuario actual es el dueño de la tienda (ej: desde el dashboard).
+// Si se llama sin ser dueño, las reglas de seguridad la rechazan,
+// como corresponde.
+export const pruneExpiredAnnouncementsIfOwner = async (store: Store, currentUserId?: string): Promise<Store> => {
+  const filtered = filterExpiredAnnouncements(store);
+  const hadExpired = filtered.announcements?.length !== (store.announcements || []).length;
+
+  if (hadExpired && currentUserId === store.ownerId) {
+    await updateStore(store.id, { announcements: filtered.announcements });
+  }
+
+  return filtered;
 };

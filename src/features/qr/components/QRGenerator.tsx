@@ -15,7 +15,8 @@ export const QRGenerator = () => {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const {
-    config, svgRef,
+    config,
+    viewShotRef,
     colorOptions,
     updateColor, updateStyle, updateSecondaryColor,
     handleShare,
@@ -37,7 +38,7 @@ export const QRGenerator = () => {
       </View>
 
       {/* Preview en tiempo real */}
-      <QRPreview config={config} svgRef={svgRef} />
+      <QRPreview config={config} ref={viewShotRef} />
 
       {/* Controles de personalización */}
       <QRColorPicker

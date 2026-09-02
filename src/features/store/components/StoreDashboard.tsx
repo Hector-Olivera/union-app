@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { pruneExpiredAnnouncementsIfOwner } from '@services/firebase/store';
+import { useAuthStore } from '@stores/authStore'; 
 import { useStoreStore } from '@stores/storeStore';
 import { router } from 'expo-router';
 import { ThemePicker } from '@features/profile/components/ThemePicker';
 import { LayoutEditor } from './LayoutEditor';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
-import { useRef } from 'react';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { StoreLivePreview } from './StoreLivePreview';
 import { PreviewScrollButton } from './PreviewScrollButton';
@@ -17,7 +18,9 @@ import { AnnouncementsFeed } from './management/AnnouncementsFeed';
 import { ImagePickerField } from './ImagePickerField';
 import { useProducts } from '@features/store/hooks/useProducts';
 import { ProductCatalogEditor } from './management/ProductCatalogEditor';
-import type { Store } from '@/types/store';
+import { CarouselEditor } from './management/CarouselEditor';
+import { AboutContactEditor } from './management/AboutContactEditor';
+import type { Store, StoreSectionType } from '@/types/store';
 
 
 type Props = {
@@ -27,11 +30,13 @@ type Props = {
 };
 
 export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) => {
+  const [editingSectionType, setEditingSectionType] = useState<StoreSectionType | null>(null);
+  const { updateCarouselImages, updateContact, updateStoreDescription } = useStoreStore();
   const { colors } = useAppTheme();
   const [activeTab, setActiveTab] = useState<DashboardTab>('manage');
   const {
       updateStoreName, updateHours, addTodo, toggleTodo, deleteTodo,
-      addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl,
+      addAnnouncement, deleteAnnouncement, updateLogoUrl, updateBannerUrl, updateIsPublic,
     } = useStoreStore();
 
   const [editingName, setEditingName] = useState(false);
@@ -81,6 +86,14 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
     setNameError(null);
     setEditingName(false);
   };
+
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (store && user) {
+      pruneExpiredAnnouncementsIfOwner(store, user.id);
+    }
+  }, [store?.announcements?.length]);
 
   const renderManagementContent = () => (
   <>
@@ -144,17 +157,20 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
             </TouchableOpacity>
           )}
 
-          <View style={[
-            styles.statusBadge,
-            { backgroundColor: store.isPublic ? `${colors.brand.accent}20` : 'rgba(255,255,255,0.06)' }
-          ]}>
+          <TouchableOpacity
+            onPress={() => updateIsPublic(!store.isPublic)}
+            style={[
+              styles.statusBadge,
+              { backgroundColor: store.isPublic ? `${colors.brand.accent}20` : 'rgba(255,255,255,0.06)' }
+            ]}
+          >
             <Text style={[
               styles.statusText,
               { color: store.isPublic ? colors.brand.accent : Colors.dark.icon }
             ]}>
-              {store.isPublic ? '● Pública' : '○ Privada'}
+              {store.isPublic ? '● Pública — toca para ocultar' : '○ Privada — toca para publicar'}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -196,29 +212,6 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
         />
       ) : (
     <>
-
-      <ImagePickerField
-        currentUrl={store.logoUrl}
-        onUploaded={updateLogoUrl}
-        aspectRatio={[1, 1]}
-        label="LOGO DE LA TIENDA"
-        folder="union-app/logos"
-        height={100}
-        placeholderIcon="🏪"
-      />
-
-      <ImagePickerField
-        currentUrl={store.bannerUrl}
-        onUploaded={updateBannerUrl}
-        aspectRatio={[16, 9]}
-        label="BANNER"
-        folder="union-app/banners"
-        height={140}
-        placeholderIcon="🖼"
-      />
-
-      <View style={styles.divider} />
-
       <ThemePicker
         selectedThemeId={store.themeId}
         onSelect={onUpdateTheme}
@@ -229,12 +222,71 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
       <LayoutEditor
         layout={store.layout}
         onUpdate={onUpdateLayout}
+        editableTypes={['logo', 'banner', 'carousel', 'about', 'contact']}
+        onEditSection={(type) => setEditingSectionType(type)}
       />
+
+      <View style={styles.divider} />
     </>
     )}
+
+    <Modal
+          visible={editingSectionType !== null}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setEditingSectionType(null)}
+        >
+      <View style={styles.modalBackdrop}>
+        <View style={styles.modalSheet}>
+          <TouchableOpacity onPress={() => setEditingSectionType(null)} style={styles.modalClose}>
+            <Text style={styles.modalCloseText}>✕ Cerrar </Text>
+          </TouchableOpacity>
+
+          {editingSectionType === 'logo' && (
+            <ImagePickerField
+              currentUrl={store.logoUrl}
+              onUploaded={updateLogoUrl}
+              aspectRatio={[1, 1]}
+              label="LOGO DE LA TIENDA"
+              folder="union-app/logos"
+              height={100}
+              placeholderIcon="🏪"
+            />
+          )}
+
+          {editingSectionType === 'banner' && (
+            <ImagePickerField
+              currentUrl={store.bannerUrl}
+              onUploaded={updateBannerUrl}
+              aspectRatio={[16, 9]}
+              label="BANNER"
+              folder="union-app/banners"
+              height={140}
+              placeholderIcon="🖼"
+            />
+          )}
+
+          {editingSectionType === 'carousel' && (
+            <CarouselEditor
+              images={store.carouselImages}
+              onUpdate={updateCarouselImages}
+            />
+          )}
+
+          {(editingSectionType === 'about' || editingSectionType === 'contact') && (
+            <AboutContactEditor
+              store={store}
+              onUpdateDescription={updateStoreDescription}
+              onUpdateContact={updateContact}
+            />
+          )}
+        </View>
+      </View>
+    </Modal>
   </>
   );
 
+  
 
 
  if (useSplitLayout) {
@@ -404,5 +456,26 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
     marginBottom: Spacing.md,
     marginTop: Spacing.lg,
+  },
+  modalBackdrop: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: Colors.dark.surface,
+    borderTopLeftRadius: Radius.lg,
+    borderTopRightRadius: Radius.lg,
+    padding: Spacing.md,
+    paddingBottom: Spacing.xxl,
+    maxHeight: '85%',
+  },
+  modalClose: {
+    alignSelf: 'flex-end',
+    marginBottom: Spacing.sm,
+  },
+  modalCloseText: {
+    color: Colors.dark.icon,
+    fontSize: Typography.sizes.sm,
   },
 });

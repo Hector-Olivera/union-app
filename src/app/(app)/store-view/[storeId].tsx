@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +9,9 @@ import { useAuthStore } from '@stores/authStore';
 import { useStoreStore } from '@stores/storeStore';
 import { Colors, Typography, Spacing } from '@constants/theme';
 import { useProducts } from '@features/store/hooks/useProducts';
+import { useCommunity } from '@features/community/hooks/useCommunity';
+import { getOrCreateConversation } from '@services/firebase/messaging';
+import { Ionicons } from '@expo/vector-icons';
 
 
 // Vista pública de una tienda — lo que ve cualquier visitante.
@@ -18,11 +22,37 @@ export default function StoreViewScreen() {
   const insets = useSafeAreaInsets();
   const { storeId } = useLocalSearchParams<{ storeId: string }>();
   const { store, loading } = useStorePreview(storeId || null);
-
   const { user } = useAuthStore();
   const { store: myStore } = useStoreStore();
-
+  const { isFavorite, toggleFav, visitStore } = useCommunity();
   const { products } = useProducts(store?.id);
+
+  useEffect(() => {
+  if (store?.id) visitStore(store.id);
+}, [store?.id]);
+
+const handleBack = () => {
+    // Si la tienda que estoy viendo es la mía, vuelvo al dashboard de Tienda
+    // Si es de otro usuario, vuelvo a Explorar (donde se descubren tiendas)
+    if (myStore && store && myStore.id === store.id) {
+      router.push('/(app)/store');
+    } else {
+      router.push('/(app)/explore');
+    }
+  };
+
+  const handleMessage = async () => {
+    if (!user || !store) return;
+    if (user.id === store.ownerId) return; // no te podés mensajear a vos mismo
+
+    const conversationId = await getOrCreateConversation(
+      user.id,
+      { name: user.displayName, avatarUrl: user.avatarUrl },
+      store.ownerId,
+      { name: store.name, avatarUrl: store.logoUrl }
+    );
+    router.push(`/(app)/chat/${conversationId}` as any);
+  };
 
   if (loading) {
     return (
@@ -42,18 +72,8 @@ export default function StoreViewScreen() {
       </View>
     );
   }
-
+ 
   const theme = THEME_OPTIONS.find(t => t.id === store.themeId) || THEME_OPTIONS[0];
-
-  const handleBack = () => {
-    // Si la tienda que estoy viendo es la mía, vuelvo al dashboard de Tienda
-    // Si es de otro usuario, vuelvo a Explorar (donde se descubren tiendas)
-    if (myStore && store && myStore.id === store.id) {
-      router.push('/(app)/store');
-    } else {
-      router.push('/(app)/explore');
-    }
-  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -63,6 +83,16 @@ export default function StoreViewScreen() {
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Text style={[styles.backText, { color: theme.primary }]}>← Volver</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => toggleFav(store.id)} style={styles.favButton}>
+          <Text style={[styles.favIcon, { color: isFavorite(store.id) ? theme.secondary : Colors.dark.icon }]}>
+            {isFavorite(store.id) ? '★' : '☆'}
+          </Text>
+        </TouchableOpacity>
+        {user?.id !== store.ownerId && (
+          <TouchableOpacity onPress={handleMessage} style={styles.messageButton}>
+            <Ionicons name="chatbubble-outline" size={30} color={theme.primary} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView
@@ -113,5 +143,19 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.xl,
     paddingBottom: Spacing.xxl,
+  },
+  favButton: {
+    position: 'absolute',
+    right: Spacing.sm,
+    top: Spacing.xxl,
+  },
+  favIcon: {
+    fontSize: Typography.sizes.xxl,
+    fontWeight: Typography.weights.bold,
+  },
+  messageButton: {
+    position: 'absolute',
+    right: Spacing.sm,
+    top: Spacing.sm,
   },
 });
