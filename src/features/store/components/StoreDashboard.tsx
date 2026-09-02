@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { pruneExpiredAnnouncementsIfOwner } from '@services/firebase/store';
+import { useAuthStore } from '@stores/authStore'; 
 import { useStoreStore } from '@stores/storeStore';
 import { router } from 'expo-router';
 import { ThemePicker } from '@features/profile/components/ThemePicker';
 import { LayoutEditor } from './LayoutEditor';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
-import { useRef } from 'react';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { StoreLivePreview } from './StoreLivePreview';
 import { PreviewScrollButton } from './PreviewScrollButton';
@@ -85,6 +86,14 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
     setNameError(null);
     setEditingName(false);
   };
+
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (store && user) {
+      pruneExpiredAnnouncementsIfOwner(store, user.id);
+    }
+  }, [store?.announcements?.length]);
 
   const renderManagementContent = () => (
   <>

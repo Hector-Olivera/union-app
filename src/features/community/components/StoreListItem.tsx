@@ -47,7 +47,7 @@ export const StoreListItem = ({ store, onPress, onRemove }: Props) => {
       {/* Nombre + indicador de novedad */}
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>{store.name}</Text>
-        {store.hasNewAnnouncement && (
+        {store.isAnnouncementUnseen && (
           <View style={styles.newBadge}>
             <View style={[styles.newDot, { backgroundColor: colors.brand.secondary }]} />
             <Text style={[styles.newText, { color: colors.brand.secondary }]}>Novedad</Text>

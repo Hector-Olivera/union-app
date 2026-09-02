@@ -8,12 +8,12 @@ export type RecentVisit = {
   visitedAt: string;
 };
 
-// Vista resumida de una tienda para listas de comunidad —
-// no necesitamos el objeto Store completo, solo lo mínimo para mostrar
 export type StoreSummary = {
   id: string;
   name: string;
   logoUrl?: string;
   themeId: string;
-  hasNewAnnouncement?: boolean;
+  hasAnnouncement?: boolean;
+  isAnnouncementUnseen?: boolean;
+  latestAnnouncementText?: string;
 };

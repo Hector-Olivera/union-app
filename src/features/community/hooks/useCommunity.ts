@@ -5,14 +5,8 @@ import { toggleFavorite, recordVisit, searchPublicStores } from '@services/fireb
 import type { StoreSummary } from '@/types/community';
 import type { Store } from '@/types/store';
 import { doc, updateDoc } from 'firebase/firestore';
+import { subscribeToStore } from '@services/firebase/store';
 import { db } from '@/services/firebase/config';
-
-const toSummary = (store: Store): StoreSummary => ({
-  id: store.id,
-  name: store.name,
-  logoUrl: store.logoUrl,
-  themeId: store.themeId,
-});
 
 export const useCommunity = () => {
   const { user, setUser } = useAuthStore();
@@ -20,27 +14,71 @@ export const useCommunity = () => {
   const [recentStores, setRecentStores] = useState<StoreSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Resuelve los IDs guardados (favoritos/recientes) a datos reales de tienda
-  const loadStoreSummaries = useCallback(async () => {
-    if (!user) return;
-    setLoading(true);
+  const toSummaryWithNews = (store: Store): StoreSummary => {
+    const latestAnnouncement = (store.announcements || [])[0];
+    const lastVisit = (user?.recentVisits || []).find(v => v.storeId === store.id);
+    const isUnseen = !!latestAnnouncement &&
+    (!lastVisit || latestAnnouncement.createdAt > lastVisit.visitedAt);
 
-    const favIds = user.favorites || [];
-    const recentIds = (user.recentVisits || []).map(v => v.storeId);
+    return {
+      id: store.id,
+      name: store.name,
+      logoUrl: store.logoUrl,
+      themeId: store.themeId,
+      hasAnnouncement: !!latestAnnouncement,
+      isAnnouncementUnseen: isUnseen,
+      latestAnnouncementText: latestAnnouncement?.text,
+    };
+  };
 
-    const [favResults, recentResults] = await Promise.all([
-      Promise.all(favIds.map(id => getUserStore(id))),
-      Promise.all(recentIds.map(id => getUserStore(id))),
-    ]);
+  const favIds = user?.favorites || [];
+  const recentIds = (user?.recentVisits || []).map(v => v.storeId);
 
-    setFavoriteStores(favResults.filter(Boolean).map(s => toSummary(s!)));
-    setRecentStores(recentResults.filter(Boolean).map(s => toSummary(s!)));
-    setLoading(false);
-  }, [user]);
+  const favIdsKey = favIds.join(',');
+  const recentIdsKey = recentIds.join(',');
 
   useEffect(() => {
-    loadStoreSummaries();
-  }, [loadStoreSummaries]);
+    if (!user) {
+      setFavoriteStores([]);
+      setRecentStores([]);
+      setLoading(false);
+      return;
+    }
+
+  const allIds = [...new Set([...favIds, ...recentIds])];
+
+  if (allIds.length === 0) {
+    setFavoriteStores([]);
+    setRecentStores([]);
+    setLoading(false);
+    return;
+  }
+
+  setLoading(true);
+  const storesMap = new Map<string, Store>();
+  let receivedCount = 0;
+
+  const unsubscribes = allIds.map(id =>
+    subscribeToStore(id, (store) => {
+      if (store) storesMap.set(id, store);
+      receivedCount++;
+
+      const allStores = Array.from(storesMap.values());
+      setFavoriteStores(
+        allStores.filter(s => favIds.includes(s.id)).map(toSummaryWithNews)
+      );
+      setRecentStores(
+        allStores.filter(s => recentIds.includes(s.id)).map(toSummaryWithNews)
+      );
+
+      if (receivedCount >= allIds.length) setLoading(false);
+    })
+  );
+
+  return () => unsubscribes.forEach(unsub => unsub());
+}, [user?.id, favIdsKey, recentIdsKey]);
+ 
+
 
   const isFavorite = (storeId: string) => (user?.favorites || []).includes(storeId);
 
@@ -72,8 +110,12 @@ export const useCommunity = () => {
     setRecentStores(prev => prev.filter(s => s.id !== storeId));
   };
 
+  const storesWithNews = [...favoriteStores, ...recentStores]
+  .filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i)
+  .filter(s => s.hasAnnouncement);
+
   return {
     favoriteStores, recentStores, loading,
-    isFavorite, toggleFav, visitStore, search, removeVisit
+    isFavorite, toggleFav, visitStore, search, removeVisit, storesWithNews
   };
 };
