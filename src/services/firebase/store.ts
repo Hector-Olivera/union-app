@@ -1,5 +1,6 @@
 import {
   doc, getDoc, setDoc, updateDoc,
+  query, where, getDocs, limit,
   collection, serverTimestamp, onSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
@@ -165,4 +166,17 @@ export const pruneExpiredAnnouncementsIfOwner = async (store: Store, currentUser
   }
 
   return filtered;
+};
+
+export const getPublicStoreByOwner = async (ownerId: string): Promise<Store | null> => {
+  const q = query(
+    collection(db, 'stores'),
+    where('ownerId', '==', ownerId),
+    where('isPublic', '==', true),
+    limit(1)
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const doc = snap.docs[0];
+  return { id: doc.id, ...doc.data() } as Store;
 };

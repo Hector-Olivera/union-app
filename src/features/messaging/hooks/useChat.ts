@@ -7,7 +7,7 @@ export const useChat = (conversationId: string | undefined) => {
   const { user } = useAuthStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-
+ 
   useEffect(() => {
     if (!conversationId) {
       setMessages([]);
@@ -21,9 +21,9 @@ export const useChat = (conversationId: string | undefined) => {
     return () => unsubscribe();
   }, [conversationId]);
 
-  const send = async (text: string) => {
+  const send = async (text: string, otherUserId: string) => {
     if (!conversationId || !user || !text.trim()) return;
-    await sendMessage(conversationId, user.id, text);
+    await sendMessage(conversationId, user.id, text, otherUserId);
   };
 
   return { messages, loading, send, currentUserId: user?.id };
