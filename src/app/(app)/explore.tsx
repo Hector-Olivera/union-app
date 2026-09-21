@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, Dimensions,
   NativeSyntheticEvent, NativeScrollEvent,
 } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCommunity } from '@features/community/hooks/useCommunity';
 import { useConversations } from '@features/messaging/hooks/useConversations';
@@ -20,6 +21,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const initialTab = (tab as CommunityTab) || 'community';
   const [activeTab, setActiveTab] = useState<CommunityTab>('community');
   const scrollRef = useRef<ScrollView>(null);
 
@@ -43,6 +46,16 @@ export default function ExploreScreen() {
     scrollRef.current?.scrollTo({ x: index * SCREEN_WIDTH, animated: true });
     setActiveTab(TABS[index].key);
   };
+
+  useEffect(() => {
+    if (tab) {
+      const index = TABS.findIndex(t => t.key === tab);
+      if (index >= 0) {
+        setActiveTab(tab as CommunityTab);
+        scrollRef.current?.scrollTo({ x: index * SCREEN_WIDTH, animated: false });
+      }
+    }
+  }, [tab]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

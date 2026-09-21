@@ -1,15 +1,19 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, Image, TouchableOpacity, FlatList,
   KeyboardAvoidingView, Platform, StyleSheet
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useChat } from '@features/messaging/hooks/useChat';
 import { useConversations } from '@features/messaging/hooks/useConversations';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { markConversationAsRead } from '@services/firebase/messaging';
 import type { Message } from '@/types/messaging';
+import { getPublicStoreByOwner } from '@/services/firebase/store';
+
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
@@ -24,12 +28,36 @@ export default function ChatScreen() {
   const otherInfo = otherUserId ? conversation?.participantInfo[otherUserId] : null;
   const otherInitial = otherInfo?.name.charAt(0).toUpperCase() || '?';
 
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    // Solo marcamos como leído si la pantalla está realmente en foco  
+    if (conversationId && currentUserId && isFocused) {
+      markConversationAsRead(conversationId, currentUserId);
+    }
+  }, [conversationId, currentUserId, messages.length, isFocused]);
+
   const handleSend = async () => {
-    if (!input.trim()) return;
-    await send(input);
-    setInput('');
-    // Scrolleamos al final para ver el mensaje recién enviado
-    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+    if (!input.trim() || !otherUserId) return;
+    const textToSend = input;
+    setInput(''); // Limpiamos inmediatamente — no esperamos la red para dar feedback visual
+    try {
+      await send(textToSend, otherUserId);
+    } catch (error) {
+      // Si falla el envío, restauramos el texto para que el usuario no lo pierda
+      setInput(textToSend);
+      console.error('[Chat] send error:', error);
+    }
+    setTimeout(() => listRef.current?.scrollToIndex({ index: 0 }), 100);
+  };
+
+  const handleVisitStore = async () => {
+    if (!otherUserId) return;
+    const store = await getPublicStoreByOwner(otherUserId);
+    if (store) {
+      router.push(`/(app)/store-view/${store.id}`);
+    }
+    // Si no tiene tienda pública, no pasa nada — silenciosamente
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
@@ -54,30 +82,31 @@ export default function ChatScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.push('/(app)/explore?tab=messages')} style={styles.backButton}>
           <Text style={[styles.backText, { color: colors.brand.primary }]}>←</Text>
         </TouchableOpacity>
 
-        {otherInfo?.avatarUrl ? (
-          <Image source={{ uri: otherInfo.avatarUrl }} style={styles.headerAvatar} />
-        ) : (
-          <View style={[styles.headerAvatarPlaceholder, { backgroundColor: colors.brand.primary }]}>
-            <Text style={styles.headerAvatarInitial}>{otherInitial}</Text>
-          </View>
-        )}
-
-        <Text style={styles.headerName} numberOfLines={1}>
-          {otherInfo?.name || 'Conversación'}
-        </Text>
+        <TouchableOpacity onPress={handleVisitStore} style={styles.headerUserInfo} activeOpacity={0.7}>
+          {otherInfo?.avatarUrl ? (
+            <Image source={{ uri: otherInfo.avatarUrl }} style={styles.headerAvatar} />
+          ) : (
+            <View style={[styles.headerAvatarPlaceholder, { backgroundColor: colors.brand.primary }]}>
+              <Text style={styles.headerAvatarInitial}>{otherInitial}</Text>
+            </View>
+          )}
+          <Text style={styles.headerName} numberOfLines={1}>
+            {otherInfo?.name || 'Conversación'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
         ref={listRef}
-        data={messages}
+        data={[...messages].reverse()}
+        inverted
         keyExtractor={(item) => item.id}
         renderItem={renderMessage}
         contentContainerStyle={styles.messagesList}
-        onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
       />
 
       <View style={styles.inputRow}>
@@ -169,6 +198,12 @@ const styles = StyleSheet.create({
     color: Colors.dark.text,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
+    flex: 1,
+  },
+  headerUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
     flex: 1,
   },
 });

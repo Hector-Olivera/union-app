@@ -1,6 +1,7 @@
 import {
   collection, doc, setDoc, addDoc, updateDoc, onSnapshot,
   query, orderBy, where, serverTimestamp, getDoc,
+  arrayRemove,
 } from 'firebase/firestore';
 import { db } from './config';
 import type { Conversation, Message } from '@/types/messaging';
@@ -39,7 +40,8 @@ export const getOrCreateConversation = async (
         [otherUserId]: buildInfo(otherUserInfo),
       },
       lastMessage: '',
-      lastMessageAt: new Date().toISOString(),
+      lastMessageAt: serverTimestamp(),
+      unreadBy: [],
     });
   }
 
@@ -49,24 +51,33 @@ export const getOrCreateConversation = async (
 export const sendMessage = async (
   conversationId: string,
   senderId: string,
-  text: string
+  text: string,
+  otherUserId: string,
 ): Promise<void> => {
   const messagesRef = collection(db, 'conversations', conversationId, 'messages');
   await addDoc(messagesRef, {
     senderId,
     text: text.trim(),
-    createdAt: new Date().toISOString(),
+    createdAt: serverTimestamp(),
   });
 
   // Actualizamos el resumen de la conversación para que la lista
   // muestre el último mensaje sin tener que leer la subcolección completa
   await updateDoc(doc(db, 'conversations', conversationId), {
     lastMessage: text.trim(),
-    lastMessageAt: new Date().toISOString(),
+    lastMessageAt: serverTimestamp(),
+    lastMessageSenderId: senderId,
+    unreadBy: [otherUserId],
   });
 };
 
-// Escucha en tiempo real todas las conversaciones donde participa el usuario
+const timestampToISO = (value: any): string => {
+  if (!value) return new Date().toISOString();
+  if (typeof value.toDate === 'function') return value.toDate().toISOString();
+  return value; 
+};
+
+
 export const subscribeToConversations = (
   userId: string,
   callback: (conversations: Conversation[]) => void
@@ -78,7 +89,19 @@ export const subscribeToConversations = (
   );
 
   return onSnapshot(q, (snapshot) => {
-    const conversations = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Conversation[];
+    const conversations = snapshot.docs.map(d => {
+      const data = d.data({ serverTimestamps: 'estimate' });
+      console.log('[DEBUG] conversation', d.id, 'unreadBy:', data.unreadBy, 'lastMessage:', data.lastMessage);
+      return {
+        id: d.id,
+        participants: data.participants,
+        participantInfo: data.participantInfo,
+        lastMessage: data.lastMessage,
+        lastMessageSenderId: data.lastMessageSenderId,
+        unreadBy: data.unreadBy || [],
+        lastMessageAt: timestampToISO(data.lastMessageAt),
+      } as Conversation;
+    });
     callback(conversations);
   }, (error) => {
     console.error('[messaging] subscribeToConversations:', error);
@@ -97,10 +120,22 @@ export const subscribeToMessages = (
   );
 
   return onSnapshot(q, (snapshot) => {
-    const messages = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Message[];
+    const messages = snapshot.docs.map(d => {
+      const data = d.data({ serverTimestamps: 'estimate' });
+      return { id: d.id, ...data, createdAt: timestampToISO(data.createdAt) };
+    }) as Message[];
     callback(messages);
   }, (error) => {
     console.error('[messaging] subscribeToMessages:', error);
     callback([]);
+  });
+};
+
+export const markConversationAsRead = async (
+  conversationId: string,
+  userId: string
+): Promise<void> => {
+  await updateDoc(doc(db, 'conversations', conversationId), {
+    unreadBy: arrayRemove(userId),
   });
 };

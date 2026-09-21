@@ -4,6 +4,8 @@ export type Conversation = {
   participantInfo: Record<string, { name: string; avatarUrl?: string }>;
   lastMessage: string;
   lastMessageAt: string;
+  lastMessageSenderId?: string;
+  unreadBy?: string[];
 };
 
 export type Message = {

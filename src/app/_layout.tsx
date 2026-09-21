@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { Stack, router, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -6,6 +7,8 @@ import { useAuthStore } from '@stores/authStore';
 import { useThemeStore } from '@stores/themeStore';
 import { injectWebGlobalStyles } from '@utils/webStyles';
 import { useStoreStore } from '@stores/storeStore';
+import { disableNetwork, enableNetwork } from 'firebase/firestore';
+import { db } from '@services/firebase/config';
 
 export default function RootLayout() {
   const { loadStore, clearStore } = useStoreStore();
@@ -41,6 +44,29 @@ export default function RootLayout() {
     if (isAuthenticated && inAuthGroup) router.replace('/(app)');
     else if (!isAuthenticated && inAppGroup) router.replace('/(auth)/login');
   }, [isAuthenticated, loading, segments]);
+
+  useEffect(() => {
+  const reconnect = async () => {
+    try {
+      await disableNetwork(db);
+      await enableNetwork(db);
+    } catch (e) {
+      console.error('[Firestore] reconnect error:', e);
+    }
+  };
+
+  const interval = setInterval(reconnect, 60000); // cada 60 segundos
+
+  const handleAppStateChange = (nextState: AppStateStatus) => {
+    if (nextState === 'active') reconnect();
+  };
+  const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+  return () => {
+    clearInterval(interval);
+    subscription.remove();
+  };
+}, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
