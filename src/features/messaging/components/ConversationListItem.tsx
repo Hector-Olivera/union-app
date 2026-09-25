@@ -6,6 +6,8 @@ import type { Conversation } from '@/types/messaging';
 type Props = {
   conversation: Conversation;
   currentUserId: string;
+  onPress?: () => void;
+  isSelected?: boolean;
 };
 
 const formatRelativeTime = (isoDate: string): string => {
@@ -19,7 +21,7 @@ const formatRelativeTime = (isoDate: string): string => {
   return `${days} sem`;
 };
 
-export const ConversationListItem = ({ conversation, currentUserId }: Props) => {
+export const ConversationListItem = ({ conversation, currentUserId, onPress, isSelected }: Props) => {
   
   const otherUserId = conversation.participants.find(id => id !== currentUserId);
   const otherInfo = otherUserId ? conversation.participantInfo[otherUserId] : null;
@@ -31,8 +33,8 @@ export const ConversationListItem = ({ conversation, currentUserId }: Props) => 
 
   return (
     <TouchableOpacity
-      style={styles.container}
-      onPress={() => router.push(`/(app)/chat/${conversation.id}` as any)}
+      style={[styles.container, isSelected && styles.containerSelected]}
+      onPress={onPress || (() => router.push(`/(app)/chat/${conversation.id}` as any))}
       activeOpacity={0.75}
     >
       <View style={styles.avatarContainer}>
@@ -87,5 +89,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.status.success,
     borderWidth: 2,
     borderColor: Colors.dark.background,
+  },
+  containerSelected: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: Radius.md,
   },
 });

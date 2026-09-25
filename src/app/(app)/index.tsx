@@ -5,8 +5,10 @@ import { useThemeStore } from '@stores/themeStore';
 import { useStoreStore } from '@stores/storeStore';
 import { useCommunity } from '@features/community/hooks/useCommunity';
 import { useConversations } from '@features/messaging/hooks/useConversations';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { AvatarPicker } from '@features/profile/components/AvatarPicker';
 import { AvatarStack } from '@components/ui/AvatarStack';
+import { SplitScreenLayout } from '@components/ui/SplitScreenLayout';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
 export default function HomeScreen() {
@@ -15,6 +17,7 @@ export default function HomeScreen() {
   const { store } = useStoreStore();
   const { storesWithNews } = useCommunity();
   const { conversations } = useConversations();
+  const { useSplitLayout } = useResponsiveLayout();
 
   if (!user) return null;
 
@@ -27,31 +30,22 @@ export default function HomeScreen() {
 
   const firstName = user.displayName.split(' ')[0];
 
-  // Avatares de quienes nos escribieron — el "otro" participante de cada conversación
-  const messageAvatars = [...conversations].reverse().map(c => {
+  const messageAvatars = conversations.map(c => {
     const otherId = c.participants.find(id => id !== user.id);
     const info = otherId ? c.participantInfo[otherId] : null;
     if (!info) return null;
-
     const isUnread = (c.unreadBy || []).includes(user.id);
-
     return { id: otherId!, name: info.name, imageUrl: info.avatarUrl, hasNew: isUnread };
   }).filter(Boolean) as any[];
 
-  // Avatares de tiendas con novedades vigentes
   const newsAvatars = storesWithNews.map(s => ({
     id: s.id, name: s.name, imageUrl: s.logoUrl, hasNew: s.isAnnouncementUnseen,
   }));
 
   const pendingTodos = (store?.todos || []).filter(t => !t.done);
 
-  const hasUnseenMessages = messageAvatars.some(a => a.hasNew);
-  const hasUnseenNews = newsAvatars.some(a => a.hasNew);  
-
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-
-      {/* Header */}
+  const leftContent = (
+    <>
       <View style={styles.header}>
         <View style={styles.headerText}>
           <Text style={styles.greeting}>{getGreeting()},</Text>
@@ -62,7 +56,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Mi Tienda */}
       <TouchableOpacity
         style={[styles.card, { borderColor: `${activeTheme.primary}30` }]}
         onPress={() => router.push('/(app)/store')}
@@ -77,7 +70,6 @@ export default function HomeScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* Mensajes */}
       <TouchableOpacity
         style={[styles.card, { borderColor: `${activeTheme.secondary}30` }]}
         onPress={() => router.push('/(app)/explore?tab=messages')}
@@ -87,19 +79,16 @@ export default function HomeScreen() {
         {messageAvatars.length > 0 ? (
           <>
             <AvatarStack items={messageAvatars} />
-            {hasUnseenMessages && (
+            {messageAvatars.some(a => a.hasNew) && (
               <Text style={[styles.newLabel, { color: activeTheme.secondary }]}>Mensaje nuevo</Text>
             )}
-            <Text style={[styles.cardAction, { color: activeTheme.secondary}]}>
-              Ver conversaciones →
-            </Text>
+            <Text style={[styles.cardAction, { color: activeTheme.secondary }]}>Ver conversaciones →</Text>
           </>
         ) : (
           <Text style={styles.cardSubtitle}>No tenés mensajes nuevos.</Text>
         )}
       </TouchableOpacity>
 
-      {/* Actividad reciente / Novedades */}
       <TouchableOpacity
         style={[styles.card, { borderColor: `${activeTheme.accent}30` }]}
         onPress={() => router.push('/(app)/explore?tab=notifications')}
@@ -109,19 +98,16 @@ export default function HomeScreen() {
         {newsAvatars.length > 0 ? (
           <>
             <AvatarStack items={newsAvatars} />
-            {hasUnseenNews && (
+            {newsAvatars.some(a => a.hasNew) && (
               <Text style={[styles.newLabel, { color: activeTheme.accent }]}>Nueva novedad</Text>
             )}
-            <Text style={[styles.cardAction, { color: activeTheme.accent}]}>
-              Ver novedades →
-            </Text>
+            <Text style={[styles.cardAction, { color: activeTheme.accent }]}>Ver novedades →</Text>
           </>
         ) : (
           <Text style={styles.cardSubtitle}>Sin novedades de tus tiendas seguidas.</Text>
         )}
       </TouchableOpacity>
 
-      {/* Pendientes de mi tienda */}
       {store && pendingTodos.length > 0 && (
         <TouchableOpacity
           style={[styles.card, { borderColor: `${activeTheme.primary}30` }]}
@@ -139,7 +125,41 @@ export default function HomeScreen() {
           ))}
         </TouchableOpacity>
       )}
+    </>
+  );
 
+  const rightContent = (
+    <View>
+      <Text style={[styles.newsTitle, { color: activeTheme.primary }]}>Bienvenido a Union</Text>
+      <Text style={styles.newsParagraph}>
+        Gracias por formar parte de la comunidad de Union!
+      </Text>
+      <Text style={styles.newsParagraph}>
+        Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.
+      </Text>
+      <Text style={styles.newsParagraph}>
+        Publicitá tus productos ofreciendo regalos y descuentos.
+      </Text>
+      <Text style={styles.newsParagraph}>
+        Siendo parte de Union es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.
+      </Text>
+    </View>
+  );
+
+  if (useSplitLayout) {
+    return (
+      <View style={styles.container}>
+        <SplitScreenLayout left={leftContent} right={rightContent} />
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      {leftContent}
+        <View style={styles.divider} />
+        <Text style={styles.mobileSectionTitle}>Novedades de la app</Text>
+      {rightContent}
     </ScrollView>
   );
 }
@@ -147,31 +167,30 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   content: { paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xxl },
-  header: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
-    paddingVertical: Spacing.xl,
-  },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: Spacing.xl },
   headerText: { flex: 1, marginRight: Spacing.md },
   greeting: { color: Colors.dark.icon, fontSize: Typography.sizes.md },
   userName: { fontSize: Typography.sizes.xxl, fontWeight: Typography.weights.bold },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    gap: Spacing.sm,
-  },
+  card: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: Radius.lg, borderWidth: 1, padding: Spacing.lg, marginBottom: Spacing.md, gap: Spacing.sm },
   cardTitle: { color: Colors.dark.text, fontSize: Typography.sizes.lg, fontWeight: Typography.weights.semibold },
   cardSubtitle: { color: Colors.dark.icon, fontSize: Typography.sizes.sm, lineHeight: 20 },
   cardAction: { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold },
+  newLabel: { fontSize: Typography.sizes.xs, fontWeight: Typography.weights.bold, letterSpacing: 0.5 },
   pendingHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   countBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.full, minWidth: 22, alignItems: 'center' },
   countText: { fontSize: Typography.sizes.xs, fontWeight: Typography.weights.bold },
   todoText: { color: Colors.dark.icon, fontSize: Typography.sizes.sm },
-  newLabel: {
-  fontSize: Typography.sizes.xs,
-  fontWeight: Typography.weights.bold,
-  letterSpacing: 0.5,
+  newsTitle: { fontSize: Typography.sizes.xxl, fontWeight: Typography.weights.bold, marginBottom: Spacing.lg },
+  newsParagraph: { color: Colors.dark.text, fontSize: Typography.sizes.lg, lineHeight: 24, marginBottom: Spacing.md },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginVertical: Spacing.lg,
+  },
+  mobileSectionTitle: {
+    color: Colors.dark.text,
+    fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.semibold,
+    marginBottom: Spacing.md,
   },
 });

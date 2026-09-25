@@ -144,7 +144,7 @@ export const pruneExpiredAnnouncements = async (store: Store): Promise<Store> =>
 // Filtra en MEMORIA las novedades vencidas, sin escribir nada.
 // Cualquier usuario (dueño o visitante) puede usar esto de forma segura
 // al leer una tienda — nunca intenta persistir el cambio.
-const filterExpiredAnnouncements = (store: Store): Store => {
+export const filterExpiredAnnouncements = (store: Store): Store => {
   const now = Date.now();
   const validAnnouncements = (store.announcements || []).filter(a => {
     const ageHours = (now - new Date(a.createdAt).getTime()) / (1000 * 60 * 60);
@@ -179,4 +179,27 @@ export const getPublicStoreByOwner = async (ownerId: string): Promise<Store | nu
   if (snap.empty) return null;
   const doc = snap.docs[0];
   return { id: doc.id, ...doc.data() } as Store;
+};
+
+// Tiendas públicas creadas en los últimos N días, más nuevas primero
+export const getRecentPublicStores = async (days: number = 30): Promise<Store[]> => {
+  const q = query(collection(db, 'stores'), where('isPublic', '==', true));
+  const snap = await getDocs(q);
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() } as Store))
+    .filter(s => new Date(s.createdAt).getTime() > cutoff)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+};
+
+// Tiendas públicas con novedades vigentes, excluyendo las que el usuario
+// ya visitó (favoritas o recientes) — para el feed "Te enteraste??"
+export const getUnvisitedStoresWithNews = async (excludeIds: string[]): Promise<Store[]> => {
+  const q = query(collection(db, 'stores'), where('isPublic', '==', true));
+  const snap = await getDocs(q);
+
+  return snap.docs
+    .map(d => filterExpiredAnnouncements({ id: d.id, ...d.data() } as Store))
+    .filter(s => !excludeIds.includes(s.id) && (s.announcements || []).length > 0);
 };
