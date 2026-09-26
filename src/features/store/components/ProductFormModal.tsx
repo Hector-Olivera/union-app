@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView, StyleSheet } from 'react-native';
+import { 
+  View, Text, TextInput, TouchableOpacity, Modal, ScrollView, StyleSheet 
+} from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { ImagePickerField } from './ImagePickerField';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { Product, ProductFormData } from '@/types/product';
@@ -14,13 +17,14 @@ type Props = {
 
 export const ProductFormModal = ({ visible, editingProduct, onClose, onSave }: Props) => {
   const { colors } = useAppTheme();
+  const { isWeb } = useResponsiveLayout();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   // Cuando se abre el modal, precargamos los datos si estamos editando
   useEffect(() => {
     if (visible) {
@@ -49,9 +53,9 @@ export const ProductFormModal = ({ visible, editingProduct, onClose, onSave }: P
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.backdrop}>
-        <View style={styles.sheet}>
+    <Modal visible={visible} transparent animationType={isWeb ? 'fade' : 'slide'} onRequestClose={onClose}>
+      <View style={[styles.backdrop, isWeb && styles.backdropWeb]}>
+        <View style={[styles.sheet, isWeb && styles.sheetWeb]}>
           <ScrollView showsVerticalScrollIndicator={false}>
 
             <Text style={styles.title}>
@@ -197,5 +201,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
+  },
+  backdropWeb: {
+    justifyContent: 'center', // centrado vertical en vez de pegado abajo
+    alignItems: 'center',
+  },
+  sheetWeb: {
+    borderRadius: Radius.lg, // bordes redondeados en las 4 esquinas, no solo arriba
+    width: '100%',
+    maxWidth: 480,
+    maxHeight: '80%',
   },
 });

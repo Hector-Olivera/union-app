@@ -21,6 +21,7 @@ import { ProductCatalogEditor } from './management/ProductCatalogEditor';
 import { CarouselEditor } from './management/CarouselEditor';
 import { AboutContactEditor } from './management/AboutContactEditor';
 import type { Store, StoreSectionType } from '@/types/store';
+import { SplitScreenLayout } from '@/components/ui/SplitScreenLayout';
 
 
 type Props = {
@@ -233,11 +234,11 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
     <Modal
           visible={editingSectionType !== null}
           transparent
-          animationType="slide"
+          animationType={useSplitLayout ? 'fade' : 'slide'}
           onRequestClose={() => setEditingSectionType(null)}
         >
-      <View style={styles.modalBackdrop}>
-        <View style={styles.modalSheet}>
+      <View style={[styles.modalBackdrop, useSplitLayout && styles.backdropWeb]}>
+        <View style={[styles.modalSheet, useSplitLayout && styles.sheetWeb]}>
           <TouchableOpacity onPress={() => setEditingSectionType(null)} style={styles.modalClose}>
             <Text style={styles.modalCloseText}>✕ Cerrar </Text>
           </TouchableOpacity>
@@ -290,22 +291,12 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
 
  if (useSplitLayout) {
-  // Layout dividido para web ancha: controles | preview fija
   return (
-    <View style={styles.splitContainer}>
-      <ScrollView
-        style={styles.splitLeft}
-        contentContainerStyle={styles.splitLeftContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Todo el contenido de edición: header, nombre, acciones, tema, layout */}
-        {renderEditorContent()}
-      </ScrollView>
-
-      <View style={styles.splitRight}>
-        <StoreLivePreview store={store} products={products}/>
-      </View>
-    </View>
+    <SplitScreenLayout
+      left={renderEditorContent()}
+      right={<StoreLivePreview store={store} products={products} />}
+      leftRatio={0.3}
+    />
   );
 }
 
@@ -429,27 +420,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     marginVertical: Spacing.lg,
   },
-  splitContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    position: 'relative',
-    overflow: 'hidden',
-    width: '100%',
-    maxWidth: 1200,
-    alignSelf: 'center',
-  },
-  splitLeft: {
-    flex: 1.4,
-    paddingRight: Spacing.lg,
-  },
-  splitLeftContent: {
-    padding: Spacing.xl,
-  },
-  splitRight: {
-    flex: 1,
-    padding: Spacing.xl,
-    alignSelf: 'center',
-  },
   previewSectionTitle: {
     color: Colors.dark.text,
     fontSize: Typography.sizes.md,
@@ -469,6 +439,16 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     paddingBottom: Spacing.xxl,
     maxHeight: '85%',
+  },
+  backdropWeb: {
+    justifyContent: 'center', // centrado vertical en vez de pegado abajo
+    alignItems: 'center',
+  },
+  sheetWeb: {
+    borderRadius: Radius.lg, // bordes redondeados en las 4 esquinas, no solo arriba
+    width: '100%',
+    maxWidth: 480,
+    maxHeight: '80%',
   },
   modalClose: {
     alignSelf: 'flex-end',

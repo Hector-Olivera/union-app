@@ -1,6 +1,8 @@
+import { useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { THEME_OPTIONS } from '@stores/themeStore';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { Typography, Spacing, Radius, Colors } from '@constants/theme';
 
 type Props = {
@@ -10,16 +12,40 @@ type Props = {
 
 export const ThemePicker = ({ selectedThemeId, onSelect }: Props) => {
   const { colors } = useAppTheme();
+  const { isWeb } = useResponsiveLayout();
+  const scrollRef = useRef<ScrollView>(null);
+
+  const scrollByAmount = (amount: number) => {
+    scrollRef.current?.scrollTo({ x: amount, animated: true });
+  };
+
+  const currentOffset = useRef(0);
+
+  const handleScroll = (amount: number) => () => {
+    const next = Math.max(0, currentOffset.current + amount);
+    scrollRef.current?.scrollTo({ x: next, animated: true });
+    currentOffset.current = next;
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tema de color</Text>
       <Text style={styles.subtitle}>Se aplica en toda la aplicación</Text>
 
+      <View style={styles.scrollWrapper}>
+        {isWeb && (
+          <TouchableOpacity style={styles.arrowButton} onPress={handleScroll(-150)}>
+            <Text style={styles.arrowText}>‹</Text>
+          </TouchableOpacity>
+        )}
+
       <ScrollView
+        ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
+        onScroll={(e) => { currentOffset.current = e.nativeEvent.contentOffset.x; }}
+        scrollEventThrottle={16}
       >
         {THEME_OPTIONS.map((theme) => {
           const isSelected = theme.id === selectedThemeId;
@@ -60,6 +86,13 @@ export const ThemePicker = ({ selectedThemeId, onSelect }: Props) => {
           );
         })}
       </ScrollView>
+
+      {isWeb && (
+          <TouchableOpacity style={styles.arrowButton} onPress={handleScroll(150)}>
+            <Text style={styles.arrowText}>›</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
@@ -120,6 +153,24 @@ const styles = StyleSheet.create({
   checkmarkText: {
     color: '#fff',
     fontSize: 10,
+    fontWeight: '700',
+  },
+  scrollWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  arrowButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: Spacing.xs,
+  },
+  arrowText: {
+    color: Colors.dark.text,
+    fontSize: 20,
     fontWeight: '700',
   },
 });
