@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
+import { SplitScreenLayout } from '@components/ui/SplitScreenLayout';
 import { useProfile } from '@features/profile/hooks/useProfile';
 import { AvatarPicker } from '@features/profile/components/AvatarPicker';
 import { ThemePicker } from '@features/profile/components/ThemePicker';
@@ -18,6 +20,7 @@ import { useStoreStore } from '@stores/storeStore';
 
 
 export default function ProfileScreen() {
+  const { useSplitLayout } = useResponsiveLayout();
   const { store } = useStoreStore();
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
@@ -34,14 +37,11 @@ export default function ProfileScreen() {
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user?.displayName || '');
-  // editingName controla si mostramos el TextInput o el texto estático
-  // Patrón inline edit — más fluido que navegar a otra pantalla
 
   const handleSaveName = async () => {
     await updateDisplayName(nameInput);
     setEditingName(false);
   };
-
 
  const handleSignOut = () => {
   setShowSignOutDialog(true);
@@ -49,9 +49,8 @@ export default function ProfileScreen() {
 
   if (!user) return null;
 
-  return (
-    <View style={[styles.flex, { paddingTop: insets.top }]}>
-        <ScrollView
+  const leftContent = (
+    <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
@@ -90,7 +89,7 @@ export default function ProfileScreen() {
             onSelect={changeTheme}
           />
 
-          <SectionLabel label="MI TIENDA" color={colors.brand.secondary} />
+          <SectionLabel label="MI TIENDA" color={colors.brand.secondary}/>
 
           {/* Activación de tienda */}
           <StoreActivation
@@ -143,6 +142,33 @@ export default function ProfileScreen() {
           />
 
         </ScrollView>
+  )
+
+  const rightContent = (
+    <View>
+      <Text style={[styles.newsTitle, { color: colors.brand.primary }]}>Bienvenido a Union</Text>
+      <Text style={styles.newsParagraph}>Gracias por formar parte de la comunidad de Union!</Text>
+      <Text style={styles.newsParagraph}>Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.</Text>
+      <Text style={styles.newsParagraph}>Publicitá tus productos ofreciendo regalos y descuentos.</Text>
+      <Text style={styles.newsParagraph}>Siendo parte de Union es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.</Text>
+    </View>
+  );
+
+  if (useSplitLayout) {
+    return (
+      <View style={styles.container}>
+        <SplitScreenLayout left={leftContent} right={rightContent} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.flex, { paddingTop: insets.top }]}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          {leftContent}
+          <View style={styles.divider} />
+          {rightContent}
+        </ScrollView>
     </View>
   );
 }
@@ -165,14 +191,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: Spacing.xl,
     paddingBottom: Spacing.xxl,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.lg,
-    paddingVertical: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   userInfo: {
     flex: 1,
@@ -238,6 +263,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     marginTop: Spacing.lg,
     marginBottom: Spacing.md,
+    marginHorizontal: Spacing.sm,
   },
   accountSection: {
     backgroundColor: 'rgba(255,255,255,0.04)',
@@ -287,4 +313,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.5,
   },
+  newsTitle: { 
+    fontSize: Typography.sizes.xxl, 
+    fontWeight: Typography.weights.bold, 
+    marginBottom: Spacing.lg,
+    marginHorizontal: Spacing.sm,
+  },
+  newsParagraph: { 
+    color: Colors.dark.text, 
+    fontSize: Typography.sizes.lg, 
+    lineHeight: 24, 
+    marginBottom: Spacing.md,
+    marginHorizontal: Spacing.sm
+  },
+  mobileSectionTitle: {
+    color: Colors.dark.text,
+    fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.semibold,
+    marginBottom: Spacing.md,
+    marginHorizontal: Spacing.sm,
+  },  
 });

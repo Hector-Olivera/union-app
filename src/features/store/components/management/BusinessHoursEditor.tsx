@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
   dayRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: Spacing.sm,
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: Radius.md,
