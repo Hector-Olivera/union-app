@@ -1,5 +1,6 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Typography } from '@constants/theme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 
 type Props = {
   storeName: string;
@@ -12,16 +13,19 @@ type Props = {
 export const BannerSection = ({
    storeName, description, primaryColor, secondaryColor, bannerUrl
    }: Props) => {
+    const { isWeb } = useResponsiveLayout();
+    const bannerHeight = isWeb ? 140 : 90;
+
   if (bannerUrl) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { minHeight: bannerHeight }]}>
         <Image source={{ uri: bannerUrl }} style={styles.bannerImage} resizeMode="cover" />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, styles.placeholderContainer, { backgroundColor: primaryColor }]}>
+    <View style={[styles.container, styles.placeholderContainer, {minHeight: bannerHeight, backgroundColor: primaryColor }]}>
       <View style={[styles.overlay, { backgroundColor: secondaryColor }]} />
       <View style={styles.textOverlay}>
         <Text style={styles.name}>{storeName}</Text>
@@ -36,7 +40,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 33,
-    minHeight: 80,
   },
    placeholderContainer: {
     justifyContent: 'flex-end',

@@ -201,14 +201,19 @@ export default function ExploreScreen() {
         {/* Página 3: Mensajes */}
         <View style={{ width: SCREEN_WIDTH, flex: 1  }}>
           {useSplitLayout ? (
-            <SplitScreenLayout
-              left={messagesLeft}
-              right={
-                selectedConversationId
-                  ? <ChatPanel conversationId={selectedConversationId} />
-                  : <Text style={styles.emptyText}>Seleccioná una conversación para ver los mensajes.</Text>
-              }
-            />
+            <View style={styles.messagesSplit}>
+              <ScrollView style={styles.messagesLeftColumn} showsVerticalScrollIndicator={false}>
+                {messagesLeft}
+              </ScrollView>
+              <View style={styles.messagesDivider} />
+              <View style={styles.messagesRightColumn}>
+                {selectedConversationId ? (
+                  <ChatPanel conversationId={selectedConversationId} />
+                ) : (
+                  <Text style={styles.emptyText}>Seleccioná una conversación para ver los mensajes.</Text>
+                )}
+              </View>
+            </View>
           ) : (
             <ScrollView contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false}>
               {messagesLeft}
@@ -226,7 +231,7 @@ const styles = StyleSheet.create({
   bgAccent: { position: 'absolute', top: -60, width: 180, height: 120, borderBottomLeftRadius: 90, borderBottomRightRadius: 90, opacity: 0.1 },
   appTitle: { fontSize: Typography.sizes.md, fontWeight: Typography.weights.bold, letterSpacing: 3 },
   pager: { flex: 1 },
-  pageContent: { paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xxl },
+  pageContent: { paddingHorizontal: Spacing.sm, paddingBottom: Spacing.xxl },
   emptyText: { color: Colors.dark.icon, fontSize: Typography.sizes.sm, fontStyle: 'italic', textAlign: 'center', marginTop: Spacing.xl },
   rightTitle: { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.bold, marginBottom: Spacing.md },
   divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: Spacing.lg },
@@ -240,5 +245,26 @@ const styles = StyleSheet.create({
   cardGridItem: {
     flexBasis: '31%', 
     minWidth: 290,     
+  },
+  messagesSplit: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+  },
+  messagesLeftColumn: {
+    flexBasis: '30%',
+  flexGrow: 0,
+  flexShrink: 0,
+  padding: Spacing.xl,
+  },
+  messagesDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  messagesRightColumn: {
+    flexBasis: '70%',
+  flexGrow: 0,
+  flexShrink: 0,
+  padding: Spacing.xl,
   },
 });

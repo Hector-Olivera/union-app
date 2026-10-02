@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
-  View, Text, TextInput, TouchableOpacity, Modal, ScrollView, StyleSheet 
+  View, Text, TextInput, TouchableOpacity, Modal,
+  ScrollView, StyleSheet, KeyboardAvoidingView, Platform 
 } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
@@ -54,73 +55,78 @@ export const ProductFormModal = ({ visible, editingProduct, onClose, onSave }: P
 
   return (
     <Modal visible={visible} transparent animationType={isWeb ? 'fade' : 'slide'} onRequestClose={onClose}>
-      <View style={[styles.backdrop, isWeb && styles.backdropWeb]}>
-        <View style={[styles.sheet, isWeb && styles.sheetWeb]}>
-          <ScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={[styles.backdrop, isWeb && styles.backdropWeb]}>
+          <View style={[styles.sheet, isWeb && styles.sheetWeb]}>
+            <ScrollView showsVerticalScrollIndicator={false}>
 
-            <Text style={styles.title}>
-              {editingProduct ? 'Editar producto' : 'Nuevo producto'}
-            </Text>
+              <Text style={styles.title}>
+                {editingProduct ? 'Editar producto' : 'Nuevo producto'}
+              </Text>
 
-            <ImagePickerField
-              currentUrl={imageUrl}
-              onUploaded={setImageUrl}
-              aspectRatio={[1, 1]}
-              label="FOTO DEL PRODUCTO"
-              folder="union-app/products"
-              height={140}
-              placeholderIcon="📦"
-            />
+              <ImagePickerField
+                currentUrl={imageUrl}
+                onUploaded={setImageUrl}
+                aspectRatio={[1, 1]}
+                label="FOTO DEL PRODUCTO"
+                folder="union-app/products"
+                height={140}
+                placeholderIcon="📦"
+              />
 
-            <Text style={styles.label}>NOMBRE</Text>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Ej: Pizza muzzarella"
-              placeholderTextColor={Colors.dark.icon}
-              maxLength={60}
-            />
+              <Text style={styles.label}>NOMBRE</Text>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                placeholder="Ej: Pizza muzzarella"
+                placeholderTextColor={Colors.dark.icon}
+                maxLength={60}
+              />
 
-            <Text style={styles.label}>PRECIO</Text>
-            <TextInput
-              style={styles.input}
-              value={price}
-              onChangeText={setPrice}
-              placeholder="0.00"
-              placeholderTextColor={Colors.dark.icon}
-              keyboardType="decimal-pad"
-            />
+              <Text style={styles.label}>PRECIO</Text>
+              <TextInput
+                style={styles.input}
+                value={price}
+                onChangeText={setPrice}
+                placeholder="0.00"
+                placeholderTextColor={Colors.dark.icon}
+                keyboardType="decimal-pad"
+              />
 
-            <Text style={styles.label}>DESCRIPCIÓN (opcional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Ingredientes, detalles..."
-              placeholderTextColor={Colors.dark.icon}
-              multiline
-              maxLength={150}
-            />
+              <Text style={styles.label}>DESCRIPCIÓN (opcional)</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Ingredientes, detalles..."
+                placeholderTextColor={Colors.dark.icon}
+                multiline
+                maxLength={150}
+              />
 
-            {!!error && <Text style={styles.errorText}>{error}</Text>}
+              {!!error && <Text style={styles.errorText}>{error}</Text>}
 
-            <View style={styles.actions}>
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.saveButton, { backgroundColor: colors.brand.primary }]}
-                onPress={handleSave}
-                disabled={saving}
-              >
-                <Text style={styles.saveText}>{saving ? 'Guardando...' : 'Guardar'}</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.actions}>
+                <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                  <Text style={styles.cancelText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.saveButton, { backgroundColor: colors.brand.primary }]}
+                  onPress={handleSave}
+                  disabled={saving}
+                >
+                  <Text style={styles.saveText}>{saving ? 'Guardando...' : 'Guardar'}</Text>
+                </TouchableOpacity>
+              </View>
 
-          </ScrollView>
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -203,11 +209,11 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
   },
   backdropWeb: {
-    justifyContent: 'center', // centrado vertical en vez de pegado abajo
+    justifyContent: 'center',
     alignItems: 'center',
   },
   sheetWeb: {
-    borderRadius: Radius.lg, // bordes redondeados en las 4 esquinas, no solo arriba
+    borderRadius: Radius.lg, 
     width: '100%',
     maxWidth: 480,
     maxHeight: '80%',

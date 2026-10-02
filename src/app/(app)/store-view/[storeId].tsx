@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
   },
   content: {
-    paddingHorizontal: Spacing.xl,
+    paddingHorizontal: Spacing.sm,
     paddingBottom: Spacing.xxl,
   },
   favButton: {

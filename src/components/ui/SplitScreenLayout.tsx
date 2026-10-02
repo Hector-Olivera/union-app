@@ -32,7 +32,11 @@ export const SplitScreenLayout = ({ left, right, leftRatio = 0.3 }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: 'row' },
+  container: { 
+    flex: 1, 
+    flexDirection: 'row',
+    backgroundColor: Colors.dark.background,
+  },
   column: { flex: 1 },
   columnContent: { padding: 24, paddingBottom: 48 },
   divider: {

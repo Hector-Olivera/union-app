@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { LogoSection } from './sections/LogoSection';
 import { BannerSection } from './sections/BannerSection';
 import { ProductGridSection } from './sections/ProductGridSection';
@@ -23,74 +23,25 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
     .sort((a, b) => a.order - b.order);
 
   return (
-    <View>
+    <View style={styles.wrapContainer}>
       {visibleSections.map((section) => {
         switch (section.type) {
           case 'logo':
-            return (
-              <LogoSection
-                key={section.id}
-                storeName={store.name}
-                primaryColor={theme.primary}
-                logoUrl={store.logoUrl}
-              />
-            );
+            return <View key={section.id} style={styles.fullWidth}><LogoSection storeName={store.name} primaryColor={theme.primary} logoUrl={store.logoUrl} /></View>;
           case 'banner':
-            return (
-              <BannerSection
-                key={section.id}
-                storeName={store.name}
-                description={store.description}
-                primaryColor={theme.primary}
-                secondaryColor={theme.secondary}
-                bannerUrl={store.bannerUrl}
-              />
-            );
+            return <View key={section.id} style={styles.fullWidth}><BannerSection storeName={store.name} description={store.description} primaryColor={theme.primary} secondaryColor={theme.secondary} bannerUrl={store.bannerUrl} /></View>;
           case 'product_grid':
-            return (
-              <ProductGridSection
-                key={section.id}
-                primaryColor={theme.primary}
-                products={products}
-              />
-            );
-          case 'about':
-            return (
-              <AboutSection
-                key={section.id}
-                description={store.description}
-              />
-            );
-          case 'contact':
-            return (
-              <ContactSection
-                key={section.id}
-                primaryColor={theme.primary}
-                contact={store.contact}
-              />
-            );
+            return <View key={section.id} style={styles.fullWidth}><ProductGridSection primaryColor={theme.primary} products={products} /></View>;
           case 'carousel':
-            return (
-              <CarouselSection
-                key={section.id}
-                primaryColor={theme.primary}
-                images={store.carouselImages}
-              />
-            );
-            case 'hours':
-              return (
-                <HoursSection 
-                  key={section.id} 
-                  hours={store.businessHours} 
-                  primaryColor={theme.primary} />
-              );
-            case 'announcements':
-              return (
-                <AnnouncementsSection
-                 key={section.id} 
-                 announcements={store.announcements} 
-                 primaryColor={theme.primary} />
-              );
+            return <View key={section.id} style={styles.fullWidth}><CarouselSection primaryColor={theme.primary} images={store.carouselImages} /></View>;
+          case 'about':
+            return <View key={section.id} style={styles.inlineItem}><AboutSection description={store.description} /></View>;
+          case 'contact':
+            return <View key={section.id} style={styles.inlineItem}><ContactSection primaryColor={theme.primary} contact={store.contact} /></View>;
+          case 'hours':
+            return <View key={section.id} style={styles.inlineItem}><HoursSection hours={store.businessHours} primaryColor={theme.primary} /></View>;
+          case 'announcements':
+            return <View key={section.id} style={styles.inlineItem}><AnnouncementsSection announcements={store.announcements} primaryColor={theme.primary} /></View>;
           default:
             return null;
         }
@@ -98,3 +49,20 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
     </View>
   );
 };
+const styles = StyleSheet.create({
+  wrapContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    gap: 16,
+  },
+  fullWidth: {
+    width: '100%',
+  },
+  inlineItem: {
+    width: '47%',
+    maxWidth: 300,
+    minWidth: 140, 
+    flexGrow: 0,
+  },
+});
