@@ -1,5 +1,9 @@
+import { useRef, useState } from 'react';
 import { ScrollView, View, Image, StyleSheet } from 'react-native';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
+import { TouchableOpacity } from 'react-native';
+import { Text } from 'react-native';
 
 type Props = {
   primaryColor: string;
@@ -7,85 +11,86 @@ type Props = {
 };
 
 export const CarouselSection = ({ primaryColor, images = [] }: Props) => {
-  if (images.length === 0) return null;
-  // Sin imágenes, la sección no ocupa espacio — mejor que placeholders vacíos
+  const { isWeb } = useResponsiveLayout();
+  const scrollRef = useRef<ScrollView>(null);
+  const currentOffset = useRef(0);
+  const [contentWidth, setContentWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
 
+  if (images.length === 0) return null;
+
+  const maxOffset = Math.max(0, contentWidth - containerWidth);
+
+  const handleScroll = (amount: number) => () => {
+    const next = Math.max(0, Math.min(currentOffset.current + amount, maxOffset));
+    scrollRef.current?.scrollTo({ x: next, animated: true });
+    currentOffset.current = next;
+  };
+  
   return (
     <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {images.map((url, i) => (
-          <Image key={i} source={{ uri: url }} style={styles.slide} resizeMode="cover" />
-        ))}
-      </ScrollView>
+      <View style={styles.scrollWrapper} onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
+        {isWeb && (
+          <TouchableOpacity style={[styles.arrowButton, { left: -16 }]} onPress={handleScroll(-240)}>
+            <Text style={styles.arrowText}>‹</Text>
+          </TouchableOpacity>
+        )}
+
+        <ScrollView
+          ref={scrollRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+          onContentSizeChange={(w) => setContentWidth(w)}
+          onScroll={(e) => { currentOffset.current = e.nativeEvent.contentOffset.x; }}
+          scrollEventThrottle={16}
+        >
+          {images.map((url, i) => (
+            <Image key={i} source={{ uri: url }} style={styles.slide} resizeMode="cover" />
+          ))}
+        </ScrollView>
+
+        {isWeb && (
+          <TouchableOpacity style={[styles.arrowButton, { right: -16 }]} onPress={handleScroll(240)}>
+            <Text style={styles.arrowText}>›</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
-  );
-};
+    );
+  };
+
 
 const styles = StyleSheet.create({
   container: { marginBottom: Spacing.lg },
-  scroll: { gap: Spacing.sm },
+  scroll: { gap: Spacing.sm, paddingRight: Spacing.md },
   slide: {
     width: 220,
     height: 130,
     borderRadius: Radius.lg,
   },
-});
-
-
-/*import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import { Colors, Typography, Spacing, Radius } from '@constants/theme';
-
-type Props = {
-  primaryColor: string;
-};
-
-// Carrusel de imágenes: placeholder horizontal scrolleable.
-// Cuando exista subida de imágenes (Firebase Storage), cada card
-// renderiza la imagen real en lugar del bloque de color.
-export const CarouselSection = ({ primaryColor }: Props) => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Galería</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
-        {[1, 2, 3].map((i) => (
-          <View
-            key={i}
-            style={[styles.slide, { backgroundColor: `${primaryColor}15` }]}
-          >
-            <Text style={[styles.slideText, { color: primaryColor }]}>
-              Imagen {i}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: { marginBottom: Spacing.lg },
-  title: {
-    color: Colors.dark.text,
-    fontSize: Typography.sizes.lg,
-    fontWeight: Typography.weights.bold,
-    marginBottom: Spacing.md,
-  },
-  scroll: {
-    gap: Spacing.sm,
-  },
-  slide: {
-    width: 200,
-    height: 130,
-    borderRadius: Radius.lg,
-    justifyContent: 'center',
+  scrollWrapper: {
+    position: 'relative',
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  slideText: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.medium,
+  arrowButton: {
+     position: 'absolute',
+    top: '50%',
+    zIndex: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: Spacing.xs,
+    transform: [{ translateY: -16 }],
   },
-});*/
+  arrowText: {
+    color: Colors.dark.text,
+    fontSize: 20,
+    fontWeight: '700',
+    alignSelf: 'center',
+  },
+});

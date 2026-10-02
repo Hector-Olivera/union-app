@@ -75,7 +75,7 @@ export const ChatPanel = ({ conversationId }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, height: 500 },
+  container: { flex: 1 },
   headerName: { color: Colors.dark.text, fontSize: Typography.sizes.lg, fontWeight: Typography.weights.bold, marginBottom: Spacing.md },
   list: { flex: 1, marginBottom: Spacing.md },
   bubbleRow: { flexDirection: 'row', marginBottom: Spacing.xs },

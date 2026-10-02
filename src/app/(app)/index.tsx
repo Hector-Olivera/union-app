@@ -166,7 +166,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
-  content: { paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xxl },
+  content: { paddingHorizontal: Spacing.sm, paddingBottom: Spacing.xxl },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: Spacing.xl },
   headerText: { flex: 1, marginRight: Spacing.md },
   greeting: { color: Colors.dark.icon, fontSize: Typography.sizes.md },

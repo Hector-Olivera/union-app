@@ -5,13 +5,17 @@ import { QRPreview } from './QRPreview';
 import { QRColorPicker } from './QRColorPicker';
 import { QRStylePicker } from './QRStylePicker';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
+import { SplitScreenLayout } from '@components/ui/SplitScreenLayout';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { router } from 'expo-router';
 
 // Pantalla completa del generador de QR.
 // Combina el preview en tiempo real con los controles de personalizacion.
 // Cada cambio en color o estilo se refleja inmediatamente en el preview
 // porque el config viene del hook y el QRPreview lo lee directamente.
 export const QRGenerator = () => {
+  const { useSplitLayout } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const {
@@ -23,12 +27,15 @@ export const QRGenerator = () => {
     storeName,
   } = useQRGenerator();
 
-  return (
+  const leftContent = (
     <ScrollView
       style={[styles.container, { paddingTop: insets.top }]}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
+      <TouchableOpacity onPress={() => router.push('/(app)/store')} style={styles.backButton}>
+        <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
+      </TouchableOpacity> 
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>QR de tu tienda</Text>
@@ -37,8 +44,7 @@ export const QRGenerator = () => {
         </Text>
       </View>
 
-      {/* Preview en tiempo real */}
-      <QRPreview config={config} ref={viewShotRef} />
+      
 
       {/* Controles de personalización */}
       <QRColorPicker
@@ -83,6 +89,30 @@ export const QRGenerator = () => {
 
     </ScrollView>
   );
+
+  const rightContent = (
+    <View style={ styles.contenRight }>
+      <QRPreview config={config} ref={viewShotRef} />
+    </View>
+  );
+
+  if (useSplitLayout) {
+    return (
+      <View style={[styles.flex, { paddingTop: insets.top }]}>
+        <SplitScreenLayout left={leftContent} right={rightContent} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.flex, { paddingTop: insets.top }]}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {leftContent}
+        <View style={styles.divider} />
+        {rightContent}
+      </ScrollView>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -90,12 +120,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.dark.background,
   },
+  flex: {
+    flex: 1,
+    backgroundColor: Colors.dark.background,
+  },
   content: {
-    paddingHorizontal: Spacing.xl,
+    paddingHorizontal: Spacing.sm,
     paddingBottom: Spacing.xxl,
   },
   header: {
-    paddingVertical: Spacing.xl,
+    paddingVertical: Spacing.sm,
     gap: Spacing.xs,
   },
   title: {
@@ -137,5 +171,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
+  },
+  divider: {
+      height: 1,
+      backgroundColor: 'rgba(255,255,255,0.06)',
+      marginHorizontal: Spacing.lg,
+    },
+    mobileSectionTitle: {
+    color: Colors.dark.text,
+    fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.semibold,
+    marginBottom: Spacing.md,
+    marginHorizontal: Spacing.sm,
+  },  
+  backButton: {
+    alignSelf: 'flex-start',
+  }, 
+  backText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+  },
+  contenRight:{
+    flex: 1,
+    padding: Spacing.xxl,
   },
 });

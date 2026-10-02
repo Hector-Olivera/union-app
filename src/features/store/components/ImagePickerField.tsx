@@ -13,9 +13,6 @@ type Props = {
   placeholderIcon?: string;
 };
 
-// Campo reutilizable para elegir y subir una imagen.
-// Se usa tanto para logo (aspecto 1:1) como banner (aspecto 16:9),
-// pasando distintos valores de aspectRatio y height.
 export const ImagePickerField = ({
   currentUrl, onUploaded, aspectRatio, label, folder,
   height = 120, placeholderIcon = '🖼',

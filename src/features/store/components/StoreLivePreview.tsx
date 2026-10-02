@@ -1,6 +1,10 @@
 import { useState, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, LayoutChangeEvent } from 'react-native';
+import { 
+  View, Text, ScrollView, StyleSheet, 
+  LayoutChangeEvent, useWindowDimensions
+} from 'react-native';
 import { StoreSectionRenderer } from './StoreSectionRenderer';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { Store } from '@/types/store';
 import { Product } from '@/types/product';
@@ -10,18 +14,19 @@ type Props = {
   products?: Product[];
 };
 
-
-const REFERENCE_WIDTH = 360;
-
 const FRAME_VIEWPORT_HEIGHT = 650;
 
 const CONTENT_PADDING = Spacing.md;
 
 export const StoreLivePreview = ({ store, products = [] }: Props) => {
+  const { isWeb } = useResponsiveLayout();
+  const { width: windowWidth } = useWindowDimensions();
+
+  const REFERENCE_WIDTH = isWeb ? Math.min(windowWidth, 1200) - 64 : 360;
+  
   const [contentHeight, setContentHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   
-
   const handleContentLayout = (e: LayoutChangeEvent) => {
     
     const height = e.nativeEvent.layout.height;

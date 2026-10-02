@@ -10,7 +10,7 @@ type Props = {
   onUpdate: (images: string[]) => void;
 };
 
-const MAX_IMAGES = 6;
+const MAX_IMAGES = 12;
 
 export const CarouselEditor = ({ images = [], onUpdate }: Props) => {
   const { colors } = useAppTheme();
