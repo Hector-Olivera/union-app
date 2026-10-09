@@ -50,7 +50,7 @@ export default function RegisterScreen() {
             <Text style={authStyles.tagline}>UNION APP</Text>
             <Text style={authStyles.title}>Crear cuenta</Text>
             <Text style={authStyles.subtitle}>
-              Unite al universo aumentado
+              Unite a la comunidad mas grande de emprendedores
             </Text>
           </View>
 
@@ -105,18 +105,22 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <AuthDivider />
+           {Platform.OS !== 'web' && (
+              <>
+                <AuthDivider />
 
-          {!!googleError && (
-            <View style={authStyles.firebaseError}>
-              <Text style={authStyles.firebaseErrorText}>{googleError}</Text>
-            </View>
-          )}
+                {!!googleError && (
+                  <View style={authStyles.firebaseError}>
+                    <Text style={authStyles.firebaseErrorText}>{googleError}</Text>
+                  </View>
+                )}
 
-          <GoogleSignInButton
-            onPress={signInWithGoogle}
-            loading={googleLoading}
-          />
+                <GoogleSignInButton
+                  onPress={signInWithGoogle}
+                  loading={googleLoading}
+                />
+              </>
+            )}
 
           <View style={authStyles.footer}>
             <Text style={authStyles.footerText}>¿Ya tenés cuenta? </Text>

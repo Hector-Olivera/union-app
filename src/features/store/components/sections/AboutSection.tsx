@@ -5,14 +5,18 @@ type Props = {
   description: string;
 };
 
-export const AboutSection = ({ description }: Props) => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Acerca de</Text>
-    <Text style={styles.text}>
-      {description || 'Esta tienda todavía no agregó una descripción.'}
-    </Text>
-  </View>
-);
+export const AboutSection = ({ description }: Props) => {
+  if (!description || !description.trim()) return null;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Acerca de</Text>
+      <Text style={styles.text}>
+        {description || 'Esta tienda todavía no agregó una descripción.'}
+      </Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: { marginBottom: Spacing.lg },

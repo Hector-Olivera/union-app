@@ -8,7 +8,6 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { 
   subscribeToStore, getRecentPublicStores, getUnvisitedStoresWithNews
  } from '@services/firebase/store';
-import {  } from '@services/firebase/store';
 import { db } from '@/services/firebase/config';
 
 export const useCommunity = () => {

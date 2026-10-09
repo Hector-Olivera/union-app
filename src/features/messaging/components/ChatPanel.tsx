@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
+import { getPublicStoreByOwner } from '@services/firebase/store';
 import { useChat } from '@features/messaging/hooks/useChat';
 import { useConversations } from '@features/messaging/hooks/useConversations';
 import { useAuthStore } from '@stores/authStore';
@@ -21,6 +23,14 @@ export const ChatPanel = ({ conversationId }: Props) => {
   const otherInfo = otherUserId ? conversation?.participantInfo[otherUserId] : null;
   const [input, setInput] = useState('');
   const listRef = useRef<FlatList>(null);
+
+  const handleVisitStore = async () => {
+    if (!otherUserId) return;
+    const store = await getPublicStoreByOwner(otherUserId);
+    if (store) {
+      router.push(`/(app)/store-view/${store.id}`);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || !otherUserId) return;
@@ -46,8 +56,10 @@ export const ChatPanel = ({ conversationId }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerName}>{otherInfo?.name || 'Conversación'}</Text>
-
+      <TouchableOpacity onPress={handleVisitStore} activeOpacity={0.7}>
+        <Text style={styles.headerName}>{otherInfo?.name || 'Conversación'}</Text>
+      </TouchableOpacity>
+      
       <FlatList
         ref={listRef}
         data={[...messages].reverse()}

@@ -33,17 +33,18 @@ export default function EditProfileScreen() {
     setSaving(true);
     await updateProfileInfo(firstName.trim(), lastName.trim(), avatarUrl);
     setSaving(false);
-    router.back();
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.push('/(app)/profile')} style={styles.backButton}>
         <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
       </TouchableOpacity>
 
+      <Text style={styles.title}>Editar perfil</Text>
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Editar perfil</Text>
+        
 
         <View style={styles.avatarSection}>
           <ImagePickerField
@@ -95,12 +96,19 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   backButton: { paddingHorizontal: Spacing.xl, paddingVertical: Spacing.sm },
   backText: { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold },
-  content: { paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xxl },
+  content: { 
+    padding: Spacing.xl,
+    width: '100%',
+    maxWidth: 450,
+    alignSelf: 'center',
+    gap: Spacing.sm,
+  },
   title: {
     color: Colors.dark.text,
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
     marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
   },
   avatarSection: { alignItems: 'center', marginBottom: Spacing.md },
   label: {

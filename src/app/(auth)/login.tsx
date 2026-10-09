@@ -50,7 +50,7 @@ export default function LoginScreen() {
             <Text style={authStyles.tagline}>UNION APP</Text>
             <Text style={authStyles.title}>Bienvenido</Text>
             <Text style={authStyles.subtitle}>
-              Ingresa al universo aumentado
+              Ingresá a la comunidad mas grande de emprendedores
             </Text>
           </View>
 
@@ -89,20 +89,25 @@ export default function LoginScreen() {
               loading={loading}
             />
 
-            <AuthDivider />
+            {Platform.OS !== 'web' && (
+              <>
+                <AuthDivider />
 
-            {!!googleError && (
-              <View style={authStyles.firebaseError}>
-                <Text style={authStyles.firebaseErrorText}>{googleError}</Text>
-              </View>
+                {!!googleError && (
+                  <View style={authStyles.firebaseError}>
+                    <Text style={authStyles.firebaseErrorText}>{googleError}</Text>
+                  </View>
+                )}
+
+                <GoogleSignInButton
+                  onPress={signInWithGoogle}
+                  loading={googleLoading}
+                />
+              </>
             )}
 
-            <GoogleSignInButton
-              onPress={signInWithGoogle}
-              loading={googleLoading}
-            />
-
-            <TouchableOpacity style={styles.forgotPassword}>
+            <TouchableOpacity style={styles.forgotPassword} 
+              onPress={() => router.push('/(auth)/forgot-password')}>
               <Text style={styles.forgotPasswordText}>
                 ¿Olvidaste tu contraseña?  </Text>
             </TouchableOpacity>

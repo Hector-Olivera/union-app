@@ -35,12 +35,15 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
           case 'carousel':
             return <View key={section.id} style={styles.fullWidth}><CarouselSection primaryColor={theme.primary} images={store.carouselImages} /></View>;
           case 'about':
+            if (!store.description?.trim()) return null;
             return <View key={section.id} style={styles.inlineItem}><AboutSection description={store.description} /></View>;
           case 'contact':
+            if (!store.contact || (!store.contact.phone && !store.contact.whatsapp && !store.contact.address && !store.contact.instagram)) return null;
             return <View key={section.id} style={styles.inlineItem}><ContactSection primaryColor={theme.primary} contact={store.contact} /></View>;
           case 'hours':
             return <View key={section.id} style={styles.inlineItem}><HoursSection hours={store.businessHours} primaryColor={theme.primary} /></View>;
           case 'announcements':
+            if (!(store.announcements || []).length) return null;
             return <View key={section.id} style={styles.inlineItem}><AnnouncementsSection announcements={store.announcements} primaryColor={theme.primary} /></View>;
           default:
             return null;

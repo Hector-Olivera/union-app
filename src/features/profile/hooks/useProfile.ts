@@ -32,23 +32,6 @@ export const useProfile = () => {
     }
   };
 
-  const activateStore = async () => {
-    if (!user) return;
-    try {
-      setSaving(true);
-      await setDoc(doc(db, 'players', user.id), {
-        hasStore: true,
-        // storeId se genera cuando el usuario configura su tienda
-        // por ahora solo marcamos la intención
-        storeCreatedAt: new Date().toISOString(),
-      }, { merge: true });
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const changeTheme = async (themeId: string) => {
     if (!user) return;
     // setTheme ya hace la actualización optimista + guarda en Firestore
@@ -61,7 +44,6 @@ export const useProfile = () => {
     error,
     selectedThemeId,
     updateDisplayName,
-    activateStore,
     changeTheme,
     clearError: () => setError(null),
   };
