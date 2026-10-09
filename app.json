@@ -17,6 +17,7 @@
         "backgroundColor": "#0a0a0a"
       },
       "package": "com.unionapp.base",
+      "versionCode": 1,
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.CAMERA",
@@ -37,7 +38,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Union App usa tu ubicacion para mostrar jugadores y lugares cercanos."
+          "locationWhenInUsePermission": "Union App usa tu ubicacion para mostrar Tiendas cercanas."
         }
       ],
       [

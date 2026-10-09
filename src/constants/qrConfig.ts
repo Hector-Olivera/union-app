@@ -23,7 +23,7 @@ export const QR_CONFIG = {
     actionLabel: 'Explorar lugar',
   },
   profile: {
-    label: 'JUGADOR',
+    label: 'USUARIO',
     color: Colors.brand.secondary,
     description: (id: string) => `Usuario: ${id}`,
     actionLabel: 'Ver perfil',

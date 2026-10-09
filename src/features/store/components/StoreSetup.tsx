@@ -73,6 +73,9 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
     justifyContent: 'center',
     gap: Spacing.md,
+    width: '100%',
+    maxWidth: 450,
+    alignSelf: 'center',
   },
   iconContainer: {
     width: 72,

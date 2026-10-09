@@ -44,13 +44,15 @@ export default function ChangePasswordScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.push('/(app)/profile')} style={styles.backButton}>
         <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
       </TouchableOpacity>
 
-      <View style={styles.content}>
-        <Text style={styles.title}>Cambiar contraseña</Text>
+      <Text style={styles.title}>Cambiar contraseña</Text>
 
+
+      <View style={styles.content}>
+        
         {success ? (
           <View style={styles.successBox}>
             <Text style={styles.successText}>Contraseña actualizada correctamente.</Text>
@@ -107,12 +109,19 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   backButton: { paddingHorizontal: Spacing.xl, paddingVertical: Spacing.sm },
   backText: { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold },
-  content: { paddingHorizontal: Spacing.xl },
+  content: { 
+    padding: Spacing.xl,
+    width: '100%',
+    maxWidth: 450,
+    alignSelf: 'center',
+    gap: Spacing.sm,
+   },
   title: {
     color: Colors.dark.text,
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
     marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
   },
   label: {
     color: Colors.dark.text,

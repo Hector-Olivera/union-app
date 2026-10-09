@@ -29,7 +29,6 @@ export default function ProfileScreen() {
     user, saving, error,
     selectedThemeId,
     updateDisplayName,
-    activateStore,
     changeTheme,
   } = useProfile();
 
@@ -92,11 +91,7 @@ export default function ProfileScreen() {
           <SectionLabel label="MI TIENDA" color={colors.brand.secondary}/>
 
           {/* Activación de tienda */}
-          <StoreActivation
-            hasStore={!!store}           
-            onActivate={activateStore}
-            saving={saving}
-          />
+          <StoreActivation hasStore={!!store}/>
 
           <SectionLabel label="CUENTA" color={Colors.dark.icon} />
 
@@ -124,8 +119,15 @@ export default function ProfileScreen() {
             <Text style={styles.signOutText}>Cerrar sesión</Text>
           </TouchableOpacity>
 
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/delete-account')}>
+            <Text style={[styles.accountRowText, { color: Colors.status.error }]}>Eliminar cuenta </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
           {/* Versión de la app */}
-          <Text style={styles.version}>Union App v0.3.0</Text>
+          <Text style={styles.version}>Union App v1.0.0</Text>
 
           <ConfirmDialog
             visible={showSignOutDialog}
