@@ -4,13 +4,14 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
-  onAuthStateChanged,
+  onAuthStateChanged, sendPasswordResetEmail,
   initializeAuth, browserLocalPersistence,
-  sendEmailVerification, reload, updateProfile,
+  sendEmailVerification, reload, updateProfile, deleteUser,
   EmailAuthProvider, reauthenticateWithCredential, updatePassword,
   type User as FirebaseUser,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, deleteDoc, collection, getDocs, 
+  getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firebaseApp, db } from './config';
 import type { User } from '@stores/authStore';
 
@@ -124,4 +125,34 @@ export const changeUserPassword = async (
   const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
   await reauthenticateWithCredential(auth.currentUser, credential);
   await updatePassword(auth.currentUser, newPassword);
+};
+
+export const resetPassword = async (email: string): Promise<void> => {
+  await sendPasswordResetEmail(auth, email);
+};
+
+export const deleteAccount = async (password: string): Promise<void> => {
+  if (!auth.currentUser || !auth.currentUser.email) {
+    throw new Error('No hay sesión activa');
+  }
+
+  const userId = auth.currentUser.uid;
+
+  // Reautenticación obligatoria antes de cualquier operación destructiva
+  const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
+  await reauthenticateWithCredential(auth.currentUser, credential);
+
+  // Si el usuario tiene tienda, borramos sus productos y la tienda misma
+  const storeRef = doc(db, 'stores', userId);
+  const productsSnap = await getDocs(collection(db, 'stores', userId, 'products'));
+  await Promise.all(productsSnap.docs.map(d => deleteDoc(d.ref)));
+  await deleteDoc(storeRef).catch(() => {});
+  // El catch silencioso es porque deleteDoc no falla si el documento
+  // no existe (usuario sin tienda) — Firestore simplemente no hace nada
+
+  // Borramos el documento de datos del usuario
+  await deleteDoc(doc(db, 'players', userId));
+
+  // Por último, eliminamos la cuenta de autenticación en sí
+  await deleteUser(auth.currentUser);
 };

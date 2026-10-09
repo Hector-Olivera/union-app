@@ -6,6 +6,8 @@ import type { Conversation } from '@/types/messaging';
 type Props = {
   conversation: Conversation;
   currentUserId: string;
+  onPress?: () => void;
+  isSelected?: boolean;
 };
 
 const formatRelativeTime = (isoDate: string): string => {
@@ -19,32 +21,38 @@ const formatRelativeTime = (isoDate: string): string => {
   return `${days} sem`;
 };
 
-export const ConversationListItem = ({ conversation, currentUserId }: Props) => {
-  // El "otro" participante — el que no soy yo
+export const ConversationListItem = ({ conversation, currentUserId, onPress, isSelected }: Props) => {
+  
   const otherUserId = conversation.participants.find(id => id !== currentUserId);
   const otherInfo = otherUserId ? conversation.participantInfo[otherUserId] : null;
-
   if (!otherInfo) return null;
 
+  
+  const isUnread = (conversation.unreadBy || []).includes(currentUserId);
   const initial = otherInfo.name.charAt(0).toUpperCase();
 
   return (
     <TouchableOpacity
-      style={styles.container}
-      onPress={() => router.push(`/(app)/chat/${conversation.id}` as any)}
+      style={[styles.container, isSelected && styles.containerSelected]}
+      onPress={onPress || (() => router.push(`/(app)/chat/${conversation.id}` as any))}
       activeOpacity={0.75}
     >
-      {otherInfo.avatarUrl ? (
-        <Image source={{ uri: otherInfo.avatarUrl }} style={styles.avatar} />
-      ) : (
-        <View style={styles.avatarPlaceholder}>
-          <Text style={styles.avatarInitial}>{initial}</Text>
-        </View>
-      )}
+      <View style={styles.avatarContainer}>
+        {otherInfo.avatarUrl ? (
+          <Image source={{ uri: otherInfo.avatarUrl }} style={styles.avatar} />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarInitial}>{initial}</Text>
+          </View>
+        )}
+        {isUnread && <View style={styles.unreadDot} />}
+      </View>
 
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>{otherInfo.name}</Text>
-        <Text style={styles.lastMessage} numberOfLines={1}>
+        <Text style={[styles.name, isUnread && { fontWeight: Typography.weights.bold }]} numberOfLines={1}>
+          {otherInfo.name}
+        </Text>
+        <Text style={[styles.lastMessage, isUnread && { color: Colors.dark.text }]} numberOfLines={1}>
           {conversation.lastMessage || 'Nueva conversación'}
         </Text>
       </View>
@@ -72,4 +80,18 @@ const styles = StyleSheet.create({
   name: { color: Colors.dark.text, fontSize: Typography.sizes.md, fontWeight: Typography.weights.medium },
   lastMessage: { color: Colors.dark.icon, fontSize: Typography.sizes.sm },
   time: { color: Colors.dark.icon, fontSize: Typography.sizes.xs },
+  avatarContainer: { position: 'relative' },
+  unreadDot: {
+    position: 'absolute',
+    bottom: 0, right: 0,
+    width: 12, height: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.status.success,
+    borderWidth: 2,
+    borderColor: Colors.dark.background,
+  },
+  containerSelected: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: Radius.md,
+  },
 });

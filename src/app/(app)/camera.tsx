@@ -51,7 +51,7 @@ export default function CameraScreen() {
           {mode === 'ar' && (
             <>
               <ARCrosshair />
-              <PlayerTag name="Andres" level={11} position={{ x: 120, y: 180 }} />
+              <PlayerTag name="Usuario" level={11} position={{ x: 120, y: 180 }} />
             </>
           )}
 

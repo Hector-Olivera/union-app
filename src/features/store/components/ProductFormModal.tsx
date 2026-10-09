@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView, StyleSheet } from 'react-native';
+import { 
+  View, Text, TextInput, TouchableOpacity, Modal,
+  ScrollView, StyleSheet, KeyboardAvoidingView, Platform 
+} from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { ImagePickerField } from './ImagePickerField';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { Product, ProductFormData } from '@/types/product';
@@ -14,13 +18,14 @@ type Props = {
 
 export const ProductFormModal = ({ visible, editingProduct, onClose, onSave }: Props) => {
   const { colors } = useAppTheme();
+  const { isWeb } = useResponsiveLayout();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   // Cuando se abre el modal, precargamos los datos si estamos editando
   useEffect(() => {
     if (visible) {
@@ -49,74 +54,79 @@ export const ProductFormModal = ({ visible, editingProduct, onClose, onSave }: P
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.backdrop}>
-        <View style={styles.sheet}>
-          <ScrollView showsVerticalScrollIndicator={false}>
+    <Modal visible={visible} transparent animationType={isWeb ? 'fade' : 'slide'} onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={[styles.backdrop, isWeb && styles.backdropWeb]}>
+          <View style={[styles.sheet, isWeb && styles.sheetWeb]}>
+            <ScrollView showsVerticalScrollIndicator={false}>
 
-            <Text style={styles.title}>
-              {editingProduct ? 'Editar producto' : 'Nuevo producto'}
-            </Text>
+              <Text style={styles.title}>
+                {editingProduct ? 'Editar producto' : 'Nuevo producto'}
+              </Text>
 
-            <ImagePickerField
-              currentUrl={imageUrl}
-              onUploaded={setImageUrl}
-              aspectRatio={[1, 1]}
-              label="FOTO DEL PRODUCTO"
-              folder="union-app/products"
-              height={140}
-              placeholderIcon="📦"
-            />
+              <ImagePickerField
+                currentUrl={imageUrl}
+                onUploaded={setImageUrl}
+                aspectRatio={[1, 1]}
+                label="FOTO DEL PRODUCTO"
+                folder="union-app/products"
+                height={140}
+                placeholderIcon="📦"
+              />
 
-            <Text style={styles.label}>NOMBRE</Text>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Ej: Pizza muzzarella"
-              placeholderTextColor={Colors.dark.icon}
-              maxLength={60}
-            />
+              <Text style={styles.label}>NOMBRE</Text>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={setName}
+                placeholder="Ej: Pizza muzzarella"
+                placeholderTextColor={Colors.dark.icon}
+                maxLength={60}
+              />
 
-            <Text style={styles.label}>PRECIO</Text>
-            <TextInput
-              style={styles.input}
-              value={price}
-              onChangeText={setPrice}
-              placeholder="0.00"
-              placeholderTextColor={Colors.dark.icon}
-              keyboardType="decimal-pad"
-            />
+              <Text style={styles.label}>PRECIO</Text>
+              <TextInput
+                style={styles.input}
+                value={price}
+                onChangeText={setPrice}
+                placeholder="0.00"
+                placeholderTextColor={Colors.dark.icon}
+                keyboardType="decimal-pad"
+              />
 
-            <Text style={styles.label}>DESCRIPCIÓN (opcional)</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Ingredientes, detalles..."
-              placeholderTextColor={Colors.dark.icon}
-              multiline
-              maxLength={150}
-            />
+              <Text style={styles.label}>DESCRIPCIÓN (opcional)</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Ingredientes, detalles..."
+                placeholderTextColor={Colors.dark.icon}
+                multiline
+                maxLength={150}
+              />
 
-            {!!error && <Text style={styles.errorText}>{error}</Text>}
+              {!!error && <Text style={styles.errorText}>{error}</Text>}
 
-            <View style={styles.actions}>
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.saveButton, { backgroundColor: colors.brand.primary }]}
-                onPress={handleSave}
-                disabled={saving}
-              >
-                <Text style={styles.saveText}>{saving ? 'Guardando...' : 'Guardar'}</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.actions}>
+                <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+                  <Text style={styles.cancelText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.saveButton, { backgroundColor: colors.brand.primary }]}
+                  onPress={handleSave}
+                  disabled={saving}
+                >
+                  <Text style={styles.saveText}>{saving ? 'Guardando...' : 'Guardar'}</Text>
+                </TouchableOpacity>
+              </View>
 
-          </ScrollView>
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -197,5 +207,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
+  },
+  backdropWeb: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sheetWeb: {
+    borderRadius: Radius.lg, 
+    width: '100%',
+    maxWidth: 480,
+    maxHeight: '80%',
   },
 });

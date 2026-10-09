@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { pruneExpiredAnnouncementsIfOwner } from '@services/firebase/store';
 import { useAuthStore } from '@stores/authStore'; 
@@ -21,6 +21,7 @@ import { ProductCatalogEditor } from './management/ProductCatalogEditor';
 import { CarouselEditor } from './management/CarouselEditor';
 import { AboutContactEditor } from './management/AboutContactEditor';
 import type { Store, StoreSectionType } from '@/types/store';
+import { SplitScreenLayout } from '@/components/ui/SplitScreenLayout';
 
 
 type Props = {
@@ -231,57 +232,59 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
     )}
 
     <Modal
-          visible={editingSectionType !== null}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setEditingSectionType(null)}
-        >
-      <View style={styles.modalBackdrop}>
-        <View style={styles.modalSheet}>
-          <TouchableOpacity onPress={() => setEditingSectionType(null)} style={styles.modalClose}>
-            <Text style={styles.modalCloseText}>✕ Cerrar </Text>
-          </TouchableOpacity>
+        visible={editingSectionType !== null}
+        transparent
+        animationType={useSplitLayout ? 'fade' : 'slide'}
+        onRequestClose={() => setEditingSectionType(null)}
+      >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View style={[styles.modalBackdrop, useSplitLayout && styles.backdropWeb]}>
+          <View style={[styles.modalSheet, useSplitLayout && styles.sheetWeb]}>
+            <TouchableOpacity onPress={() => setEditingSectionType(null)} style={styles.modalClose}>
+              <Text style={styles.modalCloseText}>✕ Cerrar </Text>
+            </TouchableOpacity>
 
-          {editingSectionType === 'logo' && (
-            <ImagePickerField
-              currentUrl={store.logoUrl}
-              onUploaded={updateLogoUrl}
-              aspectRatio={[1, 1]}
-              label="LOGO DE LA TIENDA"
-              folder="union-app/logos"
-              height={100}
-              placeholderIcon="🏪"
-            />
-          )}
+            {editingSectionType === 'logo' && (
+              <ImagePickerField
+                currentUrl={store.logoUrl}
+                onUploaded={updateLogoUrl}
+                aspectRatio={[1, 1]}
+                label="LOGO DE LA TIENDA"
+                folder="union-app/logos"
+                height={100}
+                placeholderIcon="🏪"
+              />
+            )}
 
-          {editingSectionType === 'banner' && (
-            <ImagePickerField
-              currentUrl={store.bannerUrl}
-              onUploaded={updateBannerUrl}
-              aspectRatio={[16, 9]}
-              label="BANNER"
-              folder="union-app/banners"
-              height={140}
-              placeholderIcon="🖼"
-            />
-          )}
+            {editingSectionType === 'banner' && (
+              <ImagePickerField
+                currentUrl={store.bannerUrl}
+                onUploaded={updateBannerUrl}
+                aspectRatio={[16, 9]}
+                label="BANNER"
+                folder="union-app/banners"
+                height={useSplitLayout ? 140 : 90}
+                placeholderIcon="🖼"
+              />
+            )}
 
-          {editingSectionType === 'carousel' && (
-            <CarouselEditor
-              images={store.carouselImages}
-              onUpdate={updateCarouselImages}
-            />
-          )}
+            {editingSectionType === 'carousel' && (
+              <CarouselEditor
+                images={store.carouselImages}
+                onUpdate={updateCarouselImages}
+              />
+            )}
 
-          {(editingSectionType === 'about' || editingSectionType === 'contact') && (
-            <AboutContactEditor
-              store={store}
-              onUpdateDescription={updateStoreDescription}
-              onUpdateContact={updateContact}
-            />
-          )}
+            {(editingSectionType === 'about' || editingSectionType === 'contact') && (
+              <AboutContactEditor
+                store={store}
+                onUpdateDescription={updateStoreDescription}
+                onUpdateContact={updateContact}
+              />
+            )}
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   </>
   );
@@ -290,22 +293,12 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
 
  if (useSplitLayout) {
-  // Layout dividido para web ancha: controles | preview fija
   return (
-    <View style={styles.splitContainer}>
-      <ScrollView
-        style={styles.splitLeft}
-        contentContainerStyle={styles.splitLeftContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Todo el contenido de edición: header, nombre, acciones, tema, layout */}
-        {renderEditorContent()}
-      </ScrollView>
-
-      <View style={styles.splitRight}>
-        <StoreLivePreview store={store} products={products}/>
-      </View>
-    </View>
+    <SplitScreenLayout
+      left={renderEditorContent()}
+      right={<StoreLivePreview store={store} products={products} />}
+      leftRatio={0.3}
+    />
   );
 }
 
@@ -345,7 +338,7 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: {
-    padding: Spacing.xl,
+    padding: Spacing.sm,
     paddingBottom: Spacing.xxl,
   },
   header: {
@@ -429,27 +422,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     marginVertical: Spacing.lg,
   },
-  splitContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    position: 'relative',
-    overflow: 'hidden',
-    width: '100%',
-    maxWidth: 1200,
-    alignSelf: 'center',
-  },
-  splitLeft: {
-    flex: 1.4,
-    paddingRight: Spacing.lg,
-  },
-  splitLeftContent: {
-    padding: Spacing.xl,
-  },
-  splitRight: {
-    flex: 1,
-    padding: Spacing.xl,
-    alignSelf: 'center',
-  },
   previewSectionTitle: {
     color: Colors.dark.text,
     fontSize: Typography.sizes.md,
@@ -468,7 +440,17 @@ const styles = StyleSheet.create({
     borderTopRightRadius: Radius.lg,
     padding: Spacing.md,
     paddingBottom: Spacing.xxl,
-    maxHeight: '85%',
+    maxHeight: '99%',
+  },
+  backdropWeb: {
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  sheetWeb: {
+    borderRadius: Radius.lg,
+    width: '100%',
+    maxWidth: 480,
+    maxHeight: '80%',
   },
   modalClose: {
     alignSelf: 'flex-end',

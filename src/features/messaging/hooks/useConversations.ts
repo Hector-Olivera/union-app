@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '@stores/authStore';
 import { subscribeToConversations } from '@services/firebase/messaging';
 import type { Conversation } from '@/types/messaging';

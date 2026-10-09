@@ -11,7 +11,7 @@ type Props = {
   // del bounding box del modelo de visión computacional.
 };
 
-// Tag flotante que se muestra sobre un jugador detectado.
+// Tag flotante que se muestra sobre un usuario detectado.
 // Por ahora se posiciona manualmente — en la Capa 3 lo anclaremos
 // a personas reales detectadas por la cámara.
 export const PlayerTag = ({ name, level, position }: Props) => {
@@ -24,7 +24,7 @@ export const PlayerTag = ({ name, level, position }: Props) => {
   return (
     <View style={[styles.container, positionStyle, { pointerEvents: 'none' }]}>
 
-      {/* Línea vertical que conecta el tag con el jugador */}
+      {/* Línea vertical que conecta el tag con el usuario */}
       <View style={styles.connector} />
 
       {/* Card del tag */}

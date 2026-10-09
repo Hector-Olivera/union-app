@@ -5,7 +5,9 @@ import { toggleFavorite, recordVisit, searchPublicStores } from '@services/fireb
 import type { StoreSummary } from '@/types/community';
 import type { Store } from '@/types/store';
 import { doc, updateDoc } from 'firebase/firestore';
-import { subscribeToStore } from '@services/firebase/store';
+import { 
+  subscribeToStore, getRecentPublicStores, getUnvisitedStoresWithNews
+ } from '@services/firebase/store';
 import { db } from '@/services/firebase/config';
 
 export const useCommunity = () => {
@@ -114,8 +116,24 @@ export const useCommunity = () => {
   .filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i)
   .filter(s => s.hasAnnouncement);
 
+
+  const [newStores, setNewStores] = useState<Store[]>([]);
+  const [unvisitedNewsStores, setUnvisitedNewsStores] = useState<Store[]>([]);
+
+  useEffect(() => {
+    getRecentPublicStores(30).then(setNewStores);
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const visitedIds = (user.recentVisits || []).map(v => v.storeId);
+    const excludeIds = [...visitedIds, ...(user.favorites || [])];
+    getUnvisitedStoresWithNews(excludeIds).then(setUnvisitedNewsStores);
+  }, [user?.recentVisits, user?.favorites]);
+
   return {
     favoriteStores, recentStores, loading,
-    isFavorite, toggleFav, visitStore, search, removeVisit, storesWithNews
+    isFavorite, toggleFav, visitStore, search, removeVisit, storesWithNews,
+    newStores, unvisitedNewsStores
   };
 };

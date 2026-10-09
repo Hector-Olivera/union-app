@@ -11,6 +11,7 @@ type Props = {
   destructive?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  singleButton?: boolean;
 };
 
 // Modal de confirmación reutilizable para toda la plataforma.
@@ -21,6 +22,7 @@ export const ConfirmDialog = ({
   cancelLabel = 'Cancelar',
   destructive = false,
   onConfirm, onCancel,
+  singleButton = false,
 }: Props) => {
   const { activeTheme } = useThemeStore();
 
@@ -39,24 +41,26 @@ export const ConfirmDialog = ({
         onPress={onCancel}
       />
 
-      <View style={[styles.centeredContainer, { pointerEvents: 'box-none' }]}>
+      <View style={styles.centeredContainer} pointerEvents="box-none">
         <View style={styles.dialog}>
 
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
 
           <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={onCancel}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.cancelText}>{cancelLabel}</Text>
-            </TouchableOpacity>
-
+            {!singleButton && (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={onCancel}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cancelText}>{cancelLabel}</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={[
                 styles.confirmButton,
+                singleButton && { flex: 1 },
                 {
                   backgroundColor: destructive
                     ? Colors.status.error
@@ -69,7 +73,6 @@ export const ConfirmDialog = ({
               <Text style={styles.confirmText}>{confirmLabel}</Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </View>
     </Modal>

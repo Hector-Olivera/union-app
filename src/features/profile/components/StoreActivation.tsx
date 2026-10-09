@@ -5,11 +5,10 @@ import { Typography, Spacing, Radius, Colors } from '@constants/theme';
 
 type Props = {
   hasStore: boolean;
-  onActivate: () => void;
-  saving: boolean;
+  saving?: boolean;
 };
 
-export const StoreActivation = ({ hasStore, onActivate, saving }: Props) => {
+export const StoreActivation = ({ hasStore }: Props) => {
   const { colors } = useAppTheme();
 
   return (
@@ -31,12 +30,11 @@ export const StoreActivation = ({ hasStore, onActivate, saving }: Props) => {
           </Text>
           <TouchableOpacity
             style={[styles.activateButton, { backgroundColor: colors.brand.secondary }]}
-            onPress={onActivate}
-            disabled={saving}
+            onPress={() => router.push('/(app)/store')}
             activeOpacity={0.8}
           >
             <Text style={styles.activateButtonText}>
-              {saving ? 'Activando...' : 'Activar mi tienda'}
+              Crear mi Tienda
             </Text>
           </TouchableOpacity>
         </View>

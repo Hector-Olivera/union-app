@@ -38,7 +38,11 @@ export const ProductGridSection = ({ primaryColor, products }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { marginBottom: Spacing.lg },
+  container: { 
+    marginBottom: Spacing.lg,
+    width: '100%', 
+    alignSelf: 'center',
+  },
   title: {
     color: Colors.dark.text,
     fontSize: Typography.sizes.lg,
@@ -53,10 +57,13 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
     gap: Spacing.sm,
   },
   card: {
     flexBasis: '48%',
+    maxWidth: 300,
+    marginVertical: Spacing.md,
     gap: 4,
   },
   cardImage: {

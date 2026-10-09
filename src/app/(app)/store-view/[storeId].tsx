@@ -83,16 +83,19 @@ const handleBack = () => {
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Text style={[styles.backText, { color: theme.primary }]}>← Volver</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => toggleFav(store.id)} style={styles.favButton}>
-          <Text style={[styles.favIcon, { color: isFavorite(store.id) ? theme.secondary : Colors.dark.icon }]}>
-            {isFavorite(store.id) ? '★' : '☆'}
-          </Text>
-        </TouchableOpacity>
-        {user?.id !== store.ownerId && (
-          <TouchableOpacity onPress={handleMessage} style={styles.messageButton}>
-            <Ionicons name="chatbubble-outline" size={30} color={theme.primary} />
+
+        <View style={styles.topBarRight}>
+          {user?.id !== store.ownerId && (
+            <TouchableOpacity onPress={handleMessage} style={[styles.iconButton, { paddingTop: Spacing.sm }]}>
+              <Ionicons name="chatbubble-outline" size={20} color={theme.primary} />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity onPress={() => toggleFav(store.id)} style={styles.iconButton}>
+            <Text style={[styles.favIcon, { color: isFavorite(store.id) ? theme.secondary : Colors.dark.icon }]}>
+              {isFavorite(store.id) ? '★' : '☆'}
+            </Text>
           </TouchableOpacity>
-        )}
+        </View>
       </View>
 
       <ScrollView
@@ -130,6 +133,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
   },
@@ -141,21 +147,18 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
   },
   content: {
-    paddingHorizontal: Spacing.xl,
+    paddingHorizontal: Spacing.sm,
     paddingBottom: Spacing.xxl,
-  },
-  favButton: {
-    position: 'absolute',
-    right: Spacing.sm,
-    top: Spacing.xxl,
   },
   favIcon: {
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
   },
-  messageButton: {
-    position: 'absolute',
-    right: Spacing.sm,
-    top: Spacing.sm,
+  topBarRight: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  iconButton: {
+    padding: Spacing.xs,
   },
 });

@@ -1,5 +1,7 @@
 import { Tabs } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
+import { useState } from 'react';
+import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { useThemeStore } from '@stores/themeStore';
@@ -10,9 +12,19 @@ export default function AppLayout() {
   const { activeTheme } = useThemeStore();
   // useThemeStore re-renderiza el layout cuando cambia el tema
   // Así la tab bar reactiva al color elegido por el usuario
+  const [showQRWebNotice, setShowQRWebNotice] = useState(false);
 
   return (
     <View style={styles.wrapper}>
+      <ConfirmDialog
+        visible={showQRWebNotice}
+        title="Escaneo de QR"
+        message="Solo podés escanear códigos QR desde la cámara del teléfono."
+        confirmLabel="Entendido"
+        singleButton
+        onConfirm={() => setShowQRWebNotice(false)}
+        onCancel={() => setShowQRWebNotice(false) }
+      />
        <Tabs
           screenOptions={{
             headerShown: false,
@@ -51,6 +63,14 @@ export default function AppLayout() {
               title: 'Cámara',
               tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="qr-code-outline" color="secondary" />
             }}
+            listeners={{
+              tabPress: (e) => {
+                if (Platform.OS === 'web') {
+                  e.preventDefault(); // bloquea la navegación por defecto
+                  setShowQRWebNotice(true);
+                }
+              },
+            }}
           />
           <Tabs.Screen
             name="store"
@@ -79,6 +99,7 @@ export default function AppLayout() {
           <Tabs.Screen name="edit-profile" options={{ href: null }} />
           <Tabs.Screen name="change-password" options={{ href: null }} />
           <Tabs.Screen name="chat/[conversationId]" options={{ href: null }} />
+          <Tabs.Screen name="delete-account" options={{ href: null }} />
         </Tabs>
     </View>
   );
