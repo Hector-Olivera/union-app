@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ── players ──
+    match /players/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ── stores ──
+    match /stores/{storeId} {
+      // get: si el documento no existe (resource == null) se permite, para que
+      // preguntar "¿tengo tienda?" no tire error. Si existe, solo la lee el
+      // dueño o cualquiera si es pública.
+      allow get: if isSignedIn()
+                 && (resource == null
+                     || resource.data.isPublic == true
+                     || resource.data.ownerId == request.auth.uid);
+
+      // list: las queries deben filtrar por isPublic == true o por ownerId
+      // (todas las nuestras ya lo hacen)
+      allow list: if isSignedIn()
+                  && (resource.data.isPublic == true
+                      || resource.data.ownerId == request.auth.uid);
+
+      // el ID de la tienda tiene que ser el UID del dueño: una tienda por usuario
+      allow create: if isSignedIn()
+                    && storeId == request.auth.uid
+                    && request.resource.data.ownerId == request.auth.uid;
+
+      // el dueño no puede transferir la tienda cambiando ownerId
+      allow update: if isSignedIn()
+                    && resource.data.ownerId == request.auth.uid
+                    && request.resource.data.ownerId == resource.data.ownerId;
+
+      allow delete: if isSignedIn()
+                    && resource.data.ownerId == request.auth.uid;
+
+      match /products/{productId} {
+        // los productos de una tienda privada tampoco se ven
+        allow read: if isSignedIn()
+                    && (get(/databases/$(database)/documents/stores/$(storeId)).data.isPublic == true
+                        || get(/databases/$(database)/documents/stores/$(storeId)).data.ownerId == request.auth.uid);
+        allow write: if isSignedIn()
+                     && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerId == request.auth.uid;
+      }
+    }
+
+    // ── conversations ──
+    match /conversations/{conversationId} {
+      // Arregla el agujero: ya no alcanza con estar logueado, hay que ser
+      // participante. resource == null permite el chequeo de existencia de
+      // getOrCreateConversation sin abrir la lectura de conversaciones ajenas.
+      allow get: if isSignedIn()
+                 && (resource == null || request.auth.uid in resource.data.participants);
+
+      allow list: if isSignedIn()
+                  && request.auth.uid in resource.data.participants;
+
+      allow create: if isSignedIn()
+                    && request.auth.uid in request.resource.data.participants
+                    && request.resource.data.participants.size() == 2;
+
+      // nadie puede agregar ni cambiar participantes de una conversación existente
+      allow update: if isSignedIn()
+                    && request.auth.uid in resource.data.participants
+                    && request.resource.data.participants == resource.data.participants;
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn()
+                    && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+
+        // senderId tiene que ser el usuario real: nadie puede escribir en nombre de otro
+        allow create: if isSignedIn()
+                      && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants
+                      && request.resource.data.senderId == request.auth.uid;
+      }
+    }
+  }
+}

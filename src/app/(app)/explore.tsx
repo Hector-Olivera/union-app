@@ -26,7 +26,7 @@ export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const { useSplitLayout } = useResponsiveLayout();
-  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const { tab, conversation, t } = useLocalSearchParams<{ tab?: string; conversation?: string; t?: string }>();
   const [activeTab, setActiveTab] = useState<CommunityTab>('community');
   const scrollRef = useRef<ScrollView>(null);
 
@@ -42,6 +42,10 @@ export default function ExploreScreen() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (conversation) setSelectedConversationId(conversation);
+  }, [conversation, t]);
+
+  useEffect(() => {
     if (tab) {
       const index = TABS.findIndex(t => t.key === tab);
       if (index >= 0) {
@@ -49,7 +53,7 @@ export default function ExploreScreen() {
         scrollRef.current?.scrollTo({ x: index * SCREEN_WIDTH, animated: false });
       }
     }
-  }, [tab]);
+  }, [tab, t]);
 
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
@@ -208,7 +212,7 @@ export default function ExploreScreen() {
               <View style={styles.messagesDivider} />
               <View style={styles.messagesRightColumn}>
                 {selectedConversationId ? (
-                  <ChatPanel conversationId={selectedConversationId} />
+                  <ChatPanel conversationId={selectedConversationId} active={activeTab === 'messages'} />
                 ) : (
                   <Text style={styles.emptyText}>Seleccioná una conversación para ver los mensajes.</Text>
                 )}

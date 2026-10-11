@@ -86,8 +86,13 @@ export const subscribeToStore = (
         callback(null);
       }
     },
-    (error) => {
-      console.error('[store] subscribeToStore:', error);
+    (error: any) => {
+      if (error?.code === 'permission-denied') {
+        // Tienda que pasó a privada o que no es del usuario: esperado, no es un bug
+        callback(null);
+        return;
+      }
+      console.error('[store] subscribeToStore:', storeId, error);
       callback(null);
     }
   );

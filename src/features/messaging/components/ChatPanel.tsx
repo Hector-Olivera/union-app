@@ -1,6 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
+import { markConversationAsRead } from '@services/firebase/messaging';
 import { getPublicStoreByOwner } from '@services/firebase/store';
 import { useChat } from '@features/messaging/hooks/useChat';
 import { useConversations } from '@features/messaging/hooks/useConversations';
@@ -11,9 +13,10 @@ import type { Message } from '@/types/messaging';
 
 type Props = {
   conversationId: string;
+  active?: boolean;
 };
 
-export const ChatPanel = ({ conversationId }: Props) => {
+export const ChatPanel = ({ conversationId, active = true }: Props) => {
   const { colors } = useAppTheme();
   const { messages, send, currentUserId } = useChat(conversationId);
   const { conversations } = useConversations();
@@ -23,6 +26,18 @@ export const ChatPanel = ({ conversationId }: Props) => {
   const otherInfo = otherUserId ? conversation?.participantInfo[otherUserId] : null;
   const [input, setInput] = useState('');
   const listRef = useRef<FlatList>(null);
+
+  const isFocused = useIsFocused();
+  const isUnread = !!currentUserId && (conversation?.unreadBy || []).includes(currentUserId);
+
+  useEffect(() => {
+    // Solo marcamos como leído si el panel está realmente a la vista y la
+    // conversación tiene algo sin leer. El chequeo de isUnread evita escrituras
+    // innecesarias a Firestore y cualquier posible ciclo de escritura.
+    if (active && isFocused && isUnread && currentUserId) {
+      markConversationAsRead(conversationId, currentUserId);
+    }
+  }, [conversationId, currentUserId, active, isFocused, isUnread]);
 
   const handleVisitStore = async () => {
     if (!otherUserId) return;
@@ -42,6 +57,7 @@ export const ChatPanel = ({ conversationId }: Props) => {
       setInput(textToSend);
     }
   };
+
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isMine = item.senderId === currentUserId;

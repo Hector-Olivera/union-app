@@ -8,6 +8,7 @@ import { THEME_OPTIONS } from '@stores/themeStore';
 import { useAuthStore } from '@stores/authStore';
 import { useStoreStore } from '@stores/storeStore';
 import { Colors, Typography, Spacing } from '@constants/theme';
+import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { useProducts } from '@features/store/hooks/useProducts';
 import { useCommunity } from '@features/community/hooks/useCommunity';
 import { getOrCreateConversation } from '@services/firebase/messaging';
@@ -26,20 +27,21 @@ export default function StoreViewScreen() {
   const { store: myStore } = useStoreStore();
   const { isFavorite, toggleFav, visitStore } = useCommunity();
   const { products } = useProducts(store?.id);
+  const { useSplitLayout } = useResponsiveLayout();
 
   useEffect(() => {
-  if (store?.id) visitStore(store.id);
-}, [store?.id]);
+    if (store?.id) visitStore(store.id);
+  }, [store?.id]);
 
-const handleBack = () => {
-    // Si la tienda que estoy viendo es la mía, vuelvo al dashboard de Tienda
-    // Si es de otro usuario, vuelvo a Explorar (donde se descubren tiendas)
-    if (myStore && store && myStore.id === store.id) {
-      router.push('/(app)/store');
-    } else {
-      router.push('/(app)/explore');
-    }
-  };
+  const handleBack = () => {
+      // Si la tienda que estoy viendo es la mía, vuelvo al dashboard de Tienda
+      // Si es de otro usuario, vuelvo a Explorar (donde se descubren tiendas)
+      if (myStore && store && myStore.id === store.id) {
+        router.push('/(app)/store');
+      } else {
+        router.push('/(app)/explore');
+      }
+    };
 
   const handleMessage = async () => {
     if (!user || !store) return;
@@ -51,7 +53,13 @@ const handleBack = () => {
       store.ownerId,
       { name: store.name, avatarUrl: store.logoUrl }
     );
-    router.push(`/(app)/chat/${conversationId}` as any);
+    if (useSplitLayout) {
+      // Web ancha: Comunidad > Mensajes con la conversación ya seleccionada.
+      // El parámetro t fuerza que el efecto se dispare aunque sea la misma conversación.
+      router.push(`/(app)/explore?tab=messages&conversation=${conversationId}&t=${Date.now()}` as any);
+    } else {
+      router.push(`/(app)/chat/${conversationId}` as any);
+    }
   };
 
   if (loading) {

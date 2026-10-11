@@ -60,8 +60,8 @@ export const subscribeToProducts = (
       ...d.data(),
     })) as Product[];
     callback(products);
-  }, (error) => {
-    console.error('[products] subscribeToProducts:', error);
+  }, (error: any) => {
+    console.error('[products] subscribeToProducts:', storeId, error?.code, error);
     callback([]);
   });
 };

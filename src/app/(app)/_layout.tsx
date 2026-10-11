@@ -32,7 +32,7 @@ export default function AppLayout() {
               backgroundColor: Colors.dark.surface,
               borderTopColor: `${activeTheme.primary}4D`,
               borderTopWidth: 1,
-              height: 60 + insets.bottom,
+              height: 45 + insets.bottom,
               paddingBottom: insets.bottom,
               paddingTop: Spacing.sm,
               padding: 0,
