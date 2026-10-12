@@ -35,7 +35,7 @@ export default function ExploreScreen() {
     search, visitStore, toggleFav, removeVisit,
     newStores, unvisitedNewsStores,
   } = useCommunity();
-  const { conversations } = useConversations();
+  const { visibleConversations: conversations } = useConversations();
   const { user } = useAuthStore();
 
   // Conversación seleccionada en el panel de chat (solo relevante en split web)
@@ -212,7 +212,11 @@ export default function ExploreScreen() {
               <View style={styles.messagesDivider} />
               <View style={styles.messagesRightColumn}>
                 {selectedConversationId ? (
-                  <ChatPanel conversationId={selectedConversationId} active={activeTab === 'messages'} />
+                  <ChatPanel 
+                    conversationId={selectedConversationId} 
+                    active={activeTab === 'messages'} 
+                    onBlocked={() => setSelectedConversationId(null)}
+                  />
                 ) : (
                   <Text style={styles.emptyText}>Seleccioná una conversación para ver los mensajes.</Text>
                 )}

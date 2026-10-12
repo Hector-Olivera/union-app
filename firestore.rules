@@ -5,6 +5,13 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
+    function notBlocked(p) {
+      return !exists(/databases/$(database)/documents/blocks/$(p[0] + '_' + p[1]))
+          && !exists(/databases/$(database)/documents/blocks/$(p[1] + '_' + p[0]));
+    }
+    function conversationParticipants(conversationId) {
+      return get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+    }
 
     // ── players ──
     match /players/{userId} {
@@ -52,33 +59,57 @@ service cloud.firestore {
 
     // ── conversations ──
     match /conversations/{conversationId} {
-      // Arregla el agujero: ya no alcanza con estar logueado, hay que ser
-      // participante. resource == null permite el chequeo de existencia de
-      // getOrCreateConversation sin abrir la lectura de conversaciones ajenas.
       allow get: if isSignedIn()
-                 && (resource == null || request.auth.uid in resource.data.participants);
+                && (resource == null || request.auth.uid in resource.data.participants);
 
       allow list: if isSignedIn()
                   && request.auth.uid in resource.data.participants;
 
       allow create: if isSignedIn()
                     && request.auth.uid in request.resource.data.participants
-                    && request.resource.data.participants.size() == 2;
+                    && request.resource.data.participants.size() == 2
+                    && notBlocked(request.resource.data.participants);
 
-      // nadie puede agregar ni cambiar participantes de una conversación existente
+      // Marcar como leído (solo unreadBy) siempre se permite.
+      // Cambiar el último mensaje exige que no haya bloqueo.
       allow update: if isSignedIn()
                     && request.auth.uid in resource.data.participants
-                    && request.resource.data.participants == resource.data.participants;
+                    && request.resource.data.participants == resource.data.participants
+                    && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadBy'])
+                        || notBlocked(resource.data.participants));
 
       match /messages/{messageId} {
         allow read: if isSignedIn()
-                    && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+                    && request.auth.uid in conversationParticipants(conversationId);
 
-        // senderId tiene que ser el usuario real: nadie puede escribir en nombre de otro
         allow create: if isSignedIn()
-                      && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants
+                      && request.auth.uid in conversationParticipants(conversationId)
+                      && notBlocked(conversationParticipants(conversationId))
                       && request.resource.data.senderId == request.auth.uid;
       }
+    }
+
+    match /blocks/{blockId} {
+      allow read: if isSignedIn() && resource.data.blockerId == request.auth.uid;
+      allow create: if isSignedIn()
+                    && request.resource.data.blockerId == request.auth.uid
+                    && request.resource.data.blockedId != request.auth.uid
+                    && blockId == request.auth.uid + '_' + request.resource.data.blockedId;
+      allow delete: if isSignedIn() && resource.data.blockerId == request.auth.uid;
+      allow update: if false;
+    }
+
+    match /reports/{reportId} {
+      allow create: if isSignedIn()
+                    && request.resource.data.reporterId == request.auth.uid
+                    && request.resource.data.reportedUserId != request.auth.uid
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.reason is string
+                    && (!('details' in request.resource.data) || request.resource.data.details.size() <= 500)
+                    && request.resource.data.keys().hasOnly(
+                        ['reporterId', 'reportedUserId', 'targetType', 'storeId',
+                          'conversationId', 'reason', 'details', 'status', 'createdAt']);
+      allow read, update, delete: if false;
     }
   }
 }

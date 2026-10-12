@@ -7,6 +7,8 @@ import { StoreSectionRenderer } from '@features/store/components/StoreSectionRen
 import { THEME_OPTIONS } from '@stores/themeStore';
 import { useAuthStore } from '@stores/authStore';
 import { useStoreStore } from '@stores/storeStore';
+import { useBlockStore } from '@stores/blockStore';
+import { SafetyMenu } from '@features/safety/components/SafetyMenu';
 import { Colors, Typography, Spacing } from '@constants/theme';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { useProducts } from '@features/store/hooks/useProducts';
@@ -28,6 +30,7 @@ export default function StoreViewScreen() {
   const { isFavorite, toggleFav, visitStore } = useCommunity();
   const { products } = useProducts(store?.id);
   const { useSplitLayout } = useResponsiveLayout();
+  const ownerBlocked = useBlockStore(s => !!store && s.blockedIds.includes(store.ownerId));
 
   useEffect(() => {
     if (store?.id) visitStore(store.id);
@@ -93,7 +96,7 @@ export default function StoreViewScreen() {
         </TouchableOpacity>
 
         <View style={styles.topBarRight}>
-          {user?.id !== store.ownerId && (
+          {user?.id !== store.ownerId && !ownerBlocked &&(
             <TouchableOpacity onPress={handleMessage} style={[styles.iconButton, { paddingTop: Spacing.sm }]}>
               <Ionicons name="chatbubble-outline" size={20} color={theme.primary} />
             </TouchableOpacity>
@@ -103,6 +106,9 @@ export default function StoreViewScreen() {
               {isFavorite(store.id) ? '★' : '☆'}
             </Text>
           </TouchableOpacity>
+          <SafetyMenu
+            target={{ userId: store.ownerId, name: store.name, avatarUrl: store.logoUrl, storeId: store.id }}
+          />
         </View>
       </View>
 

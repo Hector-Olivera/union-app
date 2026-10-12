@@ -7,6 +7,7 @@ import { useAuthStore } from '@stores/authStore';
 import { useThemeStore } from '@stores/themeStore';
 import { injectWebGlobalStyles } from '@utils/webStyles';
 import { useStoreStore } from '@stores/storeStore';
+import { useBlockStore } from '@stores/blockStore';
 import { disableNetwork, enableNetwork } from 'firebase/firestore';
 import { db } from '@services/firebase/config';
 
@@ -15,6 +16,8 @@ export default function RootLayout() {
   const { initialize, isAuthenticated, loading, user } = useAuthStore();
   const { loadUserTheme, resetTheme } = useThemeStore();
   const segments = useSegments();
+  const { startBlocksListener, clearBlocks } = useBlockStore();
+
   
 
   useEffect(() => {
@@ -22,6 +25,16 @@ export default function RootLayout() {
     const unsubscribe = initialize();
     return unsubscribe;
   }, []);
+
+  
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      clearBlocks();
+      return;
+    }
+    const unsubscribe = startBlocksListener(user.id);
+    return unsubscribe;
+  }, [isAuthenticated, user?.id]);
 
   // Cuando cambia el estado de auth: carga o resetea el tema
   useEffect(() => {
