@@ -100,6 +100,7 @@ export default function AppLayout() {
           <Tabs.Screen name="change-password" options={{ href: null }} />
           <Tabs.Screen name="chat/[conversationId]" options={{ href: null }} />
           <Tabs.Screen name="delete-account" options={{ href: null }} />
+          <Tabs.Screen name="blocked-users" options={{ href: null }} />
         </Tabs>
     </View>
   );
