@@ -30,6 +30,7 @@ export const ChatPanel = ({ conversationId, active = true, onBlocked }: Props) =
   const [input, setInput] = useState('');
   const listRef = useRef<FlatList>(null);
   const blockedByMe = useBlockStore(s => !!otherUserId && s.blockedIds.includes(otherUserId));
+  const otherDeleted = !!otherUserId && (conversation?.deletedUsers || []).includes(otherUserId);
   const [sendError, setSendError] = useState<string | null>(null);
 
   const isFocused = useIsFocused();
@@ -94,7 +95,7 @@ export const ChatPanel = ({ conversationId, active = true, onBlocked }: Props) =
         <TouchableOpacity onPress={handleVisitStore} activeOpacity={0.7}>
           <Text style={styles.headerName}>{otherInfo?.name || 'Conversación'}</Text>
         </TouchableOpacity>
-        {otherUserId && (
+        {otherUserId && !otherDeleted &&(
           <SafetyMenu
             target={{ userId: otherUserId, name: otherInfo?.name || 'Usuario', avatarUrl: otherInfo?.avatarUrl, conversationId }}
             onBlocked={onBlocked}
@@ -111,7 +112,13 @@ export const ChatPanel = ({ conversationId, active = true, onBlocked }: Props) =
         style={styles.list}
       />
 
-      {blockedByMe ? (
+      {otherDeleted ? (
+        <View style={styles.blockedNotice}>
+          <Text style={styles.blockedText}>
+            Este usuario eliminó su cuenta. Ya no podés enviarle mensajes.
+          </Text>
+        </View>
+      ) : blockedByMe ? (
         <View style={styles.blockedNotice}>
           <Text style={styles.blockedText}>
             Bloqueaste a este usuario. Desbloquealo desde el menú (⋯) para volver a escribirle.

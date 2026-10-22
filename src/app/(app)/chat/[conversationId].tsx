@@ -30,6 +30,7 @@ export default function ChatScreen() {
   const otherInfo = otherUserId ? conversation?.participantInfo[otherUserId] : null;
   const otherInitial = otherInfo?.name.charAt(0).toUpperCase() || '?';
   const blockedByMe = useBlockStore(s => !!otherUserId && s.blockedIds.includes(otherUserId));  
+  const otherDeleted = !!otherUserId && (conversation?.deletedUsers || []).includes(otherUserId);
   const [sendError, setSendError] = useState<string | null>(null);
   
   const isFocused = useIsFocused();
@@ -112,7 +113,7 @@ export default function ChatScreen() {
           </Text>
         </TouchableOpacity>
         
-        {otherUserId && (
+        {otherUserId && !otherDeleted &&(
           <SafetyMenu
             target={{ userId: otherUserId, name: otherInfo?.name || 'Usuario', avatarUrl: otherInfo?.avatarUrl, conversationId }}
             onBlocked={() => router.push('/(app)/explore?tab=messages' as any)}
@@ -129,7 +130,13 @@ export default function ChatScreen() {
         contentContainerStyle={styles.messagesList}
       />
 
-      {blockedByMe ? (
+      {otherDeleted ? (
+        <View style={styles.blockedNotice}>
+          <Text style={styles.blockedText}>
+            Este usuario eliminó su cuenta. Ya no podés enviarle mensajes.
+          </Text>
+        </View>
+      ) : blockedByMe ? (
         <View style={styles.blockedNotice}>
           <Text style={styles.blockedText}>
             Bloqueaste a este usuario. Desbloquealo desde el menú (⋯) para volver a escribirle.

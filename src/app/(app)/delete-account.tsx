@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStoreStore } from '@stores/storeStore';
-import { deleteAccount } from '@services/firebase/auth';
+import { deleteAccount, hasPasswordProvider } from '@services/firebase/auth';
+import { LEGAL } from '@constants/legal';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 
@@ -15,8 +16,12 @@ export default function DeleteAccountScreen() {
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const needsPassword = hasPasswordProvider();
+  // En web no hay Google Sign-In: una cuenta de Google no se puede reautenticar ahí
+  const canDeleteHere = needsPassword || Platform.OS !== 'web';
+
   const handleRequestDelete = () => {
-    if (!password) {
+    if (needsPassword && !password) {
       setError('Ingresá tu contraseña para confirmar');
       return;
     }
@@ -28,14 +33,17 @@ export default function DeleteAccountScreen() {
     setShowConfirm(false);
     setLoading(true);
     try {
-      await deleteAccount(password);
-      // Al eliminar la cuenta, el observer de auth detecta la sesión
-      // cerrada automáticamente y redirige a login — no hace falta
-      // navegar manualmente acá
+      await deleteAccount(needsPassword ? password : undefined);
+      // Al borrarse la cuenta, el observer de auth cierra la sesión y redirige solo
     } catch (e: any) {
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
         setError('La contraseña es incorrecta');
+      } else if (e.code === 'auth/user-mismatch') {
+        setError('Elegí la misma cuenta de Google con la que iniciaste sesión.');
+      } else if (e.code === 'SIGN_IN_CANCELLED' || e.message?.includes('cancel')) {
+        setError(null); // cerró el selector de cuentas: no es un error
       } else {
+        console.error('[DeleteAccount] error:', e);
         setError('No pudimos eliminar la cuenta. Intentá de nuevo.');
       }
       setLoading(false);
@@ -44,33 +52,50 @@ export default function DeleteAccountScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TouchableOpacity onPress={() => router.push('/(app)/profile')} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Text style={styles.backText}>← Volver</Text>
       </TouchableOpacity>
 
       <View style={styles.content}>
         <Text style={styles.title}>Eliminar cuenta</Text>
         <Text style={styles.warning}>
-          Esta acción es irreversible. Se eliminarán tu perfil, tu tienda{store ? ` ("${store.name}")` : ''} y todos tus datos asociados.
+          Esta acción es irreversible. Se eliminarán tu perfil, tu tienda{store ? ` ("${store.name}")` : ''} y tus datos asociados.
+          Tus conversaciones se conservan para las otras personas, que te van a ver como "Usuario eliminado".
         </Text>
 
-        <Text style={styles.label}>CONFIRMÁ TU CONTRASEÑA</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor={Colors.dark.icon}
-        />
+        {canDeleteHere ? (
+          <>
+            {needsPassword ? (
+              <>
+                <Text style={styles.label}>CONFIRMÁ TU CONTRASEÑA</Text>
+                <TextInput
+                  style={styles.input}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  placeholderTextColor={Colors.dark.icon}
+                />
+              </>
+            ) : (
+              <Text style={styles.warning}>
+                Para confirmar vas a tener que elegir de nuevo tu cuenta de Google.
+              </Text>
+            )}
 
-        {!!error && <Text style={styles.errorText}>{error}</Text>}
+            {!!error && <Text style={styles.errorText}>{error}</Text>}
 
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={handleRequestDelete}
-          disabled={loading}
-        >
-          <Text style={styles.deleteText}>{loading ? 'Eliminando...' : 'Eliminar mi cuenta'}</Text>
+            <TouchableOpacity style={styles.deleteButton} onPress={handleRequestDelete} disabled={loading}>
+              <Text style={styles.deleteText}>{loading ? 'Eliminando...' : 'Eliminar mi cuenta'}</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Text style={styles.warning}>
+            Tu cuenta usa Google. Para eliminarla, hacelo desde la app en tu teléfono o escribinos a {LEGAL.contactEmail}.
+          </Text>
+        )}
+
+        <TouchableOpacity onPress={() => router.push('/data-deletion' as any)} style={styles.infoLink}>
+          <Text style={styles.infoLinkText}>Ver cómo se eliminan los datos </Text>
         </TouchableOpacity>
       </View>
 
@@ -116,4 +141,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginTop: Spacing.md,
   },
   deleteText: { color: '#fff', fontSize: Typography.sizes.md, fontWeight: Typography.weights.semibold },
+  infoLink: { alignSelf: 'flex-start', marginTop: Spacing.xl },
+  infoLinkText: { color: Colors.dark.icon, fontSize: Typography.sizes.sm, textDecorationLine: 'underline' },
 });

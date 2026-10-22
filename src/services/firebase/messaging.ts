@@ -99,6 +99,7 @@ export const subscribeToConversations = (
         lastMessage: data.lastMessage,
         lastMessageSenderId: data.lastMessageSenderId,
         unreadBy: data.unreadBy || [],
+        deletedUsers: data.deletedUsers || [],
         lastMessageAt: timestampToISO(data.lastMessageAt),
       } as Conversation;
     });

@@ -18,6 +18,7 @@ export type User = {
   emailVerified: boolean;
   favorites?: string[];
   recentVisits?: RecentVisit[];
+  termsAcceptedVersion?: string;
 };
 
 type AuthState = {
@@ -57,8 +58,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email, password) => {
     try {
       set({ loading: true, error: null });
-      const user = await loginUser(email, password);
-      set({ user, isAuthenticated: true, loading: false });
+      await loginUser(email, password);
     } catch (error: any) {
       set({ error: error.message, loading: false });
     }

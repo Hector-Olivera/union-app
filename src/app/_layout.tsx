@@ -10,6 +10,7 @@ import { useStoreStore } from '@stores/storeStore';
 import { useBlockStore } from '@stores/blockStore';
 import { disableNetwork, enableNetwork } from 'firebase/firestore';
 import { db } from '@services/firebase/config';
+import { LEGAL } from '@constants/legal';
 
 export default function RootLayout() {
   const { loadStore, clearStore } = useStoreStore();
@@ -52,11 +53,28 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loading) return;
-    const inAuthGroup = segments[0] === '(auth)';
-    const inAppGroup = segments[0] === '(app)';
-    if (isAuthenticated && inAuthGroup) router.replace('/(app)');
-    else if (!isAuthenticated && inAppGroup) router.replace('/(auth)/login');
-  }, [isAuthenticated, loading, segments]);
+
+    const seg = segments[0];
+    const inAuthGroup = seg === '(auth)';
+    const inAppGroup = seg === '(app)';
+    const inAcceptTerms = seg === 'accept-terms';
+    // Las páginas legales se pueden leer con o sin sesión
+    const inLegal = seg === 'terms' || seg === 'privacy' || seg === 'data-deletion';
+
+    if (!isAuthenticated) {
+      if (inAppGroup || inAcceptTerms) router.replace('/(auth)/login');
+      return;
+    }
+
+    // Con sesión pero sin haber aceptado la versión vigente: solo la
+    // pantalla de aceptación (y poder leer los textos)
+    if (user?.termsAcceptedVersion !== LEGAL.termsVersion) {
+      if (!inAcceptTerms && !inLegal) router.replace('/accept-terms' as any);
+      return;
+    }
+
+    if (inAuthGroup || inAcceptTerms) router.replace('/(app)');
+}, [isAuthenticated, loading, segments, user?.termsAcceptedVersion]);
 
   useEffect(() => {
   const reconnect = async () => {

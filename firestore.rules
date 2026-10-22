@@ -13,6 +13,18 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
     }
 
+    function otherParticipant(p) {
+      return p[0] == request.auth.uid ? p[1] : p[0];
+    }
+
+    // Una sola lectura de la conversación para validar todo
+    function canSendMessage(conversationId) {
+      let c = get(/databases/$(database)/documents/conversations/$(conversationId)).data;
+      return request.auth.uid in c.participants
+          && !(otherParticipant(c.participants) in c.get('deletedUsers', []))
+          && notBlocked(c.participants);
+    }
+
     // ── players ──
     match /players/{userId} {
       allow read, write: if isSignedIn() && request.auth.uid == userId;
@@ -70,21 +82,38 @@ service cloud.firestore {
                     && request.resource.data.participants.size() == 2
                     && notBlocked(request.resource.data.participants);
 
-      // Marcar como leído (solo unreadBy) siempre se permite.
-      // Cambiar el último mensaje exige que no haya bloqueo.
+      // Ahora cada tipo de actualización está acotado a los campos que le corresponden.
+      // Antes, un participante podía reescribir cualquier campo, incluido el nombre
+      // y la foto del otro.
       allow update: if isSignedIn()
                     && request.auth.uid in resource.data.participants
                     && request.resource.data.participants == resource.data.participants
-                    && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadBy'])
-                        || notBlocked(resource.data.participants));
+                    && (
+                      // marcar como leído
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadBy'])
+
+                      // enviar un mensaje: no con bloqueo ni a una cuenta eliminada
+                      || (request.resource.data.diff(resource.data).affectedKeys()
+                            .hasOnly(['lastMessage', 'lastMessageAt', 'lastMessageSenderId', 'unreadBy'])
+                          && request.resource.data.lastMessageSenderId == request.auth.uid
+                          && !(otherParticipant(resource.data.participants) in resource.data.get('deletedUsers', []))
+                          && notBlocked(resource.data.participants))
+
+                      // anonimizar la propia identidad al eliminar la cuenta (siempre permitido,
+                      // aunque haya bloqueos) sin tocar los datos del otro participante
+                      || (request.resource.data.diff(resource.data).affectedKeys()
+                            .hasOnly(['participantInfo', 'deletedUsers'])
+                          && request.auth.uid in request.resource.data.deletedUsers
+                          && request.resource.data.participantInfo[otherParticipant(resource.data.participants)]
+                              == resource.data.participantInfo[otherParticipant(resource.data.participants)])
+                    );
 
       match /messages/{messageId} {
         allow read: if isSignedIn()
                     && request.auth.uid in conversationParticipants(conversationId);
 
         allow create: if isSignedIn()
-                      && request.auth.uid in conversationParticipants(conversationId)
-                      && notBlocked(conversationParticipants(conversationId))
+                      && canSendMessage(conversationId)
                       && request.resource.data.senderId == request.auth.uid;
       }
     }

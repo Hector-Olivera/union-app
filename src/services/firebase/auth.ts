@@ -14,6 +14,7 @@ import { doc, deleteDoc, collection, getDocs,
   getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firebaseApp, db } from './config';
 import type { User } from '@stores/authStore';
+import { cleanUpUserData } from './accountCleanup';
 
 export const auth = initializeAuth(firebaseApp, {
   persistence: browserLocalPersistence,
@@ -59,8 +60,14 @@ export const subscribeToAuthChanges = (
   return onAuthStateChanged(auth, async (firebaseUser) => {
     if (firebaseUser) {
       const baseUser = await mapFirebaseUser(firebaseUser);
-      const firestoreDoc = await getDoc(doc(db, 'players', firebaseUser.uid));
-      const firestoreData = firestoreDoc.exists() ? firestoreDoc.data() : {};
+
+      let firestoreData: Record<string, any> = {};
+      try {
+        const firestoreDoc = await getDoc(doc(db, 'players', firebaseUser.uid));
+        if (firestoreDoc.exists()) firestoreData = firestoreDoc.data();
+      } catch (e) {
+        console.error('[auth] no se pudieron cargar los datos del usuario:', e);
+      }
 
       callback({
         ...baseUser,
@@ -68,6 +75,7 @@ export const subscribeToAuthChanges = (
         lastName: firestoreData.lastName,
         favorites: firestoreData.favorites || [],
         recentVisits: firestoreData.recentVisits || [],
+        termsAcceptedVersion: firestoreData.termsAcceptedVersion,
       });
     } else {
       callback(null);
@@ -131,28 +139,20 @@ export const resetPassword = async (email: string): Promise<void> => {
   await sendPasswordResetEmail(auth, email);
 };
 
-export const deleteAccount = async (password: string): Promise<void> => {
-  if (!auth.currentUser || !auth.currentUser.email) {
-    throw new Error('No hay sesión activa');
+// ¿La cuenta entra con email y contraseña? Si no, es una cuenta de Google.
+export const hasPasswordProvider = (): boolean =>
+  !!auth.currentUser?.providerData.some(p => p.providerId === 'password');
+
+export const deleteAccount = async (password?: string): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user || !user.email) throw new Error('No hay sesión activa');
+  // En web no hay Google Sign-In, así que las cuentas de Google no pueden
+  // reautenticarse acá: se eliminan desde la app o por correo.
+  if (!hasPasswordProvider() || !password) {
+    throw Object.assign(new Error('Se necesita la contraseña'), { code: 'app/requires-password' });
   }
 
-  const userId = auth.currentUser.uid;
-
-  // Reautenticación obligatoria antes de cualquier operación destructiva
-  const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
-  await reauthenticateWithCredential(auth.currentUser, credential);
-
-  // Si el usuario tiene tienda, borramos sus productos y la tienda misma
-  const storeRef = doc(db, 'stores', userId);
-  const productsSnap = await getDocs(collection(db, 'stores', userId, 'products'));
-  await Promise.all(productsSnap.docs.map(d => deleteDoc(d.ref)));
-  await deleteDoc(storeRef).catch(() => {});
-  // El catch silencioso es porque deleteDoc no falla si el documento
-  // no existe (usuario sin tienda) — Firestore simplemente no hace nada
-
-  // Borramos el documento de datos del usuario
-  await deleteDoc(doc(db, 'players', userId));
-
-  // Por último, eliminamos la cuenta de autenticación en sí
-  await deleteUser(auth.currentUser);
+  await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
+  await cleanUpUserData(user.uid);
+  await deleteUser(user);
 };

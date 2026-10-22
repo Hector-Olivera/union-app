@@ -1,7 +1,7 @@
 // Este archivo solo se carga en iOS y Android.
 // Metro resuelve automáticamente .native.ts sobre .ts en plataformas nativas.
 // @ts-ignore — false-positive conocido de Firebase v10+ en RN
-import { getReactNativePersistence, sendPasswordResetEmail } from 'firebase/auth';
+import { getReactNativePersistence, sendPasswordResetEmail, GoogleAuthProvider } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { firebaseApp } from './config';
 import {
@@ -18,6 +18,8 @@ import { doc, deleteDoc, collection, getDocs,
   getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './config';
 import type { User } from '@stores/authStore';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { cleanUpUserData } from './accountCleanup';
 
 export const auth = initializeAuth(firebaseApp, {
   persistence: getReactNativePersistence(AsyncStorage),
@@ -62,10 +64,13 @@ export const subscribeToAuthChanges = (
     if (firebaseUser) {
       const baseUser = await mapFirebaseUser(firebaseUser);
 
-      // Traemos los datos extra que solo viven en Firestore
-      // (favoritos, recientes, firstName/lastName) y los combinamos
-      const firestoreDoc = await getDoc(doc(db, 'players', firebaseUser.uid));
-      const firestoreData = firestoreDoc.exists() ? firestoreDoc.data() : {};
+      let firestoreData: Record<string, any> = {};
+      try {
+        const firestoreDoc = await getDoc(doc(db, 'players', firebaseUser.uid));
+        if (firestoreDoc.exists()) firestoreData = firestoreDoc.data();
+      } catch (e) {
+        console.error('[auth] no se pudieron cargar los datos del usuario:', e);
+      }
 
       callback({
         ...baseUser,
@@ -73,6 +78,7 @@ export const subscribeToAuthChanges = (
         lastName: firestoreData.lastName,
         favorites: firestoreData.favorites || [],
         recentVisits: firestoreData.recentVisits || [],
+        termsAcceptedVersion: firestoreData.termsAcceptedVersion,
       });
     } else {
       callback(null);
@@ -138,28 +144,34 @@ export const resetPassword = async (email: string): Promise<void> => {
   await sendPasswordResetEmail(auth, email);
 };
 
-export const deleteAccount = async (password: string): Promise<void> => {
-  if (!auth.currentUser || !auth.currentUser.email) {
-    throw new Error('No hay sesión activa');
+export const hasPasswordProvider = (): boolean =>
+  !!auth.currentUser?.providerData.some(p => p.providerId === 'password');
+
+export const deleteAccount = async (password?: string): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user || !user.email) throw new Error('No hay sesión activa');
+
+  if (hasPasswordProvider()) {
+    if (!password) {
+      throw Object.assign(new Error('Se necesita la contraseña'), { code: 'app/requires-password' });
+    }
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
+  } else {
+    // Cuenta de Google: se reautentica eligiendo la cuenta otra vez.
+    // configure() va acá porque este código puede ejecutarse sin haber pasado
+    // nunca por la pantalla de login en esta sesión de la app.
+    GoogleSignin.configure({
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      offlineAccess: false,
+    });
+    await GoogleSignin.hasPlayServices();
+    await GoogleSignin.signOut();
+    const response = await GoogleSignin.signIn();
+    const idToken = (response as any).data?.idToken || (response as any).idToken;
+    if (!idToken) throw new Error('No se recibió el token de Google');
+    await reauthenticateWithCredential(user, GoogleAuthProvider.credential(idToken));
   }
 
-  const userId = auth.currentUser.uid;
-
-  // Reautenticación obligatoria antes de cualquier operación destructiva
-  const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
-  await reauthenticateWithCredential(auth.currentUser, credential);
-
-  // Si el usuario tiene tienda, borramos sus productos y la tienda misma
-  const storeRef = doc(db, 'stores', userId);
-  const productsSnap = await getDocs(collection(db, 'stores', userId, 'products'));
-  await Promise.all(productsSnap.docs.map(d => deleteDoc(d.ref)));
-  await deleteDoc(storeRef).catch(() => {});
-  // El catch silencioso es porque deleteDoc no falla si el documento
-  // no existe (usuario sin tienda) — Firestore simplemente no hace nada
-
-  // Borramos el documento de datos del usuario
-  await deleteDoc(doc(db, 'players', userId));
-
-  // Por último, eliminamos la cuenta de autenticación en sí
-  await deleteUser(auth.currentUser);
+  await cleanUpUserData(user.uid);
+  await deleteUser(user);
 };
