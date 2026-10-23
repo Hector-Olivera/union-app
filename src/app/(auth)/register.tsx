@@ -12,6 +12,7 @@ import { GoogleSignInButton } from '@features/auth/components/GoogleSignInButton
 import { AuthDivider } from '@features/auth/components/AuthDivider';
 import { Colors, Typography, Spacing } from '@constants/theme';
 import { authStyles } from '@features/auth/authStyles';
+import { LegalLinks } from '@/features/legal/components/LegalLinks';
 
 export default function RegisterScreen() {
   const { register, loading, error, clearError } = useAuthStore();
@@ -129,6 +130,10 @@ export default function RegisterScreen() {
                 en el historial al volver al login */}
               <Text style={authStyles.footerLink}>Iniciá sesión</Text>
             </TouchableOpacity>
+          </View>
+
+          <View style={{ paddingBottom: Spacing.xl, alignItems: 'center' }}>
+            <LegalLinks />
           </View>
 
         </View>

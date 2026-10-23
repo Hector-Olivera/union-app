@@ -16,7 +16,7 @@ export default function HomeScreen() {
   const { activeTheme } = useThemeStore();
   const { store } = useStoreStore();
   const { storesWithNews } = useCommunity();
-  const { conversations } = useConversations();
+  const { visibleConversations: conversations } = useConversations();
   const { useSplitLayout } = useResponsiveLayout();
 
   if (!user) return null;

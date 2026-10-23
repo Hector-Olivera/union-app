@@ -4,6 +4,7 @@ import {
   collection, serverTimestamp, onSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
+import { reportError } from '@services/reportError';
 import type { 
   Store, StoreSection,
   BusinessHours, TodoItem, Announcement
@@ -34,6 +35,7 @@ export const getUserStore = async (userId: string): Promise<Store | null> => {
     return ensureCompleteLayout({ id: snap.id, ...snap.data() } as Store);
   } catch (error) {
     console.error('[store] getUserStore:', error);
+    reportError(error, 'store-load');
     return null;
   }
 };
@@ -86,8 +88,14 @@ export const subscribeToStore = (
         callback(null);
       }
     },
-    (error) => {
-      console.error('[store] subscribeToStore:', error);
+    (error: any) => {
+      if (error?.code === 'permission-denied') {
+        // Tienda que pasó a privada o que no es del usuario: esperado, no es un bug
+        callback(null);
+        return;
+      }
+      console.error('[store] subscribeToStore:', storeId, error);
+      reportError(error, 'store-listener');
       callback(null);
     }
   );

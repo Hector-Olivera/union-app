@@ -9,8 +9,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useChat } from '@features/messaging/hooks/useChat';
 import { useConversations } from '@features/messaging/hooks/useConversations';
 import { useAppTheme } from '@hooks/useAppTheme';
+import { useBlockStore } from '@stores/blockStore';
+import { SafetyMenu } from '@features/safety/components/SafetyMenu';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { markConversationAsRead } from '@services/firebase/messaging';
+import { reportError } from '@services/reportError';
 import type { Message } from '@/types/messaging';
 import { getPublicStoreByOwner } from '@/services/firebase/store';
 
@@ -27,8 +30,19 @@ export default function ChatScreen() {
   const otherUserId = conversation?.participants.find(id => id !== currentUserId);
   const otherInfo = otherUserId ? conversation?.participantInfo[otherUserId] : null;
   const otherInitial = otherInfo?.name.charAt(0).toUpperCase() || '?';
-
+  const blockedByMe = useBlockStore(s => !!otherUserId && s.blockedIds.includes(otherUserId));  
+  const otherDeleted = !!otherUserId && (conversation?.deletedUsers || []).includes(otherUserId);
+  const [sendError, setSendError] = useState<string | null>(null);
+  
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    setSendError(null);
+  }, [conversationId, blockedByMe]);
+
+  useEffect(() => {
+    setInput('');
+  }, [conversationId]);
 
   useEffect(() => {
     // Solo marcamos como leído si la pantalla está realmente en foco  
@@ -40,15 +54,17 @@ export default function ChatScreen() {
   const handleSend = async () => {
     if (!input.trim() || !otherUserId) return;
     const textToSend = input;
-    setInput(''); // Limpiamos inmediatamente — no esperamos la red para dar feedback visual
+    setSendError(null);
+    setInput(''); 
     try {
       await send(textToSend, otherUserId);
-    } catch (error) {
-      // Si falla el envío, restauramos el texto para que el usuario no lo pierda
-      setInput(textToSend);
-      console.error('[Chat] send error:', error);
-    }
-    setTimeout(() => listRef.current?.scrollToIndex({ index: 0 }), 100);
+    } catch (error: any) {
+      setSendError('No puedes enviar mensajes a este usuario.');
+      if (error?.code !== 'permission-denied') {
+        console.error('[Chat] send error:', error);
+        reportError(error, 'chat-send');
+      }
+    }    
   };
 
   const handleVisitStore = async () => {
@@ -98,6 +114,13 @@ export default function ChatScreen() {
             {otherInfo?.name || 'Conversación'}
           </Text>
         </TouchableOpacity>
+        
+        {otherUserId && !otherDeleted &&(
+          <SafetyMenu
+            target={{ userId: otherUserId, name: otherInfo?.name || 'Usuario', avatarUrl: otherInfo?.avatarUrl, conversationId }}
+            onBlocked={() => router.push('/(app)/explore?tab=messages' as any)}
+          />
+        )}
       </View>
 
       <FlatList
@@ -109,22 +132,41 @@ export default function ChatScreen() {
         contentContainerStyle={styles.messagesList}
       />
 
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          value={input}
-          onChangeText={setInput}
-          placeholder="Escribí un mensaje..."
-          placeholderTextColor={Colors.dark.icon}
-          multiline
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, { backgroundColor: colors.brand.primary }]}
-          onPress={handleSend}
-        >
-          <Text style={styles.sendText}>Enviar</Text>
-        </TouchableOpacity>
-      </View>
+      {otherDeleted ? (
+        <View style={styles.blockedNotice}>
+          <Text style={styles.blockedText}>
+            Este usuario eliminó su cuenta. Ya no podés enviarle mensajes.
+          </Text>
+        </View>
+      ) : blockedByMe ? (
+        <View style={styles.blockedNotice}>
+          <Text style={styles.blockedText}>
+            Bloqueaste a este usuario. Desbloquealo desde el menú (⋯) para volver a escribirle.
+          </Text>
+        </View>
+      ) : (
+        <>
+          {!!sendError && <Text style={styles.sendError}>{sendError}</Text>}
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                value={input}
+                onChangeText={setInput}
+                placeholder="Escribí un mensaje..."
+                placeholderTextColor={Colors.dark.icon}
+                multiline
+              />
+              <TouchableOpacity
+                style={[styles.sendButton, { backgroundColor: colors.brand.primary }]}
+                onPress={handleSend}
+              >
+                <Text style={styles.sendText}>Enviar</Text>
+              </TouchableOpacity>
+          </View>
+        </>
+      )}
+      
+
     </KeyboardAvoidingView>
   );
 }
@@ -206,4 +248,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     flex: 1,
   },
+  blockedNotice: { padding: Spacing.lg, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  blockedText: { color: Colors.dark.icon, fontSize: Typography.sizes.sm, textAlign: 'center' },
+  sendError: { color: Colors.status.error, fontSize: Typography.sizes.xs, paddingHorizontal: Spacing.md },
 });

@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
 import { Stack, router, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -7,15 +6,23 @@ import { useAuthStore } from '@stores/authStore';
 import { useThemeStore } from '@stores/themeStore';
 import { injectWebGlobalStyles } from '@utils/webStyles';
 import { useStoreStore } from '@stores/storeStore';
-import { disableNetwork, enableNetwork } from 'firebase/firestore';
-import { db } from '@services/firebase/config';
+import { useBlockStore } from '@stores/blockStore';
+import { initMonitoring, setMonitoringUser, withMonitoring } from '@services/monitoring';
+import { LEGAL } from '@constants/legal';
 
-export default function RootLayout() {
+// Se inicializa una sola vez, antes de definir el componente
+initMonitoring();
+
+function RootLayout() {
   const { loadStore, clearStore } = useStoreStore();
   const { initialize, isAuthenticated, loading, user } = useAuthStore();
   const { loadUserTheme, resetTheme } = useThemeStore();
   const segments = useSegments();
-  
+  const { startBlocksListener, clearBlocks } = useBlockStore();
+
+  useEffect(() => {
+    setMonitoringUser(isAuthenticated && user ? user.id : null);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     injectWebGlobalStyles();
@@ -23,15 +30,22 @@ export default function RootLayout() {
     return unsubscribe;
   }, []);
 
-  // Cuando cambia el estado de auth: carga o resetea el tema
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      clearBlocks();
+      return;
+    }
+    const unsubscribe = startBlocksListener(user.id);
+    return unsubscribe;
+  }, [isAuthenticated, user?.id]);
+
+  // Cuando cambia el estado de auth: carga o resetea el tema y la tienda
   useEffect(() => {
     if (loading) return;
     if (isAuthenticated && user) {
-      // Usuario logueado → cargar su tema personalizado desde Firestore
       loadUserTheme(user.id);
       loadStore(user.id);
     } else {
-      // Usuario deslogueado → volver al tema default
       resetTheme();
       clearStore();
     }
@@ -39,34 +53,28 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loading) return;
-    const inAuthGroup = segments[0] === '(auth)';
-    const inAppGroup = segments[0] === '(app)';
-    if (isAuthenticated && inAuthGroup) router.replace('/(app)');
-    else if (!isAuthenticated && inAppGroup) router.replace('/(auth)/login');
-  }, [isAuthenticated, loading, segments]);
 
-  useEffect(() => {
-  const reconnect = async () => {
-    try {
-      await disableNetwork(db);
-      await enableNetwork(db);
-    } catch (e) {
-      console.error('[Firestore] reconnect error:', e);
+    const seg = segments[0];
+    const inAuthGroup = seg === '(auth)';
+    const inAppGroup = seg === '(app)';
+    const inAcceptTerms = seg === 'accept-terms';
+    // Las páginas legales se pueden leer con o sin sesión
+    const inLegal = seg === 'terms' || seg === 'privacy' || seg === 'data-deletion';
+
+    if (!isAuthenticated) {
+      if (inAppGroup || inAcceptTerms) router.replace('/(auth)/login');
+      return;
     }
-  };
 
-  const interval = setInterval(reconnect, 60000); // cada 60 segundos
+    // Con sesión pero sin haber aceptado la versión vigente: solo la
+    // pantalla de aceptación (y poder leer los textos)
+    if (user?.termsAcceptedVersion !== LEGAL.termsVersion) {
+      if (!inAcceptTerms && !inLegal) router.replace('/accept-terms' as any);
+      return;
+    }
 
-  const handleAppStateChange = (nextState: AppStateStatus) => {
-    if (nextState === 'active') reconnect();
-  };
-  const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-  return () => {
-    clearInterval(interval);
-    subscription.remove();
-  };
-}, []);
+    if (inAuthGroup || inAcceptTerms) router.replace('/(app)');
+  }, [isAuthenticated, loading, segments, user?.termsAcceptedVersion]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -75,3 +83,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default withMonitoring(RootLayout);

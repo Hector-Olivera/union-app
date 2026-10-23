@@ -6,6 +6,7 @@ export type Conversation = {
   lastMessageAt: string;
   lastMessageSenderId?: string;
   unreadBy?: string[];
+  deletedUsers?: string[];
 };
 
 export type Message = {

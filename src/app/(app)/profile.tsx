@@ -121,6 +121,27 @@ export default function ProfileScreen() {
 
           <View style={styles.divider} />
 
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/terms' as any)}>
+            <Text style={styles.accountRowText}>Términos y Condiciones </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/privacy' as any)}>
+            <Text style={styles.accountRowText}>Política de Privacidad  </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/blocked-users' as any)}>
+            <Text style={styles.accountRowText}>Usuarios bloqueados </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
           <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/delete-account')}>
             <Text style={[styles.accountRowText, { color: Colors.status.error }]}>Eliminar cuenta </Text>
             <Text style={styles.accountRowArrow}>›</Text>
