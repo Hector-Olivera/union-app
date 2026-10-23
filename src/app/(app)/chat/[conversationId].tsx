@@ -13,6 +13,7 @@ import { useBlockStore } from '@stores/blockStore';
 import { SafetyMenu } from '@features/safety/components/SafetyMenu';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { markConversationAsRead } from '@services/firebase/messaging';
+import { reportError } from '@services/reportError';
 import type { Message } from '@/types/messaging';
 import { getPublicStoreByOwner } from '@/services/firebase/store';
 
@@ -61,6 +62,7 @@ export default function ChatScreen() {
       setSendError('No puedes enviar mensajes a este usuario.');
       if (error?.code !== 'permission-denied') {
         console.error('[Chat] send error:', error);
+        reportError(error, 'chat-send');
       }
     }    
   };

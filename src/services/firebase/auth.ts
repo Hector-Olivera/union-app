@@ -13,6 +13,7 @@ import {
 import { doc, deleteDoc, collection, getDocs, 
   getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firebaseApp, db } from './config';
+import { reportError } from '@services/reportError';
 import type { User } from '@stores/authStore';
 import { cleanUpUserData } from './accountCleanup';
 
@@ -67,6 +68,7 @@ export const subscribeToAuthChanges = (
         if (firestoreDoc.exists()) firestoreData = firestoreDoc.data();
       } catch (e) {
         console.error('[auth] no se pudieron cargar los datos del usuario:', e);
+        reportError(e, 'auth-load-user');
       }
 
       callback({

@@ -3,6 +3,7 @@ import {
   query, where, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './config';
+import { reportError } from '@services/reportError';
 import type { BlockedUser, ReportReason, ReportTargetType } from '@/types/safety';
 
 // El ID del documento es bloqueador_bloqueado: las reglas lo usan para
@@ -42,6 +43,7 @@ export const subscribeToBlocks = (
     }));
   }, (error) => {
     console.error('[safety] subscribeToBlocks:', error);
+    reportError(error, 'blocks-listener');
     callback([]);
   });
 };

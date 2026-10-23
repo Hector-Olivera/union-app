@@ -12,6 +12,7 @@ import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { Message } from '@/types/messaging';
 import { SafetyMenu } from '@/features/safety/components/SafetyMenu';
 import { useBlockStore } from '@/stores/blockStore';
+import { reportError } from '@/services/reportError';
 
 type Props = {
   conversationId: string;
@@ -73,6 +74,7 @@ export const ChatPanel = ({ conversationId, active = true, onBlocked }: Props) =
       setSendError('No puedes enviar mensajes a este usuario.');
       if (error?.code !== 'permission-denied') {
         console.error('[Chat] send error:', error);
+        reportError(error, 'chat-send');
       }
     }
   };

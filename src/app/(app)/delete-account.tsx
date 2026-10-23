@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStoreStore } from '@stores/storeStore';
 import { deleteAccount, hasPasswordProvider } from '@services/firebase/auth';
 import { LEGAL } from '@constants/legal';
+import { reportError } from '@services/reportError';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 
@@ -44,6 +45,7 @@ export default function DeleteAccountScreen() {
         setError(null); // cerró el selector de cuentas: no es un error
       } else {
         console.error('[DeleteAccount] error:', e);
+        reportError(e, 'delete-account');
         setError('No pudimos eliminar la cuenta. Intentá de nuevo.');
       }
       setLoading(false);

@@ -114,7 +114,7 @@ export const getPrivacyDocument = (): LegalDocument => {
           'Mensajes enviados y recibidos entre usuarios.',
           'Actividad en la App: tiendas favoritas, tiendas visitadas recientemente, tema elegido, usuarios bloqueados y reportes enviados.',
           'La cámara se usa solo para escanear códigos QR: las imágenes de la cámara no se guardan ni se envían. El acceso a la galería se usa únicamente para elegir las imágenes que el usuario decide subir.',
-          'La App no utiliza publicidad ni herramientas de analítica de terceros.',
+          'La App no utiliza publicidad ni analítica de comportamiento. Para detectar y corregir fallas se recopilan informes técnicos de errores: versión de la App, modelo y sistema operativo del dispositivo, detalle técnico del error y un identificador interno de usuario, sin nombre ni correo.',
         ],
       },
       {
@@ -128,7 +128,7 @@ export const getPrivacyDocument = (): LegalDocument => {
         heading: '4. Con quién se comparten',
         paragraphs: [
           'Otros usuarios: el nombre y la foto de perfil se muestran en las conversaciones. Las tiendas públicas muestran su contenido y sus datos de contacto a cualquier usuario de la App.',
-          `Proveedores que tratan datos por cuenta de ${appName}: Google Firebase (autenticación, base de datos y alojamiento web), Google Sign-In y Cloudinary (almacenamiento y entrega de imágenes). Cada uno se rige también por su propia política de privacidad.`,
+          `Proveedores que tratan datos por cuenta de ${appName}: Google Firebase (autenticación, base de datos y alojamiento web), Google Sign-In, Cloudinary (almacenamiento y entrega de imágenes) y Sentry (informes de errores). Cada uno se rige también por su propia política de privacidad.`,
           'Autoridades, cuando una norma o una resolución judicial lo exija.',
         ],
       },

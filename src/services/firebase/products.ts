@@ -3,6 +3,7 @@ import {
   onSnapshot, query, orderBy, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './config';
+import { reportError } from '@services/reportError';
 import type { Product, ProductFormData } from '@/types/product';
 
 const productsRef = (storeId: string) =>
@@ -62,6 +63,7 @@ export const subscribeToProducts = (
     callback(products);
   }, (error: any) => {
     console.error('[products] subscribeToProducts:', storeId, error?.code, error);
+    reportError(error, 'products-listener');
     callback([]);
   });
 };

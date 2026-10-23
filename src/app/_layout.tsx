@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
 import { Stack, router, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -8,18 +7,22 @@ import { useThemeStore } from '@stores/themeStore';
 import { injectWebGlobalStyles } from '@utils/webStyles';
 import { useStoreStore } from '@stores/storeStore';
 import { useBlockStore } from '@stores/blockStore';
-import { disableNetwork, enableNetwork } from 'firebase/firestore';
-import { db } from '@services/firebase/config';
+import { initMonitoring, setMonitoringUser, withMonitoring } from '@services/monitoring';
 import { LEGAL } from '@constants/legal';
 
-export default function RootLayout() {
+// Se inicializa una sola vez, antes de definir el componente
+initMonitoring();
+
+function RootLayout() {
   const { loadStore, clearStore } = useStoreStore();
   const { initialize, isAuthenticated, loading, user } = useAuthStore();
   const { loadUserTheme, resetTheme } = useThemeStore();
   const segments = useSegments();
   const { startBlocksListener, clearBlocks } = useBlockStore();
 
-  
+  useEffect(() => {
+    setMonitoringUser(isAuthenticated && user ? user.id : null);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     injectWebGlobalStyles();
@@ -27,7 +30,6 @@ export default function RootLayout() {
     return unsubscribe;
   }, []);
 
-  
   useEffect(() => {
     if (!isAuthenticated || !user) {
       clearBlocks();
@@ -37,15 +39,13 @@ export default function RootLayout() {
     return unsubscribe;
   }, [isAuthenticated, user?.id]);
 
-  // Cuando cambia el estado de auth: carga o resetea el tema
+  // Cuando cambia el estado de auth: carga o resetea el tema y la tienda
   useEffect(() => {
     if (loading) return;
     if (isAuthenticated && user) {
-      // Usuario logueado → cargar su tema personalizado desde Firestore
       loadUserTheme(user.id);
       loadStore(user.id);
     } else {
-      // Usuario deslogueado → volver al tema default
       resetTheme();
       clearStore();
     }
@@ -74,30 +74,7 @@ export default function RootLayout() {
     }
 
     if (inAuthGroup || inAcceptTerms) router.replace('/(app)');
-}, [isAuthenticated, loading, segments, user?.termsAcceptedVersion]);
-
-  useEffect(() => {
-  const reconnect = async () => {
-    try {
-      await disableNetwork(db);
-      await enableNetwork(db);
-    } catch (e) {
-      console.error('[Firestore] reconnect error:', e);
-    }
-  };
-
-  const interval = setInterval(reconnect, 60000); // cada 60 segundos
-
-  const handleAppStateChange = (nextState: AppStateStatus) => {
-    if (nextState === 'active') reconnect();
-  };
-  const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-  return () => {
-    clearInterval(interval);
-    subscription.remove();
-  };
-}, []);
+  }, [isAuthenticated, loading, segments, user?.termsAcceptedVersion]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -106,3 +83,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default withMonitoring(RootLayout);

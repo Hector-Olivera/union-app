@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
+import { reportError } from '@services/reportError';
 import { uploadImageToCloudinary, validateImageSize } from '@services/cloudinary/upload';
 
 export const useImageUpload = () => {
@@ -50,6 +51,7 @@ export const useImageUpload = () => {
       return url;
     } catch (e: any) {
       setError(e.message || 'Error al subir la imagen');
+      reportError(e, 'image-upload');
       return null;
     } finally {
       setUploading(false);

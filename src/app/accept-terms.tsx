@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '@stores/authStore';
 import { useAppTheme } from '@hooks/useAppTheme';
 import { acceptTerms } from '@services/firebase/legal';
+import { reportError } from '@services/reportError';
 import { LEGAL } from '@constants/legal';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
@@ -29,6 +30,7 @@ export default function AcceptTermsScreen() {
       setUser({ ...user, termsAcceptedVersion: LEGAL.termsVersion });
     } catch (e) {
       console.error('[AcceptTerms] error:', e);
+      reportError(e, 'accept-terms');
       setError('No pudimos guardar tu aceptación. Intentá de nuevo.');
     } finally {
       setSaving(false);

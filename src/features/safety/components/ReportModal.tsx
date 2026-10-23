@@ -9,6 +9,7 @@ import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { submitReport } from '@services/firebase/safety';
 import { REPORT_REASON_LABELS, type ReportReason, type ReportTargetType } from '@/types/safety';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { reportError } from '@services/reportError';
 
 export type ReportTarget = {
   type: ReportTargetType;
@@ -63,6 +64,7 @@ export const ReportModal = ({ visible, target, onClose }: Props) => {
       setSent(true);
     } catch (e) {
       console.error('[ReportModal] submit error:', e);
+      reportError(e, 'report-submit');
       setError('No pudimos enviar el reporte. Intentá de nuevo.');
     } finally {
       setSending(false);
