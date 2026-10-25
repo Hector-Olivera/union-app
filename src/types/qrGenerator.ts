@@ -3,14 +3,14 @@ export type QRStyle = 'solid' | 'gradient';
 // gradient: degradado lineal del color elegido a una versión más clara
 
 export type QRGeneratorConfig = {
-  value: string;          // El contenido del QR (el scheme unionapp://...)
+  value: string;          // El contenido del QR (el scheme emprendaya://...)
   color: string;          // Color principal del QR
   secondaryColor: string;  // Color final del degradado
   backgroundColor: string;
   style: QRStyle;
   size: number;           // Tamaño en px para el preview
   storeName: string;      // Nombre que aparece debajo del QR
-  logoSize: number;       // Tamaño del logo Union App en el centro
+  logoSize: number;       // Tamaño del logo Emprenda ya en el centro
 };
 
 // Colores predefinidos que el usuario puede elegir

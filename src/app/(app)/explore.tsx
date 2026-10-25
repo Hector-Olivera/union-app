@@ -163,7 +163,7 @@ export default function ExploreScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <View style={[styles.bgAccent, { backgroundColor: colors.brand.primary }]} pointerEvents="none" />
-        <Text style={[styles.appTitle, { color: colors.brand.primary }]}>UNION APP</Text>
+        <Text style={[styles.appTitle, { color: colors.brand.primary }]}>EMPRENDA YA</Text>
       </View>
 
       <CommunityTabCarousel activeTab={activeTab} onSelectTab={handleSelectTab} />

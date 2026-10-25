@@ -148,7 +148,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
 
           {/* Versión de la app */}
-          <Text style={styles.version}>Union App v1.0.0</Text>
+          <Text style={styles.version}>Emprenda ya v1.0.0</Text>
 
           <ConfirmDialog
             visible={showSignOutDialog}
@@ -169,11 +169,11 @@ export default function ProfileScreen() {
 
   const rightContent = (
     <View>
-      <Text style={[styles.newsTitle, { color: colors.brand.primary }]}>Bienvenido a Union</Text>
-      <Text style={styles.newsParagraph}>Gracias por formar parte de la comunidad de Union!</Text>
+      <Text style={[styles.newsTitle, { color: colors.brand.primary }]}>Bienvenido a Emprenda ya</Text>
+      <Text style={styles.newsParagraph}>Gracias por formar parte de la comunidad de Emprenda ya!</Text>
       <Text style={styles.newsParagraph}>Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.</Text>
       <Text style={styles.newsParagraph}>Publicitá tus productos ofreciendo regalos y descuentos.</Text>
-      <Text style={styles.newsParagraph}>Siendo parte de Union es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.</Text>
+      <Text style={styles.newsParagraph}>Siendo parte de Emprenda ya es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.</Text>
     </View>
   );
 

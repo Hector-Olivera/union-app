@@ -63,7 +63,7 @@ export default function HomeScreen() {
       >
         <Text style={styles.cardTitle}>{store ? store.name : 'Activá tu tienda'}</Text>
         <Text style={styles.cardSubtitle}>
-          {store ? 'Gestioná tu tienda, tu QR y tus productos.' : 'Vendé productos y servicios en Union App.'}
+          {store ? 'Gestioná tu tienda, tu QR y tus productos.' : 'Vendé productos y servicios en Emprenda ya.'}
         </Text>
         <Text style={[styles.cardAction, { color: activeTheme.primary }]}>
           {store ? 'Ir a mi tienda →' : 'Activar →'}
@@ -130,9 +130,9 @@ export default function HomeScreen() {
 
   const rightContent = (
     <View>
-      <Text style={[styles.newsTitle, { color: activeTheme.primary }]}>Bienvenido a Union</Text>
+      <Text style={[styles.newsTitle, { color: activeTheme.primary }]}>Bienvenido a Emprenda ya</Text>
       <Text style={styles.newsParagraph}>
-        Gracias por formar parte de la comunidad de Union!
+        Gracias por formar parte de la comunidad de Emprenda ya!
       </Text>
       <Text style={styles.newsParagraph}>
         Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.
@@ -141,7 +141,7 @@ export default function HomeScreen() {
         Publicitá tus productos ofreciendo regalos y descuentos.
       </Text>
       <Text style={styles.newsParagraph}>
-        Siendo parte de Union es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.
+        Siendo parte de Emprenda ya es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.
       </Text>
     </View>
   );

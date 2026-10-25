@@ -23,7 +23,7 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
         <View style={styles.card}>
 
           <Text style={[styles.appName, { color: config.color }]}>
-            UNION APP
+            EMPRENDA YA
           </Text>
 
           {/* Contenedor del QR con logo superpuesto manualmente */}
@@ -43,7 +43,7 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
               gradientDirection={['0%', '0%', '100%', '100%']}                        
             />
 
-            {/* Logo Union App superpuesto en el centro */}
+            {/* Logo Emprenda ya superpuesto en el centro */}
             <View style={[
               styles.logoOverlay,
               {
@@ -72,10 +72,7 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
           <Text style={[styles.storeName, { color: config.color }]}>
             {displayName}
           </Text>
-
-          <Text style={styles.url}>
-              union-app.com </Text>
-
+          
         </View>
       </ViewShot>
     </View>

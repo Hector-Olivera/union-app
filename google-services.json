@@ -7,12 +7,57 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1084073177222:android:bf9b8f411bae8af1b52107",
+        "android_client_info": {
+          "package_name": "com.emprendaya.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084073177222-pqj5qe1p62gitrl01ttcgq68do2gui9c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.emprendaya.app",
+            "certificate_hash": "8834d1d2096eeb28fae26103120f65526e4339c0"
+          }
+        },
+        {
+          "client_id": "1084073177222-899128g0ieemtd6pv9qrvlqu3ok84gkg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDouRn9QcNdR2YxB5G-AN-4u7BEKKCXcAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084073177222-899128g0ieemtd6pv9qrvlqu3ok84gkg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1084073177222:android:422d865cedffad93b52107",
         "android_client_info": {
           "package_name": "com.unionapp.base"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1084073177222-va7cgobaleq16146ibqucic0kq5sha62.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unionapp.base",
+            "certificate_hash": "f805fe188779c4b7f078cf725ebc7dcd3c32e0d0"
+          }
+        },
         {
           "client_id": "1084073177222-899128g0ieemtd6pv9qrvlqu3ok84gkg.apps.googleusercontent.com",
           "client_type": 3
