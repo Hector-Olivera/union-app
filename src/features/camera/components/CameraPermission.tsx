@@ -26,7 +26,7 @@ export const CameraPermission = ({ onRequestPermission, isDenied = false }: Prop
       <Text style={styles.description}>
         {isDenied
           ? 'Para usar esta función, habilitá el permiso de cámara en Configuración del sistema.'
-          : 'Union App necesita acceso a la cámara para la experiencia AR y el escaneo de códigos QR.'
+          : 'Emprenda ya necesita acceso a la cámara para la experiencia AR y el escaneo de códigos QR.'
         }
       </Text>
 

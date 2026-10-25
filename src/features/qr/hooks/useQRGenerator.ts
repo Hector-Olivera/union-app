@@ -17,7 +17,7 @@ export const useQRGenerator = () => {
   const [config, setConfig] = useState<QRGeneratorConfig>({
     ...DEFAULT_QR_CONFIG,
     // El valor del QR apunta al scheme de la tienda
-    value:     `unionapp://store/${store?.id || 'preview'}`,
+    value:     `emprendaya://store/${store?.id || 'preview'}`,
     storeName: store?.name || 'Mi Tienda',
   });
 

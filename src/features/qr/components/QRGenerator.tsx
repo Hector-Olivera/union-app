@@ -40,7 +40,7 @@ export const QRGenerator = () => {
       <View style={styles.header}>
         <Text style={styles.title}>QR de tu tienda</Text>
         <Text style={styles.subtitle}>
-          Compartilo para que tus clientes te encuentren en Union App.
+          Compartilo para que tus clientes te encuentren en Emprenda ya.
         </Text>
       </View>
 
@@ -74,7 +74,7 @@ export const QRGenerator = () => {
         <Text style={styles.infoTitle}>¿Cómo funciona?</Text>
         <Text style={styles.infoText}>
           Cuando alguien escanea este QR con su cámara, va directo a tu tienda en la web.
-          Si lo escanea con Union App, ve tu logo en realidad aumentada.
+          Si lo escanea con Emprenda ya, ve tu logo en realidad aumentada.
         </Text>
       </View>
 

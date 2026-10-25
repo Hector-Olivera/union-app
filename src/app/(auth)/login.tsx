@@ -48,7 +48,7 @@ export default function LoginScreen() {
 
           {/* Header */}
           <View style={authStyles.header}>
-            <Text style={authStyles.tagline}>UNION APP</Text>
+            <Text style={authStyles.tagline}>EMPRENDA YA</Text>
             <Text style={authStyles.title}>Bienvenido</Text>
             <Text style={authStyles.subtitle}>
               Ingresá a la comunidad mas grande de emprendedores

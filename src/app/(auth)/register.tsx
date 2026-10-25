@@ -48,7 +48,7 @@ export default function RegisterScreen() {
           </TouchableOpacity>
 
           <View style={authStyles.header}>
-            <Text style={authStyles.tagline}>UNION APP</Text>
+            <Text style={authStyles.tagline}>EMPRENDA YA</Text>
             <Text style={authStyles.title}>Crear cuenta</Text>
             <Text style={authStyles.subtitle}>
               Unite a la comunidad mas grande de emprendedores

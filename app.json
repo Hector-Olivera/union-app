@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "Union App",
+    "name": "Emprenda ya",
     "slug": "union-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "unionapp",
+    "scheme": "emprendaya",
     "userInterfaceStyle": "automatic",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon3.png",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.unionapp.base"
+      "bundleIdentifier": "com.emprendaya.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/react-logo@3x.png",
+        "foregroundImage": "./assets/images/adaptive-icon3.png",
         "backgroundColor": "#0a0a0a"
       },
-      "package": "com.unionapp.base",
+      "package": "com.emprendaya.app",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json",
       "permissions": [
@@ -29,7 +29,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Union App usa la camara para realidad aumentada y escaneo QR.",
+          "cameraPermission": "Emprenda Ya usa la camara para realidad aumentada y escaneo QR.",
           "recordAudioAndroid": false
         }
       ],
@@ -38,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon3sf.png",
           "resizeMode": "contain",
           "backgroundColor": "#0a0a0a"
         }
