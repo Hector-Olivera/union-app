@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity,
+  TouchableOpacity, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@hooks/useAppTheme';
@@ -17,6 +17,7 @@ import { Typography, Spacing, Radius, Colors } from '@constants/theme';
 import { EmailVerificationBanner } from '@features/profile/components/EmailVerificationBanner';
 import { router } from 'expo-router';
 import { useStoreStore } from '@stores/storeStore';
+import { captureError, isMonitoringActive } from '@/services/monitoring';
 
 
 export default function ProfileScreen() {
@@ -69,6 +70,23 @@ export default function ProfileScreen() {
               <Text style={styles.email}>{user.email}</Text>
             </View>
           </View>
+
+          <TouchableOpacity
+  onPress={() => {
+    if (!isMonitoringActive()) {
+      Alert.alert(
+        'Monitoreo inactivo',
+        'Es un build de desarrollo o no llegó EXPO_PUBLIC_SENTRY_DSN.'
+      );
+      return;
+    }
+    captureError(new Error('Prueba de monitoreo'), 'test');
+    Alert.alert('Monitoreo activo', 'Error de prueba enviado. Revisá Issues en Sentry.');
+  }}
+>
+  <Text style={{ color: Colors.dark.icon }}>Probar monitoreo</Text>
+</TouchableOpacity>
+
 
           <EmailVerificationBanner />
 
