@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity,
+  TouchableOpacity, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@hooks/useAppTheme';
@@ -17,6 +17,7 @@ import { Typography, Spacing, Radius, Colors } from '@constants/theme';
 import { EmailVerificationBanner } from '@features/profile/components/EmailVerificationBanner';
 import { router } from 'expo-router';
 import { useStoreStore } from '@stores/storeStore';
+import { captureError, isMonitoringActive } from '@/services/monitoring';
 
 
 export default function ProfileScreen() {
@@ -69,7 +70,7 @@ export default function ProfileScreen() {
               <Text style={styles.email}>{user.email}</Text>
             </View>
           </View>
-
+          
           <EmailVerificationBanner />
 
           {/* Error global */}

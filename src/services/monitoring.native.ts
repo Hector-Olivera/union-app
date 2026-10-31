@@ -38,3 +38,6 @@ export const withMonitoring = <P extends object>(Component: ComponentType<P>): C
     Component as unknown as ComponentType<Record<string, unknown>>
   ) as unknown as ComponentType<P>;
 };
+
+// Sirve para diagnosticar: ¿se inicializó Sentry en este build?
+export const isMonitoringActive = () => initialized;

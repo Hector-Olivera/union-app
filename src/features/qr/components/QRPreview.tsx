@@ -62,9 +62,11 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
                   borderRadius: config.logoSize / 4,
                 }
               ]}>
-                <Text style={[styles.logoText, { fontSize: config.logoSize * 0.5 }]}>
-                  U
+                <View style={styles.circleContainer}>
+                <Text style={[styles.logoText, { fontSize: config.logoSize * 0.6 }]}>
+                  3
                 </Text>
+                </View>
               </View>
             </View>
           </View>
@@ -115,8 +117,21 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: '#FFFFFF',
-    fontWeight: '900',
+    fontWeight: '300',
+    paddingBottom: 2,
+    transform: [{ scaleX: -1 }],
   },
+  circleContainer: {
+    width: '80%',
+    height: '80%',
+    borderRadius: '50%',
+    borderStyle: 'solid',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },  
   storeName: {
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,
