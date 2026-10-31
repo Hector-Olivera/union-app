@@ -70,24 +70,7 @@ export default function ProfileScreen() {
               <Text style={styles.email}>{user.email}</Text>
             </View>
           </View>
-
-          <TouchableOpacity
-  onPress={() => {
-    if (!isMonitoringActive()) {
-      Alert.alert(
-        'Monitoreo inactivo',
-        'Es un build de desarrollo o no llegó EXPO_PUBLIC_SENTRY_DSN.'
-      );
-      return;
-    }
-    captureError(new Error('Prueba de monitoreo'), 'test');
-    Alert.alert('Monitoreo activo', 'Error de prueba enviado. Revisá Issues en Sentry.');
-  }}
->
-  <Text style={{ color: Colors.dark.icon }}>Probar monitoreo</Text>
-</TouchableOpacity>
-
-
+          
           <EmailVerificationBanner />
 
           {/* Error global */}
