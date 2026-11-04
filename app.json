@@ -20,6 +20,8 @@
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.CAMERA",
+        "android.permission.VIBRATE",
+        "android.permission.CAMERA",
         "android.permission.VIBRATE"
       ]
     },
@@ -58,6 +60,12 @@
       "eas": {
         "projectId": "ee15cca1-19d8-422a-9313-4ab8df3392a8"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ee15cca1-19d8-422a-9313-4ab8df3392a8"
     }
   }
 }
