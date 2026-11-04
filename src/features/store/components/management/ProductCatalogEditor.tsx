@@ -75,7 +75,7 @@ export const ProductCatalogEditor = ({ products, loading, onAdd, onEdit, onRemov
 
             <View style={styles.info}>
               <Text style={styles.name}>{product.name}</Text>
-              <Text style={[styles.price, { color: colors.brand.primary }]}>
+              <Text style={[styles.price, { color: colors.brand.secondary }]}>
                 ${product.price.toFixed(2)}
               </Text>
             </View>

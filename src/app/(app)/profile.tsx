@@ -9,15 +9,14 @@ import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { SplitScreenLayout } from '@components/ui/SplitScreenLayout';
 import { useProfile } from '@features/profile/hooks/useProfile';
 import { AvatarPicker } from '@features/profile/components/AvatarPicker';
-import { ThemePicker } from '@features/profile/components/ThemePicker';
 import { StoreActivation } from '@features/profile/components/StoreActivation';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import { AppNewsSection } from '@features/appnews/components/AppNewsSection';
 import { useAuthStore } from '@stores/authStore';
 import { Typography, Spacing, Radius, Colors } from '@constants/theme';
 import { EmailVerificationBanner } from '@features/profile/components/EmailVerificationBanner';
 import { router } from 'expo-router';
 import { useStoreStore } from '@stores/storeStore';
-import { captureError, isMonitoringActive } from '@/services/monitoring';
 
 
 export default function ProfileScreen() {
@@ -27,10 +26,8 @@ export default function ProfileScreen() {
   const { colors } = useAppTheme();
   const { signOut } = useAuthStore();
   const {
-    user, saving, error,
-    selectedThemeId,
+    user, error,
     updateDisplayName,
-    changeTheme,
   } = useProfile();
 
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
@@ -79,15 +76,6 @@ export default function ProfileScreen() {
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
-
-          {/* Separador con label */}
-          <SectionLabel label="PERSONALIZACIÓN" color={colors.brand.primary} />
-
-          {/* Selector de tema */}
-          <ThemePicker
-            selectedThemeId={selectedThemeId}
-            onSelect={changeTheme}
-          />
 
           <SectionLabel label="MI TIENDA" color={colors.brand.secondary}/>
 
@@ -168,15 +156,7 @@ export default function ProfileScreen() {
         </ScrollView>
   )
 
-  const rightContent = (
-    <View>
-      <Text style={[styles.newsTitle, { color: colors.brand.primary }]}>Bienvenido a Emprenda ya</Text>
-      <Text style={styles.newsParagraph}>Gracias por formar parte de la comunidad de Emprenda ya!</Text>
-      <Text style={styles.newsParagraph}>Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.</Text>
-      <Text style={styles.newsParagraph}>Publicitá tus productos ofreciendo regalos y descuentos.</Text>
-      <Text style={styles.newsParagraph}>Siendo parte de Emprenda ya es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.</Text>
-    </View>
-  );
+  const rightContent = <AppNewsSection />;
 
   if (useSplitLayout) {
     return (
@@ -336,19 +316,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     textAlign: 'center',
     opacity: 0.5,
-  },
-  newsTitle: { 
-    fontSize: Typography.sizes.xxl, 
-    fontWeight: Typography.weights.bold, 
-    marginBottom: Spacing.lg,
-    marginHorizontal: Spacing.sm,
-  },
-  newsParagraph: { 
-    color: Colors.dark.text, 
-    fontSize: Typography.sizes.lg, 
-    lineHeight: 24, 
-    marginBottom: Spacing.md,
-    marginHorizontal: Spacing.sm
   },
   mobileSectionTitle: {
     color: Colors.dark.text,

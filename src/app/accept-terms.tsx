@@ -41,7 +41,7 @@ export default function AcceptTermsScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.inner}>
-          <Text style={[styles.tagline, { color: colors.brand.primary }]}>
+          <Text style={[styles.tagline, { color: colors.brand.secondary }]}>
             {LEGAL.appName.toUpperCase()}
           </Text>
           <Text style={styles.title}>Antes de continuar</Text>

@@ -90,7 +90,7 @@ export default function ExploreScreen() {
 
   const communityRight = (
     <View>
-      <Text style={[styles.rightTitle, { color: colors.brand.primary }]}>Nuevas tiendas de la comunidad</Text>
+      <Text style={[styles.rightTitle, { color: colors.brand.secondary }]}>Nuevas tiendas de la comunidad</Text>
       {newStores.length === 0 ? (
         <Text style={styles.emptyText}>No hay tiendas nuevas en los últimos 30 días.</Text>
       ) : (
@@ -112,7 +112,7 @@ export default function ExploreScreen() {
     </View>
   );
 
-  const notificationsLeft = <NotificationsSection storesWithNews={storesWithNews} onVisitStore={visitStore} />;
+  const notificationsLeft = <NotificationsSection storesWithNews={storesWithNews} />;
 
   const notificationsRight = (
     <View>
@@ -163,7 +163,7 @@ export default function ExploreScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <View style={[styles.bgAccent, { backgroundColor: colors.brand.primary }]} pointerEvents="none" />
-        <Text style={[styles.appTitle, { color: colors.brand.primary }]}>EMPRENDA YA</Text>
+        <Text style={[styles.appTitle, { color: colors.brand.secondary }]}>EMPRENDA YA</Text>
       </View>
 
       <CommunityTabCarousel activeTab={activeTab} onSelectTab={handleSelectTab} />
@@ -236,7 +236,7 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   header: { alignItems: 'center', justifyContent: 'center', paddingVertical: Spacing.lg, overflow: 'hidden' },
-  bgAccent: { position: 'absolute', top: -60, width: 180, height: 120, borderBottomLeftRadius: 90, borderBottomRightRadius: 90, opacity: 0.1 },
+  bgAccent: { position: 'absolute', top: -60, width: 210, height: 120, borderBottomLeftRadius: 90, borderBottomRightRadius: 90, opacity: 0.1 },
   appTitle: { fontSize: Typography.sizes.md, fontWeight: Typography.weights.bold, letterSpacing: 3 },
   pager: { flex: 1 },
   pageContent: { paddingHorizontal: Spacing.sm, paddingBottom: Spacing.xxl },

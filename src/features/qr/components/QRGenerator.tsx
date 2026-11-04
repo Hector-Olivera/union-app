@@ -34,7 +34,7 @@ export const QRGenerator = () => {
       showsVerticalScrollIndicator={false}
     >
       <TouchableOpacity onPress={() => router.push('/(app)/store')} style={styles.backButton}>
-        <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
+        <Text style={[styles.backText, { color: colors.brand.secondary }]}>← Volver</Text>
       </TouchableOpacity> 
       {/* Header */}
       <View style={styles.header}>

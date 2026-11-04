@@ -33,15 +33,15 @@ export const QRStylePicker = ({ selected, onSelect }: Props) => {
               style={[
                 styles.card,
                 isSelected && {
-                  borderColor: colors.brand.primary,
-                  backgroundColor: `${colors.brand.primary}10`,
+                  borderColor: colors.brand.secondary,
+                  backgroundColor: `${colors.brand.secondary}10`,
                 }
               ]}
               activeOpacity={0.7}
             >
               <Text style={[
                 styles.cardLabel,
-                isSelected && { color: colors.brand.primary }
+                isSelected && { color: colors.brand.secondary }
               ]}>
                 {option.label}
               </Text>

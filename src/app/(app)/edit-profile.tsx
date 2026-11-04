@@ -38,7 +38,7 @@ export default function EditProfileScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <TouchableOpacity onPress={() => router.push('/(app)/profile')} style={styles.backButton}>
-        <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
+        <Text style={[styles.backText, { color: colors.brand.secondary }]}>← Volver</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>Editar perfil</Text>

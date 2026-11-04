@@ -99,7 +99,7 @@ export default function ChatScreen() {
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(app)/explore?tab=messages')} style={styles.backButton}>
-          <Text style={[styles.backText, { color: colors.brand.primary }]}>←</Text>
+          <Text style={[styles.backText, { color: colors.brand.secondary }]}>←</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleVisitStore} style={styles.headerUserInfo} activeOpacity={0.7}>

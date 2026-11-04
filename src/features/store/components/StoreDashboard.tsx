@@ -177,10 +177,10 @@ export const StoreDashboard = ({ store, onUpdateLayout, onUpdateTheme }: Props) 
 
       <View style={styles.actionsRow}>
         <TouchableOpacity
-          style={[styles.actionButton, { borderColor: colors.brand.primary }]}
+          style={[styles.actionButton, { borderColor: colors.brand.secondary }]}
           onPress={() => router.push('/(app)/qrgenerator')}
         >
-          <Text style={[styles.actionButtonText, { color: colors.brand.primary }]}>
+          <Text style={[styles.actionButtonText, { color: colors.brand.secondary }]}>
             Ver QR
           </Text>
         </TouchableOpacity>

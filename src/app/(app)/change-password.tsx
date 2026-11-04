@@ -45,7 +45,7 @@ export default function ChangePasswordScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <TouchableOpacity onPress={() => router.push('/(app)/profile')} style={styles.backButton}>
-        <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
+        <Text style={[styles.backText, { color: colors.brand.secondary }]}>← Volver</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>Cambiar contraseña</Text>
@@ -57,7 +57,7 @@ export default function ChangePasswordScreen() {
           <View style={styles.successBox}>
             <Text style={styles.successText}>Contraseña actualizada correctamente.</Text>
             <TouchableOpacity onPress={() => router.back()}>
-              <Text style={[styles.link, { color: colors.brand.primary }]}>Volver al perfil</Text>
+              <Text style={[styles.link, { color: colors.brand.secondary }]}>Volver al perfil</Text>
             </TouchableOpacity>
           </View>
         ) : (

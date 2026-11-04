@@ -42,11 +42,11 @@ export const StoreActivation = ({ hasStore }: Props) => {
         // Estado: tienda activa
         <View style={styles.activeContainer}>
           <TouchableOpacity
-            style={[styles.storeButton, { borderColor: colors.brand.primary }]}
+            style={[styles.storeButton, { borderColor: colors.brand.secondary }]}
             onPress={() => router.push('/(app)/store')}
             activeOpacity={0.8}
           >
-            <Text style={[styles.storeButtonText, { color: colors.brand.primary }]}>
+            <Text style={[styles.storeButtonText, { color: colors.brand.secondary }]}>
               Ver mi tienda
             </Text>
           </TouchableOpacity>

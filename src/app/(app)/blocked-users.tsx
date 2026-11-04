@@ -24,7 +24,7 @@ export default function BlockedUsersScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.inner}>
         <TouchableOpacity onPress={() => router.push('/(app)/profile')} style={styles.backButton}>
-          <Text style={[styles.backText, { color: colors.brand.primary }]}>← Volver</Text>
+          <Text style={[styles.backText, { color: colors.brand.secondary }]}>← Volver</Text>
         </TouchableOpacity>
 
         <Text style={styles.title}>Usuarios bloqueados</Text>
@@ -43,10 +43,10 @@ export default function BlockedUsersScreen() {
               <AvatarPicker displayName={item.blockedName} avatarUrl={item.blockedAvatarUrl} size={44} />
               <Text style={styles.name} numberOfLines={1}>{item.blockedName}</Text>
               <TouchableOpacity
-                style={[styles.unblockButton, { borderColor: colors.brand.primary }]}
+                style={[styles.unblockButton, { borderColor: colors.brand.secondary }]}
                 onPress={() => handleUnblock(item.blockedId)}
               >
-                <Text style={[styles.unblockText, { color: colors.brand.primary }]}>Desbloquear</Text>
+                <Text style={[styles.unblockText, { color: colors.brand.secondary }]}>Desbloquear</Text>
               </TouchableOpacity>
             </View>
           )}

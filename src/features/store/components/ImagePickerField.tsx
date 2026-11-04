@@ -33,14 +33,14 @@ export const ImagePickerField = ({
       <TouchableOpacity
         style={[
           styles.imageContainer,
-          { height, borderColor: `${colors.brand.primary}30` }
+          { height, borderColor: `${colors.brand.secondary}30` }
         ]}
         onPress={handlePress}
         disabled={uploading}
         activeOpacity={0.8}
       >
         {uploading ? (
-          <ActivityIndicator color={colors.brand.primary} />
+          <ActivityIndicator color={colors.brand.secondary} />
         ) : currentUrl ? (
           <Image source={{ uri: currentUrl }} style={styles.image} resizeMode="cover" />
         ) : (
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: Spacing.sm,
     right: Spacing.sm,
-    backgroundColor: 'rgba(10,10,26,0.8)',
+    backgroundColor: 'rgba(11,15,25,0.8)',
     paddingHorizontal: Spacing.sm,
     paddingVertical: 4,
     borderRadius: Radius.sm,

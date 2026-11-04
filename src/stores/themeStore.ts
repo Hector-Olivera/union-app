@@ -1,110 +1,44 @@
 import { create } from 'zustand';
-import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@services/firebase/config';
+import { Colors } from '@constants/theme';
 
-// Paletas predefinidas de la plataforma.
-// Cada tema tiene un nombre, color primario, secundario y acento.
-// El usuario elige una — se guarda en Firestore y se aplica en tiempo real.
+// Temas de color para las TIENDAS. El dueño elige uno para su tienda y
+// cambia sus acentos y también su fondo.
 export type ThemeOption = {
   id: string;
   name: string;
   primary: string;
   secondary: string;
   accent: string;
+  background: string; // fondo de la tienda: un tono muy oscuro del color
 };
 
 export const THEME_OPTIONS: ThemeOption[] = [
-  { id: 'violet',   name: 'Violeta',    primary: '#6C63FF', secondary: '#FF6584', accent: '#43E8D8' },
-  { id: 'fire',     name: 'Fuego',      primary: '#FF6B35', secondary: '#F7C59F', accent: '#FFDD57' },
-  { id: 'ocean',    name: 'Oceano',     primary: '#0077B6', secondary: '#00B4D8', accent: '#90E0EF' },
-  { id: 'forest',   name: 'Bosque',     primary: '#2D6A4F', secondary: '#52B788', accent: '#B7E4C7' },
-  { id: 'midnight', name: 'Medianoche', primary: '#3A0CA3', secondary: '#7209B7', accent: '#F72585' },
-  { id: 'gold',     name: 'Dorado',     primary: '#B5830A', secondary: '#E9C46A', accent: '#F4A261' },
+  { id: 'brand',    name: 'Emprenda',   primary: '#1a3662', secondary: '#38BDF8', accent: '#F04438', background: '#0B0F19' },
+  { id: 'violet',   name: 'Violeta',    primary: '#6C63FF', secondary: '#FF6584', accent: '#43E8D8', background: '#100E24' },
+  { id: 'fire',     name: 'Fuego',      primary: '#FF6B35', secondary: '#F7C59F', accent: '#FFDD57', background: '#1F130D' },
+  { id: 'ocean',    name: 'Oceano',     primary: '#0077B6', secondary: '#00B4D8', accent: '#90E0EF', background: '#08141F' },
+  { id: 'forest',   name: 'Bosque',     primary: '#2D6A4F', secondary: '#52B788', accent: '#B7E4C7', background: '#0B1812' },
+  { id: 'midnight', name: 'Medianoche', primary: '#3A0CA3', secondary: '#7209B7', accent: '#F72585', background: '#0F0A26' },
+  { id: 'gold',     name: 'Dorado',     primary: '#B5830A', secondary: '#E9C46A', accent: '#F4A261', background: '#1C1708' },
 ];
 
-// El tema activo — lo que se usa en toda la app
 export type ActiveTheme = {
   primary: string;
   secondary: string;
   accent: string;
 };
 
-type ThemeState = {
-  activeTheme: ActiveTheme;
-  selectedThemeId: string;
-  loading: boolean;
-  // Acciones
-  loadUserTheme: (userId: string) => Promise<void>;
-  setTheme: (themeId: string, userId: string) => Promise<void>;
-  resetTheme: () => void;
+// Colores de la app: fijos, los de la marca. Ya no dependen del usuario.
+export const APP_THEME: ActiveTheme = {
+  primary:   Colors.brand.primary,
+  secondary: Colors.brand.secondary,
+  accent:    Colors.brand.accent,
 };
 
-const DEFAULT_THEME = THEME_OPTIONS[0]; // violet es el default
+type ThemeState = {
+  activeTheme: ActiveTheme;
+};
 
-export const useThemeStore = create<ThemeState>((set) => ({
-  activeTheme: {
-    primary:   DEFAULT_THEME.primary,
-    secondary: DEFAULT_THEME.secondary,
-    accent:    DEFAULT_THEME.accent,
-  },
-  selectedThemeId: DEFAULT_THEME.id,
-  loading: false,
-
-  // Carga el tema guardado del usuario desde Firestore al iniciar sesión
-  loadUserTheme: async (userId: string) => {
-    try {
-      const snap = await getDoc(doc(db, 'players', userId));
-      if (!snap.exists()) return;
-
-      const data = snap.data();
-      const themeId = data.themeId || DEFAULT_THEME.id;
-      const theme = THEME_OPTIONS.find(t => t.id === themeId) || DEFAULT_THEME;
-
-      set({
-        selectedThemeId: themeId,
-        activeTheme: {
-          primary:   theme.primary,
-          secondary: theme.secondary,
-          accent:    theme.accent,
-        }
-      });
-    } catch (error) {
-      console.error('[themeStore] loadUserTheme:', error);
-    }
-  },
-
-  // Cambia el tema en tiempo real Y lo guarda en Firestore
-  setTheme: async (themeId: string, userId: string) => {
-    const theme = THEME_OPTIONS.find(t => t.id === themeId);
-    if (!theme) return;
-
-    // Actualización optimista — primero cambia en UI, luego guarda
-    // El usuario ve el cambio inmediatamente sin esperar la red
-    set({
-      selectedThemeId: themeId,
-      activeTheme: {
-        primary:   theme.primary,
-        secondary: theme.secondary,
-        accent:    theme.accent,
-      }
-    });
-
-    try {
-      await setDoc(doc(db, 'players', userId), { themeId }, { merge: true });
-    } catch (error) {
-      console.error('[themeStore] setTheme:', error);
-      // Si falla el guardado, el tema igual queda aplicado localmente
-      // En una app de producción acá revertiríamos el estado
-    }
-  },
-
-  // Resetea al tema default — se llama al cerrar sesión
-  resetTheme: () => set({
-    selectedThemeId: DEFAULT_THEME.id,
-    activeTheme: {
-      primary:   DEFAULT_THEME.primary,
-      secondary: DEFAULT_THEME.secondary,
-      accent:    DEFAULT_THEME.accent,
-    }
-  }),
+export const useThemeStore = create<ThemeState>(() => ({
+  activeTheme: APP_THEME,
 }));

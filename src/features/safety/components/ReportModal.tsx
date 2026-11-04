@@ -100,11 +100,11 @@ export const ReportModal = ({ visible, target, onClose }: Props) => {
                     return (
                       <TouchableOpacity
                         key={key}
-                        style={[styles.reasonRow, selected && { borderColor: colors.brand.primary }]}
+                        style={[styles.reasonRow, selected && { borderColor: colors.brand.secondary }]}
                         onPress={() => setReason(key)}
                         activeOpacity={0.7}
                       >
-                        <View style={[styles.radio, selected && { borderColor: colors.brand.primary }]}>
+                        <View style={[styles.radio, selected && { borderColor: colors.brand.secondary }]}>
                           {selected && <View style={[styles.radioDot, { backgroundColor: colors.brand.primary }]} />}
                         </View>
                         <Text style={styles.reasonText}>{REPORT_REASON_LABELS[key]}</Text>
