@@ -1,9 +1,9 @@
 import { Platform } from 'react-native';
 
 // ─── COLORES ────────────────────────────────────────────────────────────────
-// Soporte light/dark nativo + paleta del juego AR
-const tintColorLight = '#6C63FF';
-const tintColorDark  = '#A89EFF';
+// Soporte light/dark nativo + paleta de la app (marca) + colores de estado (success, error, warning, info).
+const tintColorLight = '#CB0B0B';
+const tintColorDark  = '#38BDF8';
 
 export const Colors = {
   // Sistema light/dark (compatible con useColorScheme de Expo)
@@ -18,26 +18,29 @@ export const Colors = {
     border:         '#E0E0E0',
   },
   dark: {
-    text:           '#ECEDEE',
-    background:     '#0a0a0a',
+    text:           '#F1F5F9', // títulos y datos principales
+    background:     '#0B0F19', // fondo general
     tint:           tintColorDark,
-    icon:           '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon:           '#94A3B8', // texto secundario e íconos inactivos
+    tabIconDefault: '#94A3B8',
     tabIconSelected: tintColorDark,
-    surface:        '#1a1a2e',
-    border:         '#2a2a3e',
+    surface:        '#1E293B', // tarjetas, modales y barra de pestañas
+    border:         '#334155',
   },
 
-  // Paleta fija del juego AR (no cambia con el modo)
+  // Paleta fija de la marca. Los temas de colores son solo para las tiendas.
+  // Regla de uso sobre fondo oscuro:
+  //   primary   = RELLENO (botones y badges con texto blanco)
+  //   secondary = texto, íconos activos, bordes y enlaces
   brand: {
-    primary:   '#6C63FF',
-    secondary: '#FF6584',
-    accent:    '#43E8D8',
+    primary:   '#CB0B0B',
+    secondary: '#38BDF8',
+    accent:    '#7DD3FC',
   },
   ar: {
-    overlay:   'rgba(108, 99, 255, 0.3)',
-    highlight: 'rgba(255, 101, 132, 0.5)',
-    scan:      'rgba(67, 232, 216, 0.4)',
+    overlay:   'rgba(203, 11, 11, 0.3)',
+    highlight: 'rgba(56, 189, 248, 0.5)',
+    scan:      'rgba(56, 189, 248, 0.4)',
   },
   status: {
     success: '#4CAF50',
@@ -47,7 +50,7 @@ export const Colors = {
   },
 } as const;
 // "as const" → TypeScript trata cada valor como literal exacto.
-// Colors.brand.primary es '#6C63FF', no string genérico.
+// Colors.brand.primary es '#CB0B0B', no string genérico.
 // Previene typos y habilita autocompletado preciso.
 
 // ─── TIPOGRAFÍA ──────────────────────────────────────────────────────────────

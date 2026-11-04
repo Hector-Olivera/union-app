@@ -90,11 +90,11 @@ const styles = StyleSheet.create({
     right: Spacing.lg,
   },
   card: {
-    backgroundColor: 'rgba(10,10,26,0.95)',
+    backgroundColor: 'rgba(11,15,25,0.95)',
     borderRadius: Radius.lg,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: 'rgba(108,99,255,0.3)',
+    borderColor: 'rgba(56,189,248,0.3)',
   },
   typeBadge: {
     alignSelf: 'flex-start',

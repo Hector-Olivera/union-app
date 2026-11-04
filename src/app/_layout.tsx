@@ -3,7 +3,6 @@ import { Stack, router, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '@stores/authStore';
-import { useThemeStore } from '@stores/themeStore';
 import { injectWebGlobalStyles } from '@utils/webStyles';
 import { useStoreStore } from '@stores/storeStore';
 import { useBlockStore } from '@stores/blockStore';
@@ -16,7 +15,6 @@ initMonitoring();
 function RootLayout() {
   const { loadStore, clearStore } = useStoreStore();
   const { initialize, isAuthenticated, loading, user } = useAuthStore();
-  const { loadUserTheme, resetTheme } = useThemeStore();
   const segments = useSegments();
   const { startBlocksListener, clearBlocks } = useBlockStore();
 
@@ -43,13 +41,11 @@ function RootLayout() {
   useEffect(() => {
     if (loading) return;
     if (isAuthenticated && user) {
-      loadUserTheme(user.id);
       loadStore(user.id);
     } else {
-      resetTheme();
       clearStore();
     }
-  }, [isAuthenticated, user, loading]);
+  }, [isAuthenticated, user?.id, loading]);
 
   useEffect(() => {
     if (loading) return;
@@ -78,7 +74,7 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="light" backgroundColor="#0a0a0a" />
+      <StatusBar style="light" backgroundColor="#0B0F19" />
       <Stack screenOptions={{ headerShown: false }} />
     </GestureHandlerRootView>
   );

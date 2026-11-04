@@ -84,7 +84,7 @@ export const ChatPanel = ({ conversationId, active = true, onBlocked }: Props) =
     const isMine = item.senderId === currentUserId;
     return (
       <View style={[styles.bubbleRow, isMine && styles.bubbleRowMine]}>
-        <View style={[styles.bubble, isMine ? { backgroundColor: colors.brand.primary } : { backgroundColor: 'rgba(255,255,255,0.08)' }]}>
+        <View style={[styles.bubble, isMine ? { backgroundColor: colors.ar.highlight } : { backgroundColor: 'rgba(255,255,255,0.08)' }]}>
           <Text style={[styles.bubbleText, isMine && { color: '#fff' }]}>{item.text}</Text>
         </View>
       </View>
@@ -138,7 +138,7 @@ export const ChatPanel = ({ conversationId, active = true, onBlocked }: Props) =
               placeholderTextColor={Colors.dark.icon}
               multiline
             />
-            <TouchableOpacity style={[styles.sendButton, { backgroundColor: colors.brand.primary }]} onPress={handleSend}>
+            <TouchableOpacity style={[styles.sendButton, { backgroundColor: colors.ar.highlight }]} onPress={handleSend}>
               <Text style={styles.sendText}>Enviar</Text>
             </TouchableOpacity>
           </View>

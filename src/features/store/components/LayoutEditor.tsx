@@ -63,7 +63,7 @@ export const LayoutEditor = ({
             key={section.id}
             style={[
               styles.sectionRow,
-              { borderColor: section.visible ? `${colors.brand.primary}40` : 'rgba(255,255,255,0.06)' }
+              { borderColor: section.visible ? `${colors.brand.secondary}40` : 'rgba(255,255,255,0.06)' }
             ]}
           >
             <View style={[styles.visibilityDot, { backgroundColor: section.visible ? colors.brand.primary : Colors.dark.icon }]} />

@@ -49,7 +49,7 @@ export const createStore = async (
     ownerId:     userId,
     name,
     description: '',
-    themeId:     'violet',
+    themeId:     'brand',
     isPublic:    false,
     // La tienda arranca privada — el usuario la publica cuando esté lista
     createdAt:   new Date().toISOString(),

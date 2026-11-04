@@ -21,6 +21,8 @@ export type QRColorOption = {
 };
 
 export const QR_COLOR_OPTIONS: QRColorOption[] = [
+  { id: 'brand',    label: 'Rojo',       color: '#CB0B0B' },
+  { id: 'navy',     label: 'Azul noche', color: '#0B0F19' },
   { id: 'violet',   label: 'Violeta',    color: '#6C63FF' },
   { id: 'black',    label: 'Negro',      color: '#0a0a0a' },
   { id: 'fire',     label: 'Fuego',      color: '#FF6B35' },
@@ -31,8 +33,8 @@ export const QR_COLOR_OPTIONS: QRColorOption[] = [
 
 // Config por defecto al abrir el generador
 export const DEFAULT_QR_CONFIG: Omit<QRGeneratorConfig, 'value' | 'storeName'> = {
-  color:           '#6C63FF',
-  secondaryColor:  '#FF6584',
+  color:           '#CB0B0B',
+  secondaryColor:  '#0B0F19',
   backgroundColor: '#FFFFFF',
   style:           'solid',
   size:            220,

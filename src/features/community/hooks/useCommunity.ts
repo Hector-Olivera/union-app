@@ -28,6 +28,7 @@ export const useCommunity = () => {
       id: store.id,
       name: store.name,
       logoUrl: store.logoUrl,
+      bannerUrl: store.bannerUrl,
       themeId: store.themeId,
       hasAnnouncement: !!latestAnnouncement,
       isAnnouncementUnseen: isUnseen,

@@ -12,6 +12,7 @@ import { GoogleSignInButton } from '@features/auth/components/GoogleSignInButton
 import { AuthDivider } from '@features/auth/components/AuthDivider';
 import { Colors, Typography, Spacing } from '@constants/theme';
 import { authStyles } from '@features/auth/authStyles';
+import { BrandLogo } from '@components/ui/BrandLogo';
 import { LegalLinks } from '@/features/legal/components/LegalLinks';
 
 export default function RegisterScreen() {
@@ -48,7 +49,7 @@ export default function RegisterScreen() {
           </TouchableOpacity>
 
           <View style={authStyles.header}>
-            <Text style={authStyles.tagline}>EMPRENDA YA</Text>
+            <BrandLogo uppercase size={44} textSize={20} />
             <Text style={authStyles.title}>Crear cuenta</Text>
             <Text style={authStyles.subtitle}>
               Unite a la comunidad mas grande de emprendedores

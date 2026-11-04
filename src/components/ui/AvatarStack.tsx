@@ -16,7 +16,7 @@ type Props = {
 };
 
 const getColor = (name: string): string => {
-  const colors = ['#6C63FF', '#FF6584', '#43E8D8', '#FF6B35', '#0077B6', '#2D6A4F'];
+  const colors = ['#CB0B0B', '#0369A1', '#0F766E', '#B45309', '#6D28D9', '#BE185D'];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];

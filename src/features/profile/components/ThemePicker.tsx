@@ -59,7 +59,7 @@ export const ThemePicker = ({ selectedThemeId, onSelect }: Props) => {
               style={[
                 styles.themeItem,
                 isSelected && {
-                  borderColor: colors.brand.primary,
+                  borderColor: colors.brand.secondary,
                   borderWidth: 2,
                 }
               ]}
@@ -74,7 +74,7 @@ export const ThemePicker = ({ selectedThemeId, onSelect }: Props) => {
 
               <Text style={[
                 styles.themeName,
-                isSelected && { color: colors.brand.primary }
+                isSelected && { color: colors.brand.secondary }
               ]}>
                 {theme.name}
               </Text>

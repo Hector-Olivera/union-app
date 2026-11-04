@@ -32,7 +32,7 @@ export const CommunityTabCarousel = ({ activeTab, onSelectTab }: Props) => {
             style={styles.labelButton}
           >
             <Text
-              style={[styles.labelText, isActive && { color: colors.brand.primary, fontWeight: Typography.weights.bold }]}
+              style={[styles.labelText, isActive && { color: colors.brand.secondary, fontWeight: Typography.weights.bold }]}
               numberOfLines={1}
             >
               {tab.label}

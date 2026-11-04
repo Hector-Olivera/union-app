@@ -20,7 +20,7 @@ export default function StoreScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.brand.primary} />
+        <ActivityIndicator size="large" color={colors.brand.secondary} />
       </View>
     );
   }

@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@services/firebase/config';
 import { useAuthStore } from '@stores/authStore';
-import { useThemeStore } from '@stores/themeStore';
 
 export const useProfile = () => {
   const { user, setUser } = useAuthStore();
-  const { setTheme, selectedThemeId } = useThemeStore();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,19 +30,11 @@ export const useProfile = () => {
     }
   };
 
-  const changeTheme = async (themeId: string) => {
-    if (!user) return;
-    // setTheme ya hace la actualización optimista + guarda en Firestore
-    await setTheme(themeId, user.id);
-  };
-
   return {
     user,
     saving,
     error,
-    selectedThemeId,
     updateDisplayName,
-    changeTheme,
     clearError: () => setError(null),
   };
 };

@@ -87,7 +87,7 @@ export default function StoreViewScreen() {
   const theme = THEME_OPTIONS.find(t => t.id === store.themeId) || THEME_OPTIONS[0];
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.background }]}>
 
       {/* Header simple con botón volver */}
       <View style={styles.topBar}>

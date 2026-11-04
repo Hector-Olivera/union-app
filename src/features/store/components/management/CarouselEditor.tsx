@@ -51,11 +51,11 @@ export const CarouselEditor = ({ images = [], onUpdate }: Props) => {
 
       {images.length < MAX_IMAGES && (
         <TouchableOpacity
-          style={[styles.addButton, { borderColor: colors.brand.primary }]}
+          style={[styles.addButton, { borderColor: colors.brand.secondary }]}
           onPress={handleAdd}
           disabled={uploading}
         >
-          <Text style={[styles.addText, { color: colors.brand.primary }]}>
+          <Text style={[styles.addText, { color: colors.brand.secondary }]}>
             {uploading ? 'Subiendo...' : '+ Agregar imagen'}
           </Text>
         </TouchableOpacity>

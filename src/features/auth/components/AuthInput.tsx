@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   inputWrapperFocused: {
     borderColor: Colors.brand.primary,
-    backgroundColor: 'rgba(108,99,255,0.08)',
+    backgroundColor: 'rgba(56,189,248,0.08)',
     // Glow sutil al enfocar — característica visual del tema cyberpunk
   },
   inputWrapperError: {

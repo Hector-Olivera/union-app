@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.brand.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(108,99,255,0.08)',
+    backgroundColor: 'rgba(56,189,248,0.08)',
     // Glow sutil — consistente con el estilo del resto de la plataforma
   },
   iconText: {
