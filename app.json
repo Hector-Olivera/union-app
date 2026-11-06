@@ -11,6 +11,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.emprendaya.app"
     },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon3B.png",
@@ -20,7 +23,7 @@
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.VIBRATE"
+        "android.permission.VIBRATE",
       ]
     },
     "plugins": [
@@ -28,11 +31,10 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Emprenda Ya usa la camara para realidad aumentada y escaneo QR.",
+          "cameraPermission": "Emprenda ya usa la cámara para escanear códigos QR.",
           "recordAudioAndroid": false
         }
       ],
-      "expo-web-browser",
       "@react-native-google-signin/google-signin",
       [
         "expo-splash-screen",
@@ -58,6 +60,12 @@
       "eas": {
         "projectId": "ee15cca1-19d8-422a-9313-4ab8df3392a8"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ee15cca1-19d8-422a-9313-4ab8df3392a8"
     }
   }
 }
