@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.lg,
-    marginBottom: Spacing.lg,
+    margin: Spacing.lg,
   },
   userInfo: {
     flex: 1,

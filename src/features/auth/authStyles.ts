@@ -24,7 +24,7 @@ export const authStyles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: Spacing.xl,
-    paddingTop: 80,
+    paddingTop: 60,
     paddingBottom: Spacing.xl,
   },
   header: {
@@ -42,6 +42,7 @@ export const authStyles = StyleSheet.create({
     color: Colors.dark.text,
     fontSize: Typography.sizes.display,
     fontWeight: Typography.weights.bold,
+    marginTop: Spacing.md,
     marginBottom: Spacing.xs,
   },
   subtitle: {

@@ -50,7 +50,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <BrandLogo size={40} textSize={22} />
         <View style={styles.greetingBlock}>
-          <Text style={styles.greeting}>{getGreeting()},</Text>
+          <Text style={styles.greeting}>{getGreeting()},   </Text>
           <Text style={[styles.userName, { color: activeTheme.secondary }]} numberOfLines={1}>
             {firstName}
           </Text>
@@ -151,7 +151,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   content: { paddingHorizontal: Spacing.sm, paddingBottom: Spacing.xxl },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: Spacing.xl },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: Spacing.xl, paddingHorizontal: Spacing.sm },
   greetingBlock: { alignItems: 'flex-end', flexShrink: 1, marginLeft: Spacing.md },
   greeting: { color: Colors.dark.icon, fontSize: Typography.sizes.md },
   userName: { fontSize: Typography.sizes.xxl, fontWeight: Typography.weights.bold },

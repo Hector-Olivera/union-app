@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
@@ -62,11 +62,11 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
                   borderRadius: config.logoSize / 4,
                 }
               ]}>
-                <View style={styles.circleContainer}>
-                <Text style={[styles.logoText, { fontSize: config.logoSize * 0.6 }]}>
-                  3
-                </Text>
-                </View>
+                 <Image
+                    source={require('../../../../assets/images/icon3Bsf.png')}
+                    style={{ width: 40, height: 40, borderRadius: '50%' }}
+                    resizeMode="cover"
+                  />
               </View>
             </View>
           </View>
@@ -114,24 +114,7 @@ const styles = StyleSheet.create({
   logo: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  logoText: {
-    color: '#FFFFFF',
-    fontWeight: '300',
-    paddingBottom: 2,
-    transform: [{ scaleX: -1 }],
-  },
-  circleContainer: {
-    width: '80%',
-    height: '80%',
-    borderRadius: '50%',
-    borderStyle: 'solid',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },  
+  }, 
   storeName: {
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,

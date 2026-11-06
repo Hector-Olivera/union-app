@@ -30,6 +30,6 @@ export const BrandLogo = ({ size = 36, textSize = Typography.sizes.lg, uppercase
 };
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   name: { color: Colors.brand.primary, fontWeight: Typography.weights.bold, flexShrink: 1 },
 });
