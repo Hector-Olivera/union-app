@@ -29,7 +29,7 @@ export const StoreSetup = ({
 
       <Text style={styles.title}>Creá tu tienda</Text>
       <Text style={styles.subtitle}>
-        Vendé productos, ofrecé servicios y generá tu QR personalizado dentro del ecosistema Union App.
+        Vendé productos, ofrecé servicios y generá tu QR personalizado dentro del ecosistema Emprenda ya.
       </Text>
 
       {/* Campo nombre */}

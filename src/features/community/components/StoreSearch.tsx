@@ -37,7 +37,7 @@ export const StoreSearch = ({ onSearch, onVisitStore }: Props) => {
   return (
     <View style={styles.container}>
 
-      <View style={[styles.inputWrapper, { borderColor: `${colors.brand.primary}30` }]}>
+      <View style={[styles.inputWrapper, { borderColor: `${colors.brand.secondary}30` }]}>
         <Ionicons name="search" size={18} color={Colors.dark.icon} style={styles.searchIcon} />
         <TextInput
           style={styles.input}
@@ -48,7 +48,7 @@ export const StoreSearch = ({ onSearch, onVisitStore }: Props) => {
         />
       </View>
 
-      {loading && <ActivityIndicator style={styles.loader} color={colors.brand.primary} size="small" />}
+      {loading && <ActivityIndicator style={styles.loader} color={colors.brand.secondary} size="small" />}
 
       {!loading && query.trim().length > 0 && results.length === 0 && (
         <Text style={styles.emptyText}>No encontramos tiendas con ese nombre.</Text>

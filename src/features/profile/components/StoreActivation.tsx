@@ -26,7 +26,7 @@ export const StoreActivation = ({ hasStore }: Props) => {
         // Estado: sin tienda
         <View style={styles.inactiveContainer}>
           <Text style={styles.description}>
-            Creá tu tienda dentro del ecosistema Union App. Vendé productos, ofrecé servicios y generá tu QR personalizado.
+            Creá tu tienda dentro del ecosistema Emprenda ya. Vendé productos, ofrecé servicios y generá tu QR personalizado.
           </Text>
           <TouchableOpacity
             style={[styles.activateButton, { backgroundColor: colors.brand.secondary }]}
@@ -42,11 +42,11 @@ export const StoreActivation = ({ hasStore }: Props) => {
         // Estado: tienda activa
         <View style={styles.activeContainer}>
           <TouchableOpacity
-            style={[styles.storeButton, { borderColor: colors.brand.primary }]}
+            style={[styles.storeButton, { borderColor: colors.brand.secondary }]}
             onPress={() => router.push('/(app)/store')}
             activeOpacity={0.8}
           >
-            <Text style={[styles.storeButtonText, { color: colors.brand.primary }]}>
+            <Text style={[styles.storeButtonText, { color: colors.brand.secondary }]}>
               Ver mi tienda
             </Text>
           </TouchableOpacity>

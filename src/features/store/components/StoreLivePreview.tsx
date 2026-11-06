@@ -6,6 +6,7 @@ import {
 import { StoreSectionRenderer } from './StoreSectionRenderer';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
+import { THEME_OPTIONS } from '@stores/themeStore';
 import type { Store } from '@/types/store';
 import { Product } from '@/types/product';
 
@@ -21,7 +22,7 @@ const CONTENT_PADDING = Spacing.md;
 export const StoreLivePreview = ({ store, products = [] }: Props) => {
   const { isWeb } = useResponsiveLayout();
   const { width: windowWidth } = useWindowDimensions();
-
+  const storeTheme = THEME_OPTIONS.find(t => t.id === store.themeId) || THEME_OPTIONS[0];
   const REFERENCE_WIDTH = isWeb ? Math.min(windowWidth, 1200) - 64 : 360;
   
   const [contentHeight, setContentHeight] = useState(0);
@@ -50,7 +51,7 @@ export const StoreLivePreview = ({ store, products = [] }: Props) => {
   const scaledContentHeight = contentHeight * scale;
 
   return (
-    <View style={styles.frame}>
+    <View style={[styles.frame, { backgroundColor: storeTheme.background }]}>
       <View style={styles.frameHeader}>
         <View style={styles.dot} />
         <Text style={styles.frameLabel}>VISTA PREVIA</Text>

@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import type { QRColorOption } from '@/types/qrGenerator';
+import { ScrollWithArrows } from '@components/ui/ScrollWithArrows';
 
 type Props = {
   options: QRColorOption[];
@@ -16,11 +17,7 @@ export const QRColorPicker = ({ options, selectedColor, onSelect, label = 'COLOR
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
-      >
+      <ScrollWithArrows contentContainerStyle={styles.scroll}>
         {options.map((option) => {
           const isSelected = option.color === selectedColor;
           return (
@@ -50,7 +47,7 @@ export const QRColorPicker = ({ options, selectedColor, onSelect, label = 'COLOR
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </ScrollWithArrows>
     </View>
   );
 };

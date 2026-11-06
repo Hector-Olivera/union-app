@@ -63,7 +63,7 @@ export const TodoList = ({ todos = [], onAdd, onToggle, onDelete }: Props) => {
               onPress={() => onToggle(todo.id)}
               style={[
                 styles.checkbox,
-                todo.done && { backgroundColor: colors.brand.primary, borderColor: colors.brand.primary }
+                todo.done && { backgroundColor: colors.brand.primary, borderColor: colors.brand.secondary }
               ]}
             >
               {todo.done && <Text style={styles.checkmark}>✓</Text>}

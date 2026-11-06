@@ -1,4 +1,4 @@
-// El contenido de un QR en la plataforma Union App sigue un formato propio.
+// El contenido de un QR en la plataforma Emprenda ya sigue un formato propio.
 // Esto nos permite distinguir QRs del ecosistema de QRs externos (URLs, texto).
 
 export type QRContentType =

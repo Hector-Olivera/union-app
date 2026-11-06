@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@stores/authStore';
+import { useBlockStore } from '@stores/blockStore';
 import { getUserStore } from '@services/firebase/store';
 import { toggleFavorite, recordVisit, searchPublicStores } from '@services/firebase/community';
 import type { StoreSummary } from '@/types/community';
@@ -14,6 +15,7 @@ export const useCommunity = () => {
   const { user, setUser } = useAuthStore();
   const [favoriteStores, setFavoriteStores] = useState<StoreSummary[]>([]);
   const [recentStores, setRecentStores] = useState<StoreSummary[]>([]);
+  const blockedIds = useBlockStore(s => s.blockedIds);
   const [loading, setLoading] = useState(true);
 
   const toSummaryWithNews = (store: Store): StoreSummary => {
@@ -26,6 +28,7 @@ export const useCommunity = () => {
       id: store.id,
       name: store.name,
       logoUrl: store.logoUrl,
+      bannerUrl: store.bannerUrl,
       themeId: store.themeId,
       hasAnnouncement: !!latestAnnouncement,
       isAnnouncementUnseen: isUnseen,
@@ -100,9 +103,6 @@ export const useCommunity = () => {
     setUser({ ...user, recentVisits: updated });
   };
 
-  const search = async (queryText: string) => {
-    return searchPublicStores(queryText);
-  };
 
   const removeVisit = async (storeId: string) => {
     if (!user) return;
@@ -111,11 +111,6 @@ export const useCommunity = () => {
     setUser({ ...user, recentVisits: updated });
     setRecentStores(prev => prev.filter(s => s.id !== storeId));
   };
-
-  const storesWithNews = [...favoriteStores, ...recentStores]
-  .filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i)
-  .filter(s => s.hasAnnouncement);
-
 
   const [newStores, setNewStores] = useState<Store[]>([]);
   const [unvisitedNewsStores, setUnvisitedNewsStores] = useState<Store[]>([]);
@@ -131,9 +126,25 @@ export const useCommunity = () => {
     getUnvisitedStoresWithNews(excludeIds).then(setUnvisitedNewsStores);
   }, [user?.recentVisits, user?.favorites]);
 
+  // El ID de la tienda es el UID del dueño, así que comparar el ID alcanza
+  const notBlocked = <T extends { id: string }>(items: T[]) =>
+    items.filter(item => !blockedIds.includes(item.id));
+
+  const visibleFavorites = notBlocked(favoriteStores);
+  const visibleRecents = notBlocked(recentStores);
+
+  const storesWithNews = [...visibleFavorites, ...visibleRecents]
+    .filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i)
+    .filter(s => s.hasAnnouncement);
+
+  const search = async (queryText: string) => notBlocked(await searchPublicStores(queryText));
+
   return {
-    favoriteStores, recentStores, loading,
+    favoriteStores: visibleFavorites,
+    recentStores: visibleRecents,
+    loading,
     isFavorite, toggleFav, visitStore, search, removeVisit, storesWithNews,
-    newStores, unvisitedNewsStores
+    newStores: notBlocked(newStores),
+    unvisitedNewsStores: notBlocked(unvisitedNewsStores),
   };
 };

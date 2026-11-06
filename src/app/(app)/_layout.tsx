@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 import { useThemeStore } from '@stores/themeStore';
 import { Ionicons } from '@expo/vector-icons';
+import { ProfileTabIcon } from '@features/profile/components/ProfileTabIcon';
 
 export default function AppLayout() {
   const insets = useSafeAreaInsets();
@@ -30,15 +31,15 @@ export default function AppLayout() {
             headerShown: false,
             tabBarStyle: {
               backgroundColor: Colors.dark.surface,
-              borderTopColor: `${activeTheme.primary}4D`,
+              borderTopColor: `${activeTheme.secondary}4D`,
               borderTopWidth: 1,
-              height: 60 + insets.bottom,
+              height: 45 + insets.bottom,
               paddingBottom: insets.bottom,
               paddingTop: Spacing.sm,
               padding: 0,
               elevation: 0,
             },
-            tabBarActiveTintColor: activeTheme.primary,
+            tabBarActiveTintColor: activeTheme.secondary,
             tabBarInactiveTintColor: Colors.dark.icon,
             tabBarShowLabel: false,              
           }}
@@ -83,7 +84,7 @@ export default function AppLayout() {
             name="profile"
             options={{
               title: 'Perfil',
-              tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="person-circle-outline" />,
+              tabBarIcon: ({ focused }) => <ProfileTabIcon focused={focused} />,
             }}
           />
           <Tabs.Screen
@@ -100,6 +101,7 @@ export default function AppLayout() {
           <Tabs.Screen name="change-password" options={{ href: null }} />
           <Tabs.Screen name="chat/[conversationId]" options={{ href: null }} />
           <Tabs.Screen name="delete-account" options={{ href: null }} />
+          <Tabs.Screen name="blocked-users" options={{ href: null }} />
         </Tabs>
     </View>
   );
@@ -111,9 +113,7 @@ const TabIcon = ({ focused, name, color = 'primary' }: {
   color?: 'primary' | 'secondary';
 }) => {
   const { activeTheme } = useThemeStore();
-  const activeColor = color === 'secondary'
-    ? activeTheme.secondary
-    : activeTheme.primary;
+  const activeColor = activeTheme.secondary;
 
   return (
     <Ionicons

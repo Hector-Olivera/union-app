@@ -49,12 +49,12 @@ export const BusinessHoursEditor = ({ hours, onUpdate }: Props) => {
               onPress={() => toggleDay(day)}
               style={[
                 styles.statusToggle,
-                { backgroundColor: dayData.closed ? 'rgba(255,255,255,0.08)' : `${colors.brand.primary}20` }
+                { backgroundColor: dayData.closed ? 'rgba(255,255,255,0.08)' : `${colors.brand.accent}20` }
               ]}
             >
               <Text style={[
                 styles.statusText,
-                { color: dayData.closed ? Colors.dark.icon : colors.brand.primary }
+                { color: dayData.closed ? Colors.dark.icon : colors.brand.accent }
               ]}>
                 {dayData.closed ? 'Cerrado' : 'Abierto'}
               </Text>

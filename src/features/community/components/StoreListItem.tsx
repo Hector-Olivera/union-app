@@ -22,7 +22,7 @@ export const StoreListItem = ({ store, onPress, onRemove }: Props) => {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Mirá la tienda "${store.name}" en Union App: unionapp://store/${store.id}`,
+        message: `Mirá la tienda "${store.name}" en Emprenda ya: emprendaya://store/${store.id}`,
         title: store.name,
       });
     } catch (error) {

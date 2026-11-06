@@ -6,9 +6,10 @@ import { useStoreStore } from '@stores/storeStore';
 import { useCommunity } from '@features/community/hooks/useCommunity';
 import { useConversations } from '@features/messaging/hooks/useConversations';
 import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
-import { AvatarPicker } from '@features/profile/components/AvatarPicker';
+import { BrandLogo } from '@components/ui/BrandLogo';
 import { AvatarStack } from '@components/ui/AvatarStack';
 import { SplitScreenLayout } from '@components/ui/SplitScreenLayout';
+import { AppNewsSection } from '@features/appnews/components/AppNewsSection';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
 
 export default function HomeScreen() {
@@ -16,7 +17,7 @@ export default function HomeScreen() {
   const { activeTheme } = useThemeStore();
   const { store } = useStoreStore();
   const { storesWithNews } = useCommunity();
-  const { conversations } = useConversations();
+  const { visibleConversations: conversations } = useConversations();
   const { useSplitLayout } = useResponsiveLayout();
 
   if (!user) return null;
@@ -47,25 +48,25 @@ export default function HomeScreen() {
   const leftContent = (
     <>
       <View style={styles.header}>
-        <View style={styles.headerText}>
-          <Text style={styles.greeting}>{getGreeting()},</Text>
-          <Text style={[styles.userName, { color: activeTheme.primary }]}>{firstName}</Text>
+        <BrandLogo size={40} textSize={22} />
+        <View style={styles.greetingBlock}>
+          <Text style={styles.greeting}>{getGreeting()},   </Text>
+          <Text style={[styles.userName, { color: activeTheme.secondary }]} numberOfLines={1}>
+            {firstName}
+          </Text>
         </View>
-        <TouchableOpacity onPress={() => router.push('/(app)/profile')}>
-          <AvatarPicker displayName={user.displayName} avatarUrl={user.avatarUrl} size={56} />
-        </TouchableOpacity>
       </View>
 
       <TouchableOpacity
-        style={[styles.card, { borderColor: `${activeTheme.primary}30` }]}
+        style={[styles.card, { borderColor: `${activeTheme.secondary}30` }]}
         onPress={() => router.push('/(app)/store')}
         activeOpacity={0.8}
       >
         <Text style={styles.cardTitle}>{store ? store.name : 'Activá tu tienda'}</Text>
         <Text style={styles.cardSubtitle}>
-          {store ? 'Gestioná tu tienda, tu QR y tus productos.' : 'Vendé productos y servicios en Union App.'}
+          {store ? 'Gestioná tu tienda, tu QR y tus productos.' : 'Vendé productos y servicios en Emprenda ya.'}
         </Text>
-        <Text style={[styles.cardAction, { color: activeTheme.primary }]}>
+        <Text style={[styles.cardAction, { color: activeTheme.secondary }]}>
           {store ? 'Ir a mi tienda →' : 'Activar →'}
         </Text>
       </TouchableOpacity>
@@ -110,14 +111,14 @@ export default function HomeScreen() {
 
       {store && pendingTodos.length > 0 && (
         <TouchableOpacity
-          style={[styles.card, { borderColor: `${activeTheme.primary}30` }]}
+          style={[styles.card, { borderColor: `${activeTheme.secondary}30` }]}
           onPress={() => router.push('/(app)/store')}
           activeOpacity={0.8}
         >
           <View style={styles.pendingHeader}>
             <Text style={styles.cardTitle}>Pendientes</Text>
-            <View style={[styles.countBadge, { backgroundColor: `${activeTheme.primary}20` }]}>
-              <Text style={[styles.countText, { color: activeTheme.primary }]}>{pendingTodos.length}</Text>
+            <View style={[styles.countBadge, { backgroundColor: `${activeTheme.secondary}20` }]}>
+              <Text style={[styles.countText, { color: activeTheme.secondary }]}>{pendingTodos.length}</Text>
             </View>
           </View>
           {pendingTodos.slice(0, 3).map(todo => (
@@ -128,23 +129,7 @@ export default function HomeScreen() {
     </>
   );
 
-  const rightContent = (
-    <View>
-      <Text style={[styles.newsTitle, { color: activeTheme.primary }]}>Bienvenido a Union</Text>
-      <Text style={styles.newsParagraph}>
-        Gracias por formar parte de la comunidad de Union!
-      </Text>
-      <Text style={styles.newsParagraph}>
-        Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.
-      </Text>
-      <Text style={styles.newsParagraph}>
-        Publicitá tus productos ofreciendo regalos y descuentos.
-      </Text>
-      <Text style={styles.newsParagraph}>
-        Siendo parte de Union es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.
-      </Text>
-    </View>
-  );
+  const rightContent = <AppNewsSection />;
 
   if (useSplitLayout) {
     return (
@@ -158,7 +143,6 @@ export default function HomeScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       {leftContent}
         <View style={styles.divider} />
-        <Text style={styles.mobileSectionTitle}>Novedades de la app</Text>
       {rightContent}
     </ScrollView>
   );
@@ -167,8 +151,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   content: { paddingHorizontal: Spacing.sm, paddingBottom: Spacing.xxl },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: Spacing.xl },
-  headerText: { flex: 1, marginRight: Spacing.md },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: Spacing.xl, paddingHorizontal: Spacing.sm },
+  greetingBlock: { alignItems: 'flex-end', flexShrink: 1, marginLeft: Spacing.md },
   greeting: { color: Colors.dark.icon, fontSize: Typography.sizes.md },
   userName: { fontSize: Typography.sizes.xxl, fontWeight: Typography.weights.bold },
   card: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: Radius.lg, borderWidth: 1, padding: Spacing.lg, marginBottom: Spacing.md, gap: Spacing.sm },
@@ -180,8 +164,6 @@ const styles = StyleSheet.create({
   countBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.full, minWidth: 22, alignItems: 'center' },
   countText: { fontSize: Typography.sizes.xs, fontWeight: Typography.weights.bold },
   todoText: { color: Colors.dark.icon, fontSize: Typography.sizes.sm },
-  newsTitle: { fontSize: Typography.sizes.xxl, fontWeight: Typography.weights.bold, marginBottom: Spacing.lg },
-  newsParagraph: { color: Colors.dark.text, fontSize: Typography.sizes.lg, lineHeight: 24, marginBottom: Spacing.md },
   divider: {
     height: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',

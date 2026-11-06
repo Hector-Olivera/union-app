@@ -4,6 +4,7 @@ import {
   arrayRemove,
 } from 'firebase/firestore';
 import { db } from './config';
+import { reportError } from '@services/reportError';
 import type { Conversation, Message } from '@/types/messaging';
 
 // Genera un ID determinístico combinando ambos UIDs ordenados,
@@ -91,7 +92,6 @@ export const subscribeToConversations = (
   return onSnapshot(q, (snapshot) => {
     const conversations = snapshot.docs.map(d => {
       const data = d.data({ serverTimestamps: 'estimate' });
-      //console.log('[DEBUG] conversation', d.id, 'unreadBy:', data.unreadBy, 'lastMessage:', data.lastMessage);
       return {
         id: d.id,
         participants: data.participants,
@@ -99,12 +99,14 @@ export const subscribeToConversations = (
         lastMessage: data.lastMessage,
         lastMessageSenderId: data.lastMessageSenderId,
         unreadBy: data.unreadBy || [],
+        deletedUsers: data.deletedUsers || [],
         lastMessageAt: timestampToISO(data.lastMessageAt),
       } as Conversation;
     });
     callback(conversations);
   }, (error) => {
     console.error('[messaging] subscribeToConversations:', error);
+    reportError(error, 'conversations-listener');
     callback([]);
   });
 };
@@ -127,6 +129,7 @@ export const subscribeToMessages = (
     callback(messages);
   }, (error) => {
     console.error('[messaging] subscribeToMessages:', error);
+    reportError(error, 'messages-listener');
     callback([]);
   });
 };

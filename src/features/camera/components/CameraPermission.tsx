@@ -26,7 +26,7 @@ export const CameraPermission = ({ onRequestPermission, isDenied = false }: Prop
       <Text style={styles.description}>
         {isDenied
           ? 'Para usar esta función, habilitá el permiso de cámara en Configuración del sistema.'
-          : 'Union App necesita acceso a la cámara para la experiencia AR y el escaneo de códigos QR.'
+          : 'Emprenda ya necesita acceso a la cámara para la experiencia AR y el escaneo de códigos QR.'
         }
       </Text>
 
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.brand.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(108,99,255,0.08)',
+    backgroundColor: 'rgba(56,189,248,0.08)',
     // Glow sutil — consistente con el estilo del resto de la plataforma
   },
   iconText: {

@@ -14,7 +14,7 @@ export const BannerSection = ({
    storeName, description, primaryColor, secondaryColor, bannerUrl
    }: Props) => {
     const { isWeb } = useResponsiveLayout();
-    const bannerHeight = isWeb ? 140 : 90;
+    const bannerHeight = isWeb ? 190 : 90;
 
   if (bannerUrl) {
     return (

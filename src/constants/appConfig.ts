@@ -21,11 +21,11 @@ export type AppConfig = {
   homeQuickActions: QuickAction[];
 };
 
-// Configuración de Union App base
+// Configuración de Emprenda ya base
 // Para crear una nueva app, se crea un nuevo objeto AppConfig
 // y se importa acá o se selecciona dinámicamente
 export const CURRENT_APP_CONFIG: AppConfig = {
-  appName: 'Union App',
+  appName: 'Emprenda ya',
   appTagline: 'Tu universo aumentado',
   enabledModules: ['camera', 'store', 'explore', 'qr'],
   homeQuickActions: [

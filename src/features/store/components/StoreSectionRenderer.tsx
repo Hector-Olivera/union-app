@@ -31,7 +31,7 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
           case 'banner':
             return <View key={section.id} style={styles.fullWidth}><BannerSection storeName={store.name} description={store.description} primaryColor={theme.primary} secondaryColor={theme.secondary} bannerUrl={store.bannerUrl} /></View>;
           case 'product_grid':
-            return <View key={section.id} style={styles.fullWidth}><ProductGridSection primaryColor={theme.primary} products={products} /></View>;
+            return <View key={section.id} style={styles.fullWidth}><ProductGridSection primaryColor={theme.accent} products={products} /></View>;
           case 'carousel':
             return <View key={section.id} style={styles.fullWidth}><CarouselSection primaryColor={theme.primary} images={store.carouselImages} /></View>;
           case 'about':
@@ -39,9 +39,9 @@ export const StoreSectionRenderer = ({ store, products = [] }: Props) => {
             return <View key={section.id} style={styles.inlineItem}><AboutSection description={store.description} /></View>;
           case 'contact':
             if (!store.contact || (!store.contact.phone && !store.contact.whatsapp && !store.contact.address && !store.contact.instagram)) return null;
-            return <View key={section.id} style={styles.inlineItem}><ContactSection primaryColor={theme.primary} contact={store.contact} /></View>;
+            return <View key={section.id} style={styles.inlineItem}><ContactSection primaryColor={theme.accent} contact={store.contact} /></View>;
           case 'hours':
-            return <View key={section.id} style={styles.inlineItem}><HoursSection hours={store.businessHours} primaryColor={theme.primary} /></View>;
+            return <View key={section.id} style={styles.inlineItem}><HoursSection hours={store.businessHours} primaryColor={theme.accent} /></View>;
           case 'announcements':
             if (!(store.announcements || []).length) return null;
             return <View key={section.id} style={styles.inlineItem}><AnnouncementsSection announcements={store.announcements} primaryColor={theme.primary} /></View>;

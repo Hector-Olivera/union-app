@@ -43,7 +43,7 @@ export const QR_CONFIG = {
   unknown: {
     label: 'QR NO RECONOCIDO',
     color: Colors.dark.icon,
-    description: (_id: string) => 'Este QR no pertenece al ecosistema Union App',
+    description: (_id: string) => 'Este QR no pertenece al ecosistema Emprenda ya',
     actionLabel: '',
   },
 } as const;

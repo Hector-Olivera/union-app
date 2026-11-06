@@ -6,6 +6,8 @@ import {
   subscribeToAuthChanges,
   updateUserProfile, sendVerificationEmail, reloadCurrentUser,
 } from '@services/firebase/auth';
+import { getAuthErrorMessage, isKnownAuthError } from '@utils/authErrors';
+import { reportError } from '@services/reportError';
 import { RecentVisit } from '@/types/community';
 
 export type User = {
@@ -18,6 +20,7 @@ export type User = {
   emailVerified: boolean;
   favorites?: string[];
   recentVisits?: RecentVisit[];
+  termsAcceptedVersion?: string;
 };
 
 type AuthState = {
@@ -57,10 +60,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email, password) => {
     try {
       set({ loading: true, error: null });
-      const user = await loginUser(email, password);
-      set({ user, isAuthenticated: true, loading: false });
+      await loginUser(email, password);
     } catch (error: any) {
-      set({ error: error.message, loading: false });
+      if (!isKnownAuthError(error)) reportError(error, 'auth');
+      set({ error: getAuthErrorMessage(error), loading: false });
     }
   },
 
@@ -70,7 +73,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const user = await registerUser(email, password, displayName);
       set({ user, isAuthenticated: true, loading: false });
     } catch (error: any) {
-      set({ error: error.message, loading: false });
+      if (!isKnownAuthError(error)) reportError(error, 'auth');
+      set({ error: getAuthErrorMessage(error), loading: false });
     }
   },
 

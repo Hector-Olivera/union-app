@@ -11,7 +11,9 @@ import { useGoogleSignIn } from '@features/auth/hooks/useGoogleSignIn';
 import { GoogleSignInButton } from '@features/auth/components/GoogleSignInButton';
 import { AuthDivider } from '@features/auth/components/AuthDivider';
 import { Colors, Typography, Spacing } from '@constants/theme';
+import { BrandLogo } from '@components/ui/BrandLogo';
 import { authStyles } from '@features/auth/authStyles';
+import { LegalLinks } from '@/features/legal/components/LegalLinks';
 
 export default function LoginScreen() {
   const { login, loading, error, clearError } = useAuthStore();
@@ -47,7 +49,7 @@ export default function LoginScreen() {
 
           {/* Header */}
           <View style={authStyles.header}>
-            <Text style={authStyles.tagline}>UNION APP</Text>
+            <BrandLogo uppercase size={44} textSize={20} />
             <Text style={authStyles.title}>Bienvenido</Text>
             <Text style={authStyles.subtitle}>
               Ingresá a la comunidad mas grande de emprendedores
@@ -119,6 +121,10 @@ export default function LoginScreen() {
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
               <Text style={authStyles.footerLink}>Registrate</Text>
             </TouchableOpacity>
+          </View>
+
+          <View style={{ paddingBottom: Spacing.xl, alignItems: 'center' }}>
+            <LegalLinks />
           </View>
 
         </View>

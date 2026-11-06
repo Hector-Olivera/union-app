@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity,
+  TouchableOpacity, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@hooks/useAppTheme';
@@ -9,9 +9,9 @@ import { useResponsiveLayout } from '@hooks/useResponsiveLayout';
 import { SplitScreenLayout } from '@components/ui/SplitScreenLayout';
 import { useProfile } from '@features/profile/hooks/useProfile';
 import { AvatarPicker } from '@features/profile/components/AvatarPicker';
-import { ThemePicker } from '@features/profile/components/ThemePicker';
 import { StoreActivation } from '@features/profile/components/StoreActivation';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import { AppNewsSection } from '@features/appnews/components/AppNewsSection';
 import { useAuthStore } from '@stores/authStore';
 import { Typography, Spacing, Radius, Colors } from '@constants/theme';
 import { EmailVerificationBanner } from '@features/profile/components/EmailVerificationBanner';
@@ -26,10 +26,8 @@ export default function ProfileScreen() {
   const { colors } = useAppTheme();
   const { signOut } = useAuthStore();
   const {
-    user, saving, error,
-    selectedThemeId,
+    user, error,
     updateDisplayName,
-    changeTheme,
   } = useProfile();
 
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
@@ -69,7 +67,7 @@ export default function ProfileScreen() {
               <Text style={styles.email}>{user.email}</Text>
             </View>
           </View>
-
+          
           <EmailVerificationBanner />
 
           {/* Error global */}
@@ -78,15 +76,6 @@ export default function ProfileScreen() {
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
-
-          {/* Separador con label */}
-          <SectionLabel label="PERSONALIZACIÓN" color={colors.brand.primary} />
-
-          {/* Selector de tema */}
-          <ThemePicker
-            selectedThemeId={selectedThemeId}
-            onSelect={changeTheme}
-          />
 
           <SectionLabel label="MI TIENDA" color={colors.brand.secondary}/>
 
@@ -121,13 +110,34 @@ export default function ProfileScreen() {
 
           <View style={styles.divider} />
 
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/terms' as any)}>
+            <Text style={styles.accountRowText}>Términos y Condiciones </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/privacy' as any)}>
+            <Text style={styles.accountRowText}>Política de Privacidad  </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/blocked-users' as any)}>
+            <Text style={styles.accountRowText}>Usuarios bloqueados </Text>
+            <Text style={styles.accountRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
           <TouchableOpacity style={styles.accountRow} onPress={() => router.push('/(app)/delete-account')}>
             <Text style={[styles.accountRowText, { color: Colors.status.error }]}>Eliminar cuenta </Text>
             <Text style={styles.accountRowArrow}>›</Text>
           </TouchableOpacity>
 
           {/* Versión de la app */}
-          <Text style={styles.version}>Union App v1.0.0</Text>
+          <Text style={styles.version}>Emprenda ya v1.0.0</Text>
 
           <ConfirmDialog
             visible={showSignOutDialog}
@@ -146,15 +156,7 @@ export default function ProfileScreen() {
         </ScrollView>
   )
 
-  const rightContent = (
-    <View>
-      <Text style={[styles.newsTitle, { color: colors.brand.primary }]}>Bienvenido a Union</Text>
-      <Text style={styles.newsParagraph}>Gracias por formar parte de la comunidad de Union!</Text>
-      <Text style={styles.newsParagraph}>Podés crear una tienda virtual 100% gratuita y personalizarla como más te guste.</Text>
-      <Text style={styles.newsParagraph}>Publicitá tus productos ofreciendo regalos y descuentos.</Text>
-      <Text style={styles.newsParagraph}>Siendo parte de Union es mucho más fácil comprar, vender e intercambiar servicios y productos con la comunidad.</Text>
-    </View>
-  );
+  const rightContent = <AppNewsSection />;
 
   if (useSplitLayout) {
     return (
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.lg,
-    marginBottom: Spacing.lg,
+    margin: Spacing.lg,
   },
   userInfo: {
     flex: 1,
@@ -314,19 +316,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     textAlign: 'center',
     opacity: 0.5,
-  },
-  newsTitle: { 
-    fontSize: Typography.sizes.xxl, 
-    fontWeight: Typography.weights.bold, 
-    marginBottom: Spacing.lg,
-    marginHorizontal: Spacing.sm,
-  },
-  newsParagraph: { 
-    color: Colors.dark.text, 
-    fontSize: Typography.sizes.lg, 
-    lineHeight: 24, 
-    marginBottom: Spacing.md,
-    marginHorizontal: Spacing.sm
   },
   mobileSectionTitle: {
     color: Colors.dark.text,

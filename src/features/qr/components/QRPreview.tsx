@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
 import { Colors, Typography, Spacing, Radius } from '@constants/theme';
@@ -23,7 +23,7 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
         <View style={styles.card}>
 
           <Text style={[styles.appName, { color: config.color }]}>
-            UNION APP
+            EMPRENDA YA
           </Text>
 
           {/* Contenedor del QR con logo superpuesto manualmente */}
@@ -43,7 +43,7 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
               gradientDirection={['0%', '0%', '100%', '100%']}                        
             />
 
-            {/* Logo Union App superpuesto en el centro */}
+            {/* Logo Emprenda ya superpuesto en el centro */}
             <View style={[
               styles.logoOverlay,
               {
@@ -62,9 +62,11 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
                   borderRadius: config.logoSize / 4,
                 }
               ]}>
-                <Text style={[styles.logoText, { fontSize: config.logoSize * 0.5 }]}>
-                  U
-                </Text>
+                 <Image
+                    source={require('../../../../assets/images/icon3Bsf.png')}
+                    style={{ width: 40, height: 40, borderRadius: '50%' }}
+                    resizeMode="cover"
+                  />
               </View>
             </View>
           </View>
@@ -72,10 +74,7 @@ export const QRPreview = forwardRef<ViewShot, Props>(({ config }, ref) => {
           <Text style={[styles.storeName, { color: config.color }]}>
             {displayName}
           </Text>
-
-          <Text style={styles.url}>
-              union-app.com </Text>
-
+          
         </View>
       </ViewShot>
     </View>
@@ -115,11 +114,7 @@ const styles = StyleSheet.create({
   logo: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  logoText: {
-    color: '#FFFFFF',
-    fontWeight: '900',
-  },
+  }, 
   storeName: {
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,

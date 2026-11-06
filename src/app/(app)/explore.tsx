@@ -26,7 +26,7 @@ export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const { useSplitLayout } = useResponsiveLayout();
-  const { tab } = useLocalSearchParams<{ tab?: string }>();
+  const { tab, conversation, t } = useLocalSearchParams<{ tab?: string; conversation?: string; t?: string }>();
   const [activeTab, setActiveTab] = useState<CommunityTab>('community');
   const scrollRef = useRef<ScrollView>(null);
 
@@ -35,11 +35,15 @@ export default function ExploreScreen() {
     search, visitStore, toggleFav, removeVisit,
     newStores, unvisitedNewsStores,
   } = useCommunity();
-  const { conversations } = useConversations();
+  const { visibleConversations: conversations } = useConversations();
   const { user } = useAuthStore();
 
   // Conversación seleccionada en el panel de chat (solo relevante en split web)
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (conversation) setSelectedConversationId(conversation);
+  }, [conversation, t]);
 
   useEffect(() => {
     if (tab) {
@@ -49,7 +53,7 @@ export default function ExploreScreen() {
         scrollRef.current?.scrollTo({ x: index * SCREEN_WIDTH, animated: false });
       }
     }
-  }, [tab]);
+  }, [tab, t]);
 
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
@@ -86,7 +90,7 @@ export default function ExploreScreen() {
 
   const communityRight = (
     <View>
-      <Text style={[styles.rightTitle, { color: colors.brand.primary }]}>Nuevas tiendas de la comunidad</Text>
+      <Text style={[styles.rightTitle, { color: colors.brand.secondary }]}>Nuevas tiendas de la comunidad</Text>
       {newStores.length === 0 ? (
         <Text style={styles.emptyText}>No hay tiendas nuevas en los últimos 30 días.</Text>
       ) : (
@@ -108,7 +112,7 @@ export default function ExploreScreen() {
     </View>
   );
 
-  const notificationsLeft = <NotificationsSection storesWithNews={storesWithNews} onVisitStore={visitStore} />;
+  const notificationsLeft = <NotificationsSection storesWithNews={storesWithNews} />;
 
   const notificationsRight = (
     <View>
@@ -159,7 +163,7 @@ export default function ExploreScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <View style={[styles.bgAccent, { backgroundColor: colors.brand.primary }]} pointerEvents="none" />
-        <Text style={[styles.appTitle, { color: colors.brand.primary }]}>UNION APP</Text>
+        <Text style={[styles.appTitle, { color: colors.brand.secondary }]}>EMPRENDA YA</Text>
       </View>
 
       <CommunityTabCarousel activeTab={activeTab} onSelectTab={handleSelectTab} />
@@ -208,7 +212,11 @@ export default function ExploreScreen() {
               <View style={styles.messagesDivider} />
               <View style={styles.messagesRightColumn}>
                 {selectedConversationId ? (
-                  <ChatPanel conversationId={selectedConversationId} />
+                  <ChatPanel 
+                    conversationId={selectedConversationId} 
+                    active={activeTab === 'messages'} 
+                    onBlocked={() => setSelectedConversationId(null)}
+                  />
                 ) : (
                   <Text style={styles.emptyText}>Seleccioná una conversación para ver los mensajes.</Text>
                 )}
@@ -228,7 +236,7 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.background },
   header: { alignItems: 'center', justifyContent: 'center', paddingVertical: Spacing.lg, overflow: 'hidden' },
-  bgAccent: { position: 'absolute', top: -60, width: 180, height: 120, borderBottomLeftRadius: 90, borderBottomRightRadius: 90, opacity: 0.1 },
+  bgAccent: { position: 'absolute', top: -60, width: 210, height: 120, borderBottomLeftRadius: 90, borderBottomRightRadius: 90, opacity: 0.1 },
   appTitle: { fontSize: Typography.sizes.md, fontWeight: Typography.weights.bold, letterSpacing: 3 },
   pager: { flex: 1 },
   pageContent: { paddingHorizontal: Spacing.sm, paddingBottom: Spacing.xxl },

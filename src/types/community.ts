@@ -12,6 +12,7 @@ export type StoreSummary = {
   id: string;
   name: string;
   logoUrl?: string;
+  bannerUrl?: string;
   themeId: string;
   hasAnnouncement?: boolean;
   isAnnouncementUnseen?: boolean;

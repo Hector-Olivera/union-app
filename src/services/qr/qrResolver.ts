@@ -1,15 +1,15 @@
 import type { QRPayload, QRContentType } from '@/types/qr';
 
-// Prefijo que identifica QRs del ecosistema Union App.
-// Un QR propio tiene este formato: unionapp://type/id
-// Ejemplo: unionapp://object_3d/sword_legendary_001
-const UNION_APP_SCHEME = 'unionapp://';
+// Prefijo que identifica QRs del ecosistema Emprenda ya.
+// Un QR propio tiene este formato: emprendaya://type/id
+// Ejemplo: emprendaya://object_3d/sword_legendary_001
+const UNION_APP_SCHEME = 'emprendaya://';
 
 // Interpreta el contenido crudo de un QR y devuelve un payload tipado.
 // Es el punto de entrada único para procesar cualquier QR escaneado.
 export const resolveQRContent = (rawContent: string): QRPayload => {
 
-  // QR del ecosistema Union App
+  // QR del ecosistema Emprenda ya
   if (rawContent.startsWith(UNION_APP_SCHEME)) {
     return parseUnionAppQR(rawContent);
   }
@@ -33,7 +33,7 @@ export const resolveQRContent = (rawContent: string): QRPayload => {
 
 const parseUnionAppQR = (content: string): QRPayload => {
   // Eliminamos el scheme y separamos type/id
-  // Input:  "unionapp://object_3d/sword_legendary_001"
+  // Input:  "emprendaya://object_3d/sword_legendary_001"
   // Result: type = "object_3d", id = "sword_legendary_001"
   const path = content.replace(UNION_APP_SCHEME, '');
   const [type, id, ...rest] = path.split('/');
