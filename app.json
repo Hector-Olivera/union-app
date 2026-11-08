@@ -12,6 +12,7 @@
       "bundleIdentifier": "com.emprendaya.app"
     },
     "web": {
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "android": {
